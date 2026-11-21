@@ -18,8 +18,8 @@ import (
 
 var installOnce sync.Once
 
-// hookEvents adalah event hook Claude yang dipasang (tepat 4).
-var hookEvents = []string{HookUserPromptSubmit, HookNotification, HookStop, HookSessionStart}
+// hookEvents adalah event hook Claude yang dipasang (tepat 5).
+var hookEvents = []string{HookUserPromptSubmit, HookNotification, HookStop, HookSessionStart, HookPostToolUse}
 
 // newToken membuat launch token acak (16 hex).
 func newToken() (string, error) {
@@ -65,7 +65,7 @@ func hooksFilePath(dataDir, token string) string {
 // flag `--settings <file-or-json>` ("Settings file or JSON string to load more
 // settings from"), jadi path berkas JSON diterima. Skema `{"hooks": {"<Event>":
 // [{"hooks":[{"type":"command","command":"..."}]}]}}` dengan `matcher` opsional,
-// event UserPromptSubmit/Notification/Stop/SessionStart, payload JSON via stdin,
+// event UserPromptSubmit/Notification/Stop/SessionStart/PostToolUse, payload JSON via stdin,
 // penggabungan dengan settings user/project, dan exit 0 tidak mengganggu agent
 // diasumsikan dari dokumentasi Claude Code yang diketahui; TIDAK diverifikasi
 // ulang lewat jaringan di sini. Akhiran `|| true` menjamin exit 0.

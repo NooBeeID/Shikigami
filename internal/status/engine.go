@@ -51,6 +51,8 @@ type Engine struct {
 	waiters  map[string]map[int]func() // OnIdle: id -> waiter
 	nextWait int
 
+	activitySink func(sessionID, event string, payload map[string]any)
+
 	streamMu sync.Mutex // melindungi ensureStream
 	stream   *ipc.Client
 	unsubs   []func()
@@ -265,10 +267,30 @@ func callSub(fn func(StatusEvent), ev StatusEvent) {
 	fn(ev)
 }
 
+// SetActivitySink memasang sink aktivitas yang dipanggil untuk setiap hook event.
+func (e *Engine) SetActivitySink(fn func(sessionID, event string, payload map[string]any)) {
+	e.mu.Lock()
+	e.activitySink = fn
+	e.mu.Unlock()
+}
+
 func (e *Engine) Apply(idOrToken, event string, payload map[string]any) error {
 	id, ok := e.ResolveSessionID(idOrToken)
 	if !ok {
 		return ErrUnknownSession
+	}
+	e.mu.Lock()
+	sink := e.activitySink
+	e.mu.Unlock()
+	if sink != nil {
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					slog.Warn("activity sink panic", "recover", r)
+				}
+			}()
+			sink(id, event, payload)
+		}()
 	}
 	st, known := ClassifyEvent(event)
 	if !known {

@@ -26,6 +26,7 @@ const (
 	HookNotification     = "Notification"
 	HookStop             = "Stop"
 	HookSubagentStop     = "SubagentStop"
+	HookPostToolUse      = "PostToolUse"
 )
 
 // Jeda output-diam (konstanta; dapat diubah di sini).
