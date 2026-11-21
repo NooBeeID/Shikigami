@@ -2,7 +2,7 @@
 id: shikigami-v2-ui-ticket-01-app-install
 title: Instalasi Shikigami.app ke Applications
 spec: docs/superpowers/specs/2026-11-22-shikigami-v2-ui-design.md
-status: ready
+status: implemented
 wave: 1
 depends_on: []
 ---

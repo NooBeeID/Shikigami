@@ -4,6 +4,7 @@ import (
 	"os"
 	"sort"
 	"sync"
+	"sync/atomic"
 
 	"github.com/NooBeeID/shikigami/internal/session"
 )
@@ -40,6 +41,17 @@ func withFlag(args []string, flag string) []string {
 		}
 	}
 	return append([]string{flag}, args...)
+}
+
+var pathSource atomic.Pointer[func() string]
+
+// SetPathSource memasang sumber PATH untuk env sesi. Nil berarti memakai os.Environ apa adanya.
+func SetPathSource(fn func() string) {
+	if fn == nil {
+		pathSource.Store(nil)
+		return
+	}
+	pathSource.Store(&fn)
 }
 
 var (
@@ -100,6 +112,11 @@ func (Launcher) Command(s session.SessionSpec) (string, []string, []string) {
 
 	env := make([]string, 0, 64+len(s.Env)+len(ctx.Env)+len(extra))
 	env = append(env, os.Environ()...)
+	if src := pathSource.Load(); src != nil {
+		if p := (*src)(); p != "" {
+			env = append(env, "PATH="+p)
+		}
+	}
 	env = append(env, "TERM=xterm-256color", "COLORTERM=truecolor")
 	env = append(env, s.Env...)
 	env = append(env, envList(ctx.Env)...)

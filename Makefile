@@ -2,7 +2,7 @@ SHELL := /bin/bash
 VERSION ?= dev
 LDFLAGS := -X main.version=$(VERSION)
 
-.PHONY: build build-ui build-daemon build-app run-daemon clean check
+.PHONY: build build-ui build-daemon build-app run-daemon clean check app install uninstall link-cli
 
 build:
 	$(MAKE) build-ui
@@ -33,3 +33,15 @@ clean:
 
 check:
 	go build ./...
+
+app: build
+	VERSION=$(VERSION) ./scripts/make-app.sh
+
+install: app
+	./scripts/install.sh install
+
+uninstall:
+	./scripts/install.sh uninstall
+
+link-cli:
+	./scripts/install.sh link-cli
