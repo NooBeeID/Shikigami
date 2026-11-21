@@ -6,8 +6,9 @@ import (
 )
 
 func init() {
-	RegisterModule("session", func(srv *ipc.Server, _ *Deps) {
+	RegisterModule("session", func(srv *ipc.Server, d *Deps) {
 		m := session.NewManager(srv.Publish)
+		d.Provide("session.manager", m)
 		session.RegisterIPC(srv, m)
 	})
 }

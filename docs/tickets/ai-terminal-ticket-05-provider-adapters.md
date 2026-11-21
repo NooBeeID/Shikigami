@@ -2,7 +2,7 @@
 id: ai-terminal-ticket-05-provider-adapters
 title: Provider Adapters
 spec: docs/superpowers/specs/2026-11-21-ai-terminal-design.md
-status: ready
+status: implemented
 wave: 3
 depends_on: [ai-terminal-ticket-02-session-pty]
 ---

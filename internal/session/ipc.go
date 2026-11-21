@@ -77,6 +77,11 @@ func RegisterIPC(srv *ipc.Server, m *Manager) {
 		if err := decodeParams(params, &p); err != nil {
 			return nil, err
 		}
+		if CreateGuard != nil {
+			if err := CreateGuard(p.ProviderID); err != nil {
+				return nil, err
+			}
+		}
 		s, err := m.Create(SessionSpec{
 			WorkspaceID: p.WorkspaceID,
 			ProjectID:   p.ProjectID,
@@ -165,3 +170,7 @@ func RegisterIPC(srv *ipc.Server, m *Manager) {
 		}, nil
 	})
 }
+
+// CreateGuard, bila non-nil, dipanggil oleh session.create sebelum Manager.Create.
+// Error dikembalikan apa adanya ke klien (boleh *ipc.Error). Dipasang saat wiring, sebelum Serve.
+var CreateGuard func(providerID string) error
