@@ -1,16 +1,27 @@
 <script lang="ts">
   import WorkspaceHeader from './WorkspaceHeader.svelte';
+  import type { Session } from '../../lib/stores';
   import SessionGroups from './SessionGroups.svelte';
   import NewSessionMenu from './NewSessionMenu.svelte';
+  import { sessionListWrapper } from './registry';
 
   let err = $state('');
   const onerror = (m: string) => (err = m);
 </script>
 
+{#snippet listSnippet(filter: (s: Session) => boolean)}
+  <SessionGroups {onerror} {filter} />
+{/snippet}
+
 <aside class="side">
   <div class="label">AGENT</div>
   <WorkspaceHeader {onerror} />
-  <SessionGroups {onerror} />
+  {#if $sessionListWrapper}
+    {@const W = $sessionListWrapper}
+    <W.component {onerror} list={listSnippet} />
+  {:else}
+    <SessionGroups {onerror} />
+  {/if}
   {#if err}
     <div class="err" role="alert">
       <span class="msg">{err}</span>

@@ -4,6 +4,7 @@
   import './shell.css';
   import { leftSidebar, rightSidebar } from '../../lib/stores/shell';
   import Resizer from './Resizer.svelte';
+  import LayoutHeaderHost from './LayoutHeaderHost.svelte';
   import { installShellShortcuts } from './shortcuts';
 
   let { topbar, left, center, right }: { topbar: Snippet; left: Snippet; center: Snippet; right: Snippet } = $props();
@@ -21,7 +22,10 @@
       {@render left()}
       <Resizer side="left" />
     </aside>
-    <main class="center">{@render center()}</main>
+    <main class="center">
+      <LayoutHeaderHost />
+      <div class="center-body">{@render center()}</div>
+    </main>
     <aside class="side right">
       {@render right()}
       <Resizer side="right" />
@@ -41,5 +45,6 @@
   .side { position: relative; overflow: hidden; min-width: 0; min-height: 0; background: var(--bg-elev); }
   .side.left { border-right: 1px solid var(--border); }
   .side.right { border-left: 1px solid var(--border); }
-  .center { min-width: 0; min-height: 0; overflow: hidden; }
+  .center { min-width: 0; min-height: 0; overflow: hidden; display: grid; grid-template-rows: auto minmax(0, 1fr); }
+  .center-body { min-width: 0; min-height: 0; overflow: hidden; }
 </style>

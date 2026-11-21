@@ -250,4 +250,6 @@ func Register(srv *ipc.Server, s *Store) {
 		}
 		return configResult(s, p.WorkspaceID)
 	})
+
+	registerGroupMethods(srv, s)
 }

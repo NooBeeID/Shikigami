@@ -4,8 +4,11 @@ import { derived, writable, type Readable } from 'svelte/store';
 export interface RightTabSpec { id: string; title: string; component: Component<any>; order?: number }
 export interface TopbarItemSpec { id: string; component: Component<any>; align: 'left' | 'center' | 'right'; order?: number }
 
+export interface LayoutHeaderSpec { id: string; component: Component<any>; order?: number }
+
 const rightTabStore = writable<Record<string, RightTabSpec>>({});
 const topbarStore = writable<Record<string, TopbarItemSpec>>({});
+const layoutHeaderStore = writable<Record<string, LayoutHeaderSpec>>({});
 
 const byOrder = (a: { id: string; order?: number }, b: { id: string; order?: number }) =>
   (a.order ?? 0) - (b.order ?? 0) || a.id.localeCompare(b.id);
@@ -28,4 +31,12 @@ export function topbarItems(align: 'left' | 'center' | 'right'): Readable<Topbar
       .filter((i) => i.align === align)
       .sort(byOrder),
   );
+}
+
+export function registerLayoutHeader(spec: LayoutHeaderSpec): void {
+  layoutHeaderStore.update((m) => ({ ...m, [spec.id]: spec }));
+}
+
+export function layoutHeaders(): Readable<LayoutHeaderSpec[]> {
+  return derived(layoutHeaderStore, (m) => Object.values(m).sort(byOrder));
 }

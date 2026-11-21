@@ -5,6 +5,9 @@
   import { focusOrOpenSession, sessionTitle } from '../shell';
   import StatusBadge from '../status/StatusBadge.svelte';
   import { errMessage } from '../workspace/errors';
+  import { sessionMenuItems } from './registry';
+
+  const menuItems = sessionMenuItems();
 
   let { session, inLayout, onerror }: { session: Session; inLayout: boolean; onerror: (msg: string) => void } = $props();
 
@@ -61,7 +64,7 @@
   }
 </script>
 
-<div class="row" class:exited bind:this={root}>
+<div class="row" class:exited bind:this={root} data-session-id={session.id}>
   <button type="button" class="main" onclick={openIt} title={title}>
     <StatusBadge sessionId={session.id} compact />
     <span class="title">{title}</span>
@@ -86,6 +89,9 @@
         </div>
       {:else}
         <button type="button" role="menuitem" onclick={() => { openIt(); closeMenu(); }}>Buka di layout</button>
+        {#each $menuItems as It (It.id)}
+          <It.component sessionId={session.id} onDone={closeMenu} />
+        {/each}
         <button type="button" role="menuitem" disabled={exited} onclick={() => (confirming = true)}>Akhiri sesi</button>
       {/if}
     </div>

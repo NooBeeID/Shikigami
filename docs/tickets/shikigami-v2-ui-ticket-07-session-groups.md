@@ -2,7 +2,7 @@
 id: shikigami-v2-ui-ticket-07-session-groups
 title: Grup sesi sebagai tab
 spec: docs/superpowers/specs/2026-11-22-shikigami-v2-ui-design.md
-status: ready
+status: implemented
 wave: 6
 depends_on: [shikigami-v2-ui-ticket-06-workspace-persist]
 ---

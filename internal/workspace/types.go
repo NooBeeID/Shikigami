@@ -30,6 +30,8 @@ type Workspace struct {
 
 	Groups        []Group `json:"groups"` // selalu >= 1, tidak pernah null
 	ActiveGroupID string  `json:"activeGroupId"`
+
+	Membership map[string]string `json:"membership"` // sessionId -> groupId; non-nil saat keluar
 }
 
 // Group adalah satu grup layout di dalam workspace.
@@ -37,7 +39,8 @@ type Group struct {
 	ID     string          `json:"id"`
 	Name   string          `json:"name"`
 	Order  int             `json:"order"`
-	Layout json.RawMessage `json:"layout"` // dokumen opaque; null bila kosong
+	Main   bool            `json:"main,omitempty"` // grup bawaan "Utama"; tepat satu per workspace
+	Layout json.RawMessage `json:"layout"`         // dokumen opaque; null bila kosong
 }
 
 // SidebarState adalah keadaan satu sidebar.
@@ -71,7 +74,7 @@ func defaultUI() UIState {
 }
 
 func newDefaultGroup() Group {
-	return Group{ID: newID(), Name: "Utama", Order: 0}
+	return Group{ID: newID(), Name: "Utama", Order: 0, Main: true}
 }
 
 // GlobalConfig adalah konfigurasi global.

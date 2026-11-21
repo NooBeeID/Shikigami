@@ -53,6 +53,10 @@ func cloneWorkspace(w Workspace) Workspace {
 		}
 		c.Groups[i] = g
 	}
+	c.Membership = make(map[string]string, len(w.Membership))
+	for k, v := range w.Membership {
+		c.Membership[k] = v
+	}
 	return c
 }
 
@@ -104,7 +108,7 @@ func (s *Store) Create(name string) (Workspace, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	g := newDefaultGroup()
-	w := Workspace{ID: newID(), Name: name, Projects: []Project{}, Groups: []Group{g}, ActiveGroupID: g.ID}
+	w := Workspace{ID: newID(), Name: name, Projects: []Project{}, Groups: []Group{g}, ActiveGroupID: g.ID, Membership: map[string]string{}}
 	next := append(cloneWorkspaces(s.workspaces), w)
 	if err := s.persistLocked(next, s.ui); err != nil {
 		return Workspace{}, err

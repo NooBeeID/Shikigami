@@ -1,6 +1,10 @@
 export interface Project { id: string; path: string; name: string }
 export interface WorkspaceConfig { grimoireUrl?: string; grimoireKey?: string }
-export interface Workspace { id: string; name: string; projects: Project[]; config: WorkspaceConfig }
+export interface WorkspaceGroup { id: string; name: string; order: number; main?: boolean; layout?: unknown | null }
+export interface Workspace {
+  id: string; name: string; projects: Project[]; config: WorkspaceConfig;
+  groups?: WorkspaceGroup[]; activeGroupId?: string; membership?: Record<string, string>;
+}
 
 export type SessionStatus = 'running' | 'exited';
 export interface Session {

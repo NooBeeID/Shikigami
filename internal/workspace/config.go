@@ -105,6 +105,7 @@ func loadWorkspaces(path string) ([]Workspace, UIState, error) {
 		if !found {
 			w.ActiveGroupID = w.Groups[0].ID
 		}
+		normalizeGroups(w)
 	}
 
 	ui := doc.UI

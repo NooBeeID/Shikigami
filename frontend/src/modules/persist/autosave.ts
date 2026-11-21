@@ -19,6 +19,19 @@ export function getCurrentWsId(): string | null {
   return currentWsId;
 }
 
+export function getCurrentGroupId(): string {
+  return currentGroupId;
+}
+
+// Ganti layout aktif ke grup lain. Pemanggil sudah menjalankan flushNow() sebelumnya.
+// Sinkron: hydrate lalu baseline, sehingga autosave berikutnya menulis ke grup baru dan
+// tidak menganggap hasil hydrate sebagai perubahan. Timer retry sengaja tidak dibersihkan:
+// doWrite menangkap groupId per tulis, jadi tulis ulang grup lama tetap menuju grup lama.
+export function switchGroup(groupId: string, doc: unknown): void {
+  layout.hydrate(doc);
+  setBaseline(currentWsId, groupId);
+}
+
 export function uiPayload() {
   return {
     leftSidebar: { ...get(leftSidebar) },
