@@ -2,7 +2,7 @@
 id: shikigami-v2-ui-ticket-02-native-menu
 title: Menu native, zoom, dan Open Folder
 spec: docs/superpowers/specs/2026-11-22-shikigami-v2-ui-design.md
-status: ready
+status: implemented
 wave: 2
 depends_on: [shikigami-v2-ui-ticket-01-app-install]
 ---

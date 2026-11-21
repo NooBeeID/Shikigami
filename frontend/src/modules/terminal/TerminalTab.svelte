@@ -12,6 +12,7 @@
     writeSession,
     type OutputEvent,
   } from './terminal-client';
+  import { currentTerminalFontSize, registerTerminalInstance } from './font-scale';
 
   let { sessionId }: { sessionId: string } = $props();
 
@@ -29,7 +30,7 @@
       theme: { background: bg, foreground: val('--term-fg', '#d4d4d4'), cursor: val('--term-cursor', '#d4d4d4') },
       cursorBlink: true,
       fontFamily: 'Menlo, Monaco, "Courier New", monospace',
-      fontSize: 13,
+      fontSize: currentTerminalFontSize(),
       scrollback: 2000,
       allowProposedApi: false,
     });
@@ -40,6 +41,10 @@
       try { fit.fit(); } catch { /* host tersembunyi */ }
     };
     safeFit();
+    const unregisterFont = registerTerminalInstance(term, () => {
+      safeFit();
+      sendResize();
+    });
 
     let ended = false;
     let attachOffset: number | null = null;
@@ -99,6 +104,7 @@
       disposed = true;
       unsubOut();
       unsubExit();
+      unregisterFont();
       ro.disconnect();
       clearTimeout(timer);
       term.dispose();
