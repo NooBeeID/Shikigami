@@ -1,0 +1,16 @@
+:root {
+  --topbar-h: 38px;
+  --topbar-inset-left: 0px;
+  --left-w: 260px;
+  --right-w: 280px;
+}
+
+.shell-frame {
+  height: 100%;
+  display: grid;
+  grid-template-rows: var(--topbar-h) 1fr;
+  min-width: 0;
+  min-height: 0;
+  background: var(--bg);
+  color: var(--fg);
+}

@@ -4,8 +4,12 @@
   import { onMount, onDestroy } from 'svelte';
   import { connection, initStores } from './lib/stores';
   import LayoutArea from './modules/layout/LayoutArea.svelte';
-  import SidebarArea from './modules/shell/SidebarArea.svelte';
-  import StatusBar from './modules/shell/StatusBar.svelte';
+  import { ShellFrame, RightPanel } from './modules/shell';
+  import './modules/shell/register';
+  import Topbar from './modules/topbar/Topbar.svelte';
+  import AgentSidebar from './modules/sidebar-left/AgentSidebar.svelte';
+  import Palette from './modules/palette/Palette.svelte';
+  import Toast from './modules/openfolder/Toast.svelte';
 
   let dispose: (() => void) | null = null;
 
@@ -30,13 +34,14 @@
 {:else if $connection.state === 'connecting'}
   <div class="center"><p>Menghubungkan ke daemon...</p></div>
 {:else}
-  <div class="shell">
-    <div class="side"><SidebarArea /></div>
-    <main class="main">
-      <div class="content"><LayoutArea /></div>
-    </main>
-    <div class="status"><StatusBar /></div>
-  </div>
+  <ShellFrame>
+    {#snippet topbar()}<Topbar />{/snippet}
+    {#snippet left()}<AgentSidebar />{/snippet}
+    {#snippet center()}<LayoutArea />{/snippet}
+    {#snippet right()}<RightPanel />{/snippet}
+  </ShellFrame>
+  <Palette />
+  <div class="toast-host"><Toast /></div>
 {/if}
 
 <style>
@@ -51,21 +56,5 @@
   }
   .msg { color: var(--fg-muted); max-width: 60ch; margin: 0; }
   h2 { margin: 0; }
-  .shell {
-    height: 100%;
-    display: grid;
-    grid-template-columns: var(--sidebar-w) 1fr;
-    grid-template-rows: 1fr var(--statusbar-h);
-  }
-  .side { grid-column: 1; grid-row: 1 / span 2; min-height: 0; }
-  .main {
-    grid-column: 2;
-    grid-row: 1;
-    min-width: 0;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-  }
-  .content { flex: 1; min-height: 0; overflow: hidden; }
-  .status { grid-column: 2; grid-row: 2; min-width: 0; }
+  .toast-host { position: fixed; right: 12px; bottom: 12px; z-index: 50; pointer-events: none; }
 </style>

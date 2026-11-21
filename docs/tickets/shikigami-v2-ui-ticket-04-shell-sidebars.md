@@ -2,7 +2,7 @@
 id: shikigami-v2-ui-ticket-04-shell-sidebars
 title: Bilah atas dan dua sidebar
 spec: docs/superpowers/specs/2026-11-22-shikigami-v2-ui-design.md
-status: ready
+status: in-progress
 wave: 4
 depends_on: [shikigami-v2-ui-ticket-03-pane-layout]
 ---
