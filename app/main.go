@@ -33,6 +33,7 @@ func main() {
 		DragAndDrop:      &options.DragAndDrop{EnableFileDrop: true},
 		OnStartup:        func(ctx context.Context) { bridge.SetContext(ctx) },
 		OnShutdown:       func(ctx context.Context) { _ = bridge.Close() },
+		OnBeforeClose:    func(ctx context.Context) bool { return onBeforeCloseWindow(ctx, bridge) },
 		Bind:             []any{bridge},
 	})
 	if err != nil {

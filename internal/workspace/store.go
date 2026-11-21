@@ -1,6 +1,7 @@
 package workspace
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -16,6 +17,7 @@ type Store struct {
 	cfgPath    string
 	workspaces []Workspace // urut pembuatan; Projects selalu non-nil
 	global     GlobalConfig
+	ui         UIState
 }
 
 func NewStore(dataDir string) (*Store, error) {
@@ -31,7 +33,7 @@ func NewStore(dataDir string) (*Store, error) {
 		cfgPath: filepath.Join(dataDir, configFile),
 	}
 	var err error
-	if s.workspaces, err = loadWorkspaces(s.wsPath); err != nil {
+	if s.workspaces, s.ui, err = loadWorkspaces(s.wsPath); err != nil {
 		return nil, err
 	}
 	if s.global, err = loadConfig(s.cfgPath); err != nil {
@@ -44,6 +46,13 @@ func cloneWorkspace(w Workspace) Workspace {
 	c := w
 	c.Projects = make([]Project, len(w.Projects))
 	copy(c.Projects, w.Projects)
+	c.Groups = make([]Group, len(w.Groups))
+	for i, g := range w.Groups {
+		if g.Layout != nil {
+			g.Layout = append(json.RawMessage(nil), g.Layout...)
+		}
+		c.Groups[i] = g
+	}
 	return c
 }
 
@@ -64,8 +73,8 @@ func (s *Store) indexLocked(id string) int {
 	return -1
 }
 
-func (s *Store) persistWorkspacesLocked(ws []Workspace) error {
-	if err := writeJSONAtomic(s.wsPath, workspacesDoc{Version: fileVersion, Workspaces: ws}); err != nil {
+func (s *Store) persistLocked(ws []Workspace, ui UIState) error {
+	if err := writeJSONAtomic(s.wsPath, workspacesDoc{Version: workspacesFileVersion, Workspaces: ws, UI: ui}); err != nil {
 		return fmt.Errorf("simpan workspaces: %w", err)
 	}
 	return nil
@@ -94,9 +103,10 @@ func (s *Store) Create(name string) (Workspace, error) {
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	w := Workspace{ID: newID(), Name: name, Projects: []Project{}}
+	g := newDefaultGroup()
+	w := Workspace{ID: newID(), Name: name, Projects: []Project{}, Groups: []Group{g}, ActiveGroupID: g.ID}
 	next := append(cloneWorkspaces(s.workspaces), w)
-	if err := s.persistWorkspacesLocked(next); err != nil {
+	if err := s.persistLocked(next, s.ui); err != nil {
 		return Workspace{}, err
 	}
 	s.workspaces = next
@@ -116,7 +126,7 @@ func (s *Store) Rename(id, name string) (Workspace, error) {
 	}
 	next := cloneWorkspaces(s.workspaces)
 	next[i].Name = name
-	if err := s.persistWorkspacesLocked(next); err != nil {
+	if err := s.persistLocked(next, s.ui); err != nil {
 		return Workspace{}, err
 	}
 	s.workspaces = next
@@ -132,10 +142,15 @@ func (s *Store) Delete(id string) error {
 	}
 	next := cloneWorkspaces(s.workspaces)
 	next = append(next[:i], next[i+1:]...)
-	if err := s.persistWorkspacesLocked(next); err != nil {
+	nextUI := s.ui
+	if nextUI.ActiveWorkspaceID == id {
+		nextUI.ActiveWorkspaceID = ""
+	}
+	if err := s.persistLocked(next, nextUI); err != nil {
 		return err
 	}
 	s.workspaces = next
+	s.ui = nextUI
 	return nil
 }
 
@@ -162,7 +177,7 @@ func (s *Store) AddProject(wsID, path, name string) (Workspace, Project, error) 
 	p := Project{ID: newID(), Path: norm, Name: name}
 	next := cloneWorkspaces(s.workspaces)
 	next[i].Projects = append(next[i].Projects, p)
-	if err := s.persistWorkspacesLocked(next); err != nil {
+	if err := s.persistLocked(next, s.ui); err != nil {
 		return Workspace{}, Project{}, err
 	}
 	s.workspaces = next
@@ -188,7 +203,7 @@ func (s *Store) RemoveProject(wsID, projectID string) (Workspace, error) {
 		return Workspace{}, fmt.Errorf("%w: project %q", ErrNotFound, projectID)
 	}
 	next[i].Projects = append(next[i].Projects[:j], next[i].Projects[j+1:]...)
-	if err := s.persistWorkspacesLocked(next); err != nil {
+	if err := s.persistLocked(next, s.ui); err != nil {
 		return Workspace{}, err
 	}
 	s.workspaces = next

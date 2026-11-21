@@ -2,6 +2,7 @@ package workspace
 
 import (
 	"crypto/rand"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -26,6 +27,51 @@ type Workspace struct {
 	Name     string          `json:"name"`
 	Projects []Project       `json:"projects"` // selalu [] (bukan null)
 	Config   WorkspaceConfig `json:"config"`
+
+	Groups        []Group `json:"groups"` // selalu >= 1, tidak pernah null
+	ActiveGroupID string  `json:"activeGroupId"`
+}
+
+// Group adalah satu grup layout di dalam workspace.
+type Group struct {
+	ID     string          `json:"id"`
+	Name   string          `json:"name"`
+	Order  int             `json:"order"`
+	Layout json.RawMessage `json:"layout"` // dokumen opaque; null bila kosong
+}
+
+// SidebarState adalah keadaan satu sidebar.
+type SidebarState struct {
+	Visible   bool   `json:"visible"`
+	Width     int    `json:"width"`
+	ActiveTab string `json:"activeTab,omitempty"` // hanya sidebar kanan
+}
+
+// UIState adalah keadaan UI global yang dipersist.
+type UIState struct {
+	LeftSidebar       SidebarState `json:"leftSidebar"`
+	RightSidebar      SidebarState `json:"rightSidebar"`
+	ActiveWorkspaceID string       `json:"activeWorkspaceId"`
+}
+
+// UIPatch adalah patch parsial untuk UIState.
+type UIPatch struct {
+	LeftSidebar       *SidebarState `json:"leftSidebar,omitempty"`
+	RightSidebar      *SidebarState `json:"rightSidebar,omitempty"`
+	ActiveWorkspaceID *string       `json:"activeWorkspaceId,omitempty"`
+}
+
+func defaultLeftSidebar() SidebarState { return SidebarState{Visible: true, Width: 260} }
+func defaultRightSidebar() SidebarState {
+	return SidebarState{Visible: true, Width: 280, ActiveTab: "files"}
+}
+
+func defaultUI() UIState {
+	return UIState{LeftSidebar: defaultLeftSidebar(), RightSidebar: defaultRightSidebar()}
+}
+
+func newDefaultGroup() Group {
+	return Group{ID: newID(), Name: "Utama", Order: 0}
 }
 
 // GlobalConfig adalah konfigurasi global.

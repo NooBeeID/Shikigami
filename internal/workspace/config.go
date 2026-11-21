@@ -1,6 +1,7 @@
 package workspace
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,12 +14,16 @@ import (
 const (
 	workspacesFile = "workspaces.json"
 	configFile     = "config.json"
-	fileVersion    = 1
+	// workspacesFileVersion untuk workspaces.json, configFileVersion untuk config.json.
+	workspacesFileVersion  = 2
+	configFileVersion      = 1
+	workspacesBackupSuffix = ".v1.bak"
 )
 
 type workspacesDoc struct {
 	Version    int         `json:"version"`
 	Workspaces []Workspace `json:"workspaces"`
+	UI         UIState     `json:"ui"`
 }
 
 type configDoc struct {
@@ -57,27 +62,116 @@ func loadConfig(path string) (GlobalConfig, error) {
 	return doc.Global, nil
 }
 
-func loadWorkspaces(path string) ([]Workspace, error) {
+func loadWorkspaces(path string) ([]Workspace, UIState, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return []Workspace{}, nil
+			return []Workspace{}, defaultUI(), nil
 		}
-		return nil, fmt.Errorf("baca %s: %w", path, err)
+		return nil, UIState{}, fmt.Errorf("baca %s: %w", path, err)
 	}
 	var doc workspacesDoc
 	if err := json.Unmarshal(data, &doc); err != nil {
-		return nil, fmt.Errorf("workspaces korup (%s): %w", path, err)
+		return nil, UIState{}, fmt.Errorf("workspaces korup (%s): %w", path, err)
 	}
-	if doc.Workspaces == nil {
-		doc.Workspaces = []Workspace{}
+	if doc.Version > workspacesFileVersion {
+		return nil, UIState{}, fmt.Errorf("workspaces.json versi %d tidak didukung (maksimum %d); file tidak diubah", doc.Version, workspacesFileVersion)
 	}
-	for i := range doc.Workspaces {
-		if doc.Workspaces[i].Projects == nil {
-			doc.Workspaces[i].Projects = []Project{}
+	ws := doc.Workspaces
+	if ws == nil {
+		ws = []Workspace{}
+	}
+	for i := range ws {
+		w := &ws[i]
+		if w.Projects == nil {
+			w.Projects = []Project{}
+		}
+		if len(w.Groups) == 0 {
+			w.Groups = []Group{newDefaultGroup()}
+		}
+		for j := range w.Groups {
+			t := bytes.TrimSpace(w.Groups[j].Layout)
+			if len(t) == 0 || bytes.Equal(t, []byte("null")) {
+				w.Groups[j].Layout = nil
+			}
+		}
+		found := false
+		for _, g := range w.Groups {
+			if g.ID == w.ActiveGroupID {
+				found = true
+				break
+			}
+		}
+		if !found {
+			w.ActiveGroupID = w.Groups[0].ID
 		}
 	}
-	return doc.Workspaces, nil
+
+	ui := doc.UI
+	if doc.Version < 2 {
+		ui = defaultUI()
+		if len(ws) > 0 {
+			ui.ActiveWorkspaceID = ws[0].ID
+		}
+	} else {
+		if ui.LeftSidebar.Width == 0 {
+			ui.LeftSidebar = defaultLeftSidebar()
+		}
+		if ui.RightSidebar.Width == 0 {
+			ui.RightSidebar = defaultRightSidebar()
+		}
+		if ui.RightSidebar.ActiveTab == "" {
+			ui.RightSidebar.ActiveTab = "files"
+		}
+		ui.LeftSidebar.ActiveTab = ""
+		known := false
+		for _, w := range ws {
+			if w.ID == ui.ActiveWorkspaceID {
+				known = true
+				break
+			}
+		}
+		if !known {
+			ui.ActiveWorkspaceID = ""
+		}
+	}
+
+	if doc.Version < 2 {
+		if err := backupV1(path, data); err != nil {
+			return nil, UIState{}, err
+		}
+		if err := writeJSONAtomic(path, workspacesDoc{Version: workspacesFileVersion, Workspaces: ws, UI: ui}); err != nil {
+			return nil, UIState{}, fmt.Errorf("migrasi workspaces ke v2: %w", err)
+		}
+	}
+	return ws, ui, nil
+}
+
+// backupV1 menyalin bytes asli ke path+workspacesBackupSuffix bila belum ada.
+func backupV1(path string, data []byte) error {
+	bak := path + workspacesBackupSuffix
+	f, err := os.OpenFile(bak, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600)
+	if err != nil {
+		if errors.Is(err, os.ErrExist) {
+			return nil
+		}
+		return fmt.Errorf("cadangan %s: %w", bak, err)
+	}
+	if _, err := f.Write(data); err != nil {
+		f.Close()
+		os.Remove(bak)
+		return fmt.Errorf("cadangan %s: %w", bak, err)
+	}
+	if err := f.Sync(); err != nil {
+		f.Close()
+		os.Remove(bak)
+		return fmt.Errorf("cadangan %s: %w", bak, err)
+	}
+	if err := f.Close(); err != nil {
+		os.Remove(bak)
+		return fmt.Errorf("cadangan %s: %w", bak, err)
+	}
+	return nil
 }
 
 // writeJSONAtomic menulis lewat file temp + Sync + Rename, izin 0600.
@@ -156,7 +250,7 @@ func (s *Store) SetGlobalConfig(c GlobalConfig) error {
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if err := writeJSONAtomic(s.cfgPath, configDoc{Version: fileVersion, Global: c}); err != nil {
+	if err := writeJSONAtomic(s.cfgPath, configDoc{Version: configFileVersion, Global: c}); err != nil {
 		return fmt.Errorf("simpan config: %w", err)
 	}
 	s.global = c
@@ -177,7 +271,7 @@ func (s *Store) SetWorkspaceConfig(wsID string, c WorkspaceConfig) (Workspace, e
 	}
 	next := cloneWorkspaces(s.workspaces)
 	next[i].Config = c
-	if err := s.persistWorkspacesLocked(next); err != nil {
+	if err := s.persistLocked(next, s.ui); err != nil {
 		return Workspace{}, err
 	}
 	s.workspaces = next

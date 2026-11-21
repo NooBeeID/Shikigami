@@ -2,7 +2,7 @@
 id: shikigami-v2-ui-ticket-06-workspace-persist
 title: Save workspace otomatis dan pemulihan
 spec: docs/superpowers/specs/2026-11-22-shikigami-v2-ui-design.md
-status: ready
+status: implemented
 wave: 5
 depends_on: [shikigami-v2-ui-ticket-04-shell-sidebars]
 ---

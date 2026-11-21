@@ -45,6 +45,10 @@ func publish(srv *ipc.Server, kind, wsID string, ws *Workspace) {
 	})
 }
 
+func publishLayout(srv *ipc.Server, wsID, groupID string) {
+	srv.Publish("workspace.layoutChanged", map[string]any{"workspaceId": wsID, "groupId": groupID})
+}
+
 func configResult(s *Store, wsID string) (any, error) {
 	g, wc, eff, err := s.GetConfig(wsID)
 	if err != nil {
@@ -56,7 +60,8 @@ func configResult(s *Store, wsID string) (any, error) {
 	return map[string]any{"global": g, "workspace": wc, "effective": eff}, nil
 }
 
-// Register mendaftarkan method IPC workspace.* dan config.* untuk Store.
+// Register mendaftarkan method IPC workspace.* (termasuk layout.get/set dan
+// ui.get/set) dan config.* untuk Store.
 func Register(srv *ipc.Server, s *Store) {
 	srv.Register("workspace.create", func(ctx context.Context, params json.RawMessage) (any, error) {
 		var p struct {
@@ -142,6 +147,58 @@ func Register(srv *ipc.Server, s *Store) {
 		}
 		publish(srv, "projectRemoved", ws.ID, &ws)
 		return ws, nil
+	})
+
+	srv.Register("workspace.layout.get", func(ctx context.Context, params json.RawMessage) (any, error) {
+		var p struct {
+			WorkspaceID string `json:"workspaceId"`
+			GroupID     string `json:"groupId"`
+		}
+		if err := decode(params, &p); err != nil {
+			return nil, err
+		}
+		gid, layout, err := s.GetLayout(p.WorkspaceID, p.GroupID)
+		if err != nil {
+			return nil, mapErr(err)
+		}
+		return map[string]any{"workspaceId": p.WorkspaceID, "groupId": gid, "layout": layout}, nil
+	})
+
+	srv.Register("workspace.layout.set", func(ctx context.Context, params json.RawMessage) (any, error) {
+		var p struct {
+			WorkspaceID string          `json:"workspaceId"`
+			GroupID     string          `json:"groupId"`
+			Layout      json.RawMessage `json:"layout"`
+		}
+		if err := decode(params, &p); err != nil {
+			return nil, err
+		}
+		gid, err := s.SetLayout(p.WorkspaceID, p.GroupID, p.Layout)
+		if err != nil {
+			return nil, mapErr(err)
+		}
+		publishLayout(srv, p.WorkspaceID, gid)
+		return map[string]bool{"ok": true}, nil
+	})
+
+	srv.Register("workspace.ui.get", func(ctx context.Context, params json.RawMessage) (any, error) {
+		var p struct{}
+		if err := decode(params, &p); err != nil {
+			return nil, err
+		}
+		return s.GetUI(), nil
+	})
+
+	srv.Register("workspace.ui.set", func(ctx context.Context, params json.RawMessage) (any, error) {
+		var p UIPatch
+		if err := decode(params, &p); err != nil {
+			return nil, err
+		}
+		ui, err := s.SetUI(p)
+		if err != nil {
+			return nil, mapErr(err)
+		}
+		return ui, nil
 	})
 
 	srv.Register("config.get", func(ctx context.Context, params json.RawMessage) (any, error) {
