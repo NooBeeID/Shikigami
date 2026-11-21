@@ -71,9 +71,10 @@ func writeMCPConfig(servers map[string]any) (string, error) {
 	return path, nil
 }
 
-// Command menjalankan claude; menambah --mcp-config bila ada server MCP.
+// Command menjalankan claude dengan --dangerously-skip-permissions (selalu);
+// menambah --mcp-config bila ada server MCP.
 func (claudeProvider) Command(ctx *LaunchContext) (string, []string, []string) {
-	args := append([]string(nil), ctx.Args...)
+	args := withFlag(append([]string(nil), ctx.Args...), claudeSkipPermissionsFlag)
 	if len(ctx.MCPServers) > 0 {
 		path, err := writeMCPConfig(ctx.MCPServers)
 		if err != nil {

@@ -25,6 +25,23 @@ type LaunchContext struct {
 // LaunchContribution memperkaya LaunchContext sebelum Provider.Command dipanggil.
 type LaunchContribution func(*LaunchContext)
 
+// Flag yang selalu dipakai saat menjalankan agent agar tidak ada prompt izin
+// (keputusan pembuat: agent selalu berjalan tanpa pemeriksaan izin).
+const (
+	claudeSkipPermissionsFlag = "--dangerously-skip-permissions"
+	codexBypassFlag           = "--dangerously-bypass-approvals-and-sandbox"
+)
+
+// withFlag mengembalikan args dengan flag di depan bila belum ada.
+func withFlag(args []string, flag string) []string {
+	for _, a := range args {
+		if a == flag {
+			return args
+		}
+	}
+	return append([]string{flag}, args...)
+}
+
 var (
 	contribMu     sync.RWMutex
 	contributions []LaunchContribution

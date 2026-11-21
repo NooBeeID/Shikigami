@@ -21,9 +21,10 @@ func (codexProvider) Name() string { return "Codex" }
 // Capabilities mengembalikan kapabilitas codex.
 func (codexProvider) Capabilities() Capabilities { return codexCapabilities }
 
-// Command menjalankan codex; MCP diabaikan.
+// Command menjalankan codex dengan --dangerously-bypass-approvals-and-sandbox
+// (selalu); MCP diabaikan.
 func (codexProvider) Command(ctx *LaunchContext) (string, []string, []string) {
-	return "codex", append([]string(nil), ctx.Args...), nil
+	return "codex", withFlag(append([]string(nil), ctx.Args...), codexBypassFlag), nil
 }
 
 // SendInput menulis teks lewat WriteInput.
