@@ -7,6 +7,9 @@
 # Hanya membaca; tidak mengubah apa pun. Tanpa dependency selain bash, git, sed, grep.
 set -u
 
+# --md: keluaran tabel markdown (dipakai /ticket-status). Tanpa flag: teks sejajar untuk terminal.
+md=0; [ "${1:-}" = "--md" ] && md=1
+
 common="$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)"
 if [ -n "$common" ]; then root="$(dirname "$common")"; else root="$(pwd)"; fi
 cd "$root" || exit 1
@@ -32,8 +35,13 @@ satisfied() { # tiket dianggap memenuhi dependensi bila implemented, atau in-pro
 worktrees="$(git worktree list 2>/dev/null || true)"
 
 fmt='%-34s %-12s %-6s %-9s %-26s %s\n'
-printf "$fmt" "TIKET" "STATUS" "PLAN" "PROGRESS" "DEPENDS" "LANGKAH BERIKUTNYA"
-printf "$fmt" "-----" "------" "----" "--------" "-------" "------------------"
+if [ "$md" = 1 ]; then
+  echo "| Tiket | Status | Plan | Progress | Depends | Langkah berikutnya |"
+  echo "|---|---|---|---|---|---|"
+else
+  printf "$fmt" "TIKET" "STATUS" "PLAN" "PROGRESS" "DEPENDS" "LANGKAH BERIKUTNYA"
+  printf "$fmt" "-----" "------" "----" "--------" "-------" "------------------"
+fi
 
 n_done=0; n_prog=0; n_ready=0; n_noplan=0
 for f in "${files[@]}"; do
@@ -68,9 +76,15 @@ for f in "${files[@]}"; do
   else
     next="/implement-feature $n"; n_ready=$((n_ready+1))
   fi
-  printf "$fmt" "$(short "$n")" "$st" "$plan" "$prog" "$depinfo" "$next"
+  if [ "$md" = 1 ]; then
+    case "$next" in /*) next="\`$next\`" ;; esac
+    printf '| %s | %s | %s | %s | %s | %s |\n' "$(short "$n")" "$st" "$plan" "$prog" "$depinfo" "$next"
+  else
+    printf "$fmt" "$(short "$n")" "$st" "$plan" "$prog" "$depinfo" "$next"
+  fi
 done
 
 echo
 echo "Ringkasan: selesai=$n_done, sedang/tertunda=$n_prog, siap atau menunggu dependensi=$n_ready, belum diplan=$n_noplan, total=${#files[@]}"
-echo "DEPENDS: NN:ok = tiket NN sudah terpenuhi (implemented, atau kodenya ter-merge); NN:BELUM = belum."
+echo
+echo "Depends: NN:ok = tiket NN sudah terpenuhi (implemented, atau kodenya ter-merge); NN:BELUM = belum."
