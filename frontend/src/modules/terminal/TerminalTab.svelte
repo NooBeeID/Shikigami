@@ -14,37 +14,69 @@
   } from './terminal-client';
   import { currentTerminalFontSize, registerTerminalInstance } from './font-scale';
 
-  let { sessionId }: { sessionId: string } = $props();
+  let { sessionId, scrollback = 2000, visible = true, fontSize }:
+    { sessionId: string; scrollback?: number; visible?: boolean; fontSize?: number } = $props();
+
+  const MAX_QUEUE_BYTES = 8 * 1024 * 1024;
+  let visibleNow = visible;
+  let applyVisible: (v: boolean) => void = () => {};
+  let setFontSize: (n: number) => void = () => {};
+
+  $effect(() => { applyVisible(visible); });
+  $effect(() => { if (fontSize !== undefined) setFontSize(fontSize); });
 
   let host: HTMLDivElement;
   let attachError = $state('');
 
   onMount(() => {
     const id = sessionId;
-    const cs = getComputedStyle(host);
-    const val = (n: string, fb: string) => cs.getPropertyValue(n).trim() || fb;
-    const bg = val('--term-bg', '#1e1e1e');
-    host.style.background = bg;
-
+    visibleNow = visible;
     const term = new Terminal({
-      theme: { background: bg, foreground: val('--term-fg', '#d4d4d4'), cursor: val('--term-cursor', '#d4d4d4') },
+      theme: { background: '#1e1e1e', foreground: '#d4d4d4', cursor: '#d4d4d4' },
       cursorBlink: true,
       fontFamily: 'Menlo, Monaco, "Courier New", monospace',
-      fontSize: currentTerminalFontSize(),
-      scrollback: 2000,
+      fontSize: fontSize ?? currentTerminalFontSize(),
+      scrollback,
       allowProposedApi: false,
     });
     const fit = new FitAddon();
     term.loadAddon(fit);
-    term.open(host);
+    let opened = false;
     const safeFit = () => {
+      if (!opened) return;
       try { fit.fit(); } catch { /* host tersembunyi */ }
     };
-    safeFit();
+    // Buka xterm hanya saat host sudah terpasang di DOM dan terlihat.
+    const tryOpen = () => {
+      if (opened || !host.isConnected || !visibleNow) return;
+      const cs = getComputedStyle(host);
+      const val = (n: string, fb: string) => cs.getPropertyValue(n).trim() || fb;
+      const bg = val('--term-bg', '#1e1e1e');
+      host.style.background = bg;
+      term.options.theme = { background: bg, foreground: val('--term-fg', '#d4d4d4'), cursor: val('--term-cursor', '#d4d4d4') };
+      term.open(host);
+      opened = true;
+      safeFit();
+    };
+    tryOpen();
     const unregisterFont = registerTerminalInstance(term, () => {
+      if (!visibleNow || !opened) return;
       safeFit();
       sendResize();
     });
+
+    // Antrian tulis saat tersembunyi.
+    let queue: (Uint8Array | string)[] = [];
+    let queueBytes = 0;
+    const sizeOf = (c: Uint8Array | string) => (typeof c === 'string' ? c.length : c.byteLength);
+    function emit(chunk: Uint8Array | string) {
+      if (visibleNow) { term.write(chunk); return; }
+      queue.push(chunk);
+      queueBytes += sizeOf(chunk);
+      while (queueBytes > MAX_QUEUE_BYTES && queue.length > 1) {
+        queueBytes -= sizeOf(queue.shift()!);
+      }
+    }
 
     let ended = false;
     let attachOffset: number | null = null;
@@ -55,14 +87,14 @@
     function markEnded() {
       if (ended) return;
       ended = true;
-      term.write('\r\n[sesi berakhir]\r\n');
+      emit('\r\n[sesi berakhir]\r\n');
       term.options.disableStdin = true;
     }
 
     // Subscribe sebelum attach.
     const unsubOut = subscribeOutput(id, (ev) => {
       if (attachOffset === null) pending.push(ev);
-      else if (ev.offset > attachOffset) term.write(base64ToBytes(ev.data));
+      else if (ev.offset > attachOffset) emit(base64ToBytes(ev.data));
     });
     const unsubExit = subscribeExit(id, () => markEnded());
 
@@ -72,10 +104,10 @@
       try {
         const res = await attachSession(id);
         if (disposed) return;
-        term.write(res.scrollback);
+        emit(res.scrollback);
         attachOffset = res.offset;
         for (const ev of pending) {
-          if (ev.offset > res.offset) term.write(base64ToBytes(ev.data));
+          if (ev.offset > res.offset) emit(base64ToBytes(ev.data));
         }
         pending.length = 0;
         if (res.session.status === 'exited') markEnded();
@@ -84,7 +116,7 @@
         if (disposed) return;
         const msg = 'Gagal terhubung ke sesi: ' + (e instanceof Error ? e.message : String(e));
         attachError = msg;
-        term.write('\r\n' + msg + '\r\n');
+        emit('\r\n' + msg + '\r\n');
       }
     })();
 
@@ -93,7 +125,33 @@
       writeSession(id, d).catch(() => {});
     });
 
+    applyVisible = (v) => {
+      if (v === visibleNow) return;
+      if (!v) {
+        visibleNow = false;
+        clearTimeout(timer);
+        return;
+      }
+      visibleNow = true;
+      tryOpen();
+      for (const c of queue) term.write(c);
+      queue = [];
+      queueBytes = 0;
+      safeFit();
+      sendResize();
+      try { term.refresh(0, term.rows - 1); } catch { /* belum terbuka */ }
+    };
+    setFontSize = (n) => {
+      term.options.fontSize = n;
+      if (visibleNow && opened) {
+        safeFit();
+        sendResize();
+      }
+    };
+
     const ro = new ResizeObserver(() => {
+      if (!visibleNow) return;
+      tryOpen();
       safeFit();
       clearTimeout(timer);
       timer = setTimeout(sendResize, 100);
@@ -107,6 +165,9 @@
       unregisterFont();
       ro.disconnect();
       clearTimeout(timer);
+      queue = [];
+      applyVisible = () => {};
+      setFontSize = () => {};
       term.dispose();
     };
   });

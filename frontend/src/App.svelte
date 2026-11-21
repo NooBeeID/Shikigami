@@ -3,8 +3,7 @@
   import './styles/base.css';
   import { onMount, onDestroy } from 'svelte';
   import { connection, initStores } from './lib/stores';
-  import TabBar from './modules/tabs/TabBar.svelte';
-  import TabContent from './modules/tabs/TabContent.svelte';
+  import LayoutArea from './modules/layout/LayoutArea.svelte';
   import SidebarArea from './modules/shell/SidebarArea.svelte';
   import StatusBar from './modules/shell/StatusBar.svelte';
 
@@ -34,8 +33,7 @@
   <div class="shell">
     <div class="side"><SidebarArea /></div>
     <main class="main">
-      <TabBar />
-      <div class="content"><TabContent /></div>
+      <div class="content"><LayoutArea /></div>
     </main>
     <div class="status"><StatusBar /></div>
   </div>

@@ -2,7 +2,7 @@
 id: shikigami-v2-ui-ticket-03-pane-layout
 title: Layout multi-pane (split, drag and drop, resize)
 spec: docs/superpowers/specs/2026-11-22-shikigami-v2-ui-design.md
-status: ready
+status: in-progress
 wave: 3
 depends_on: [shikigami-v2-ui-ticket-02-native-menu]
 ---
