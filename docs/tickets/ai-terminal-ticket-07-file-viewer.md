@@ -2,7 +2,7 @@
 id: ai-terminal-ticket-07-file-viewer
 title: File Viewer
 spec: docs/superpowers/specs/2026-11-21-ai-terminal-design.md
-status: ready
+status: implemented
 wave: 5
 depends_on: [ai-terminal-ticket-06-ui-shell, ai-terminal-ticket-03-file-service]
 ---
