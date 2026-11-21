@@ -66,6 +66,8 @@ const decomp = await agent(
   `Baca spec di ${specPath} secara penuh (dan lihat isi project yang sudah ada bila ada).
 Pecah pekerjaan di spec menjadi TIKET = EPIC/MODUL (bukan satu fitur per tiket). Tiap epic memuat beberapa FITUR.
 
+PERIKSA DULU apakah repo sudah berisi aplikasi yang berjalan (mis. go.mod, cmd/, internal/, frontend/ dan folder docs/tickets/ berisi tiket sebelumnya). Bila SUDAH ada, tiket baru dibuat DI ATAS kode yang ada: aturan "Tiket 1 = base/scaffold", "Hello World", "spike pengukuran fase 0", dan "tab terminal minimal di tiket sesi pertama" di bawah TIDAK berlaku; tiket 1 langsung kemampuan pertama dari spec. Baca struktur kode nyata (paket, modul, registry, komponen) agar ownedPaths merujuk path yang sungguh ada atau yang akan dibuat secara konsisten dengan konvensi yang ada, dan agar tiket memperluas titik ekstensi yang sudah ada, bukan membuat ulang. Tiket lama di docs/tickets/ adalah catatan historis; jangan diubah dan jangan dijadikan dependensi kecuali benar-benar diperlukan.
+
 Aturan pemecahan (IRISAN VERTIKAL YANG SELALU BISA JALAN):
 - SETIAP tiket, begitu selesai, harus menghasilkan aplikasi yang BISA DI-BUILD dan BISA DIJALANKAN (end-to-end, daemon + UI bila relevan), di atas hasil tiket-tiket sebelumnya. Tidak boleh ada tiket yang hasilnya baru berguna setelah tiket lain (tidak ada tiket "wiring di akhir").
 - Tiket 1 = base: scaffold project + build berhasil + hello world/placeholder yang bisa dijalankan. Tiket 1 juga menyediakan TITIK EKSTENSI (mis. registri method daemon dan registri panel UI berbasis satu file per modul) agar tiket berikutnya menambah fiturnya sendiri tanpa merombak file milik tiket lain.
