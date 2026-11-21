@@ -189,3 +189,14 @@ func (b *Bridge) Close() error {
 	}
 	return nil
 }
+
+// SetPageZoom mengatur zoom native webview; percent dibatasi 50-300.
+func (b *Bridge) SetPageZoom(percent float64) {
+	if percent < 50 {
+		percent = 50
+	}
+	if percent > 300 {
+		percent = 300
+	}
+	setNativePageZoom(percent / 100)
+}

@@ -1,17 +1,1 @@
-:root { --ui-scale: 1; }
-
-/* Skala seluruh UI. Karena zoom ikut menskalakan ukuran, bagi tinggi/lebar
-   agar #app tetap persis mengisi jendela. */
-#app {
-  zoom: var(--ui-scale);
-  width: calc(100% / var(--ui-scale));
-  height: calc(100% / var(--ui-scale));
-}
-
-/* Batalkan skala CSS pada kontainer terminal: xterm menghitung sel pada skala 1,
-   font efektif = 13 x skala lewat setTerminalFontScale. */
-#app .term-host {
-  zoom: calc(1 / var(--ui-scale));
-  width: calc(100% * var(--ui-scale));
-  height: calc(100% * var(--ui-scale));
-}
+/* Zoom ditangani native oleh WKWebView.pageZoom (lihat index.ts). */

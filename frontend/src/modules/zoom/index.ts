@@ -31,10 +31,12 @@ function clamp(n: number): number {
 function applyZoom(next: number): void {
   percent = clamp(next);
   setStore?.(percent);
-  document.documentElement.style.setProperty('--ui-scale', String(percent / 100));
-  import('../terminal')
-    .then((m) => (m as any).setTerminalFontScale?.(percent))
-    .catch(() => {});
+  // Zoom native webview (WKWebView.pageZoom); bukan CSS zoom, agar koordinat konsisten.
+  try {
+    (window as any).go?.main?.Bridge?.SetPageZoom?.(percent);
+  } catch {
+    /* di luar Wails: abaikan */
+  }
 }
 
 let persistTimer: ReturnType<typeof setTimeout> | undefined;
