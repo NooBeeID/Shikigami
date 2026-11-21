@@ -3,6 +3,7 @@ module aiterm
 go 1.26.3
 
 require (
+	github.com/creack/pty v1.1.24
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/wailsapp/wails/v2 v2.17.1
 )
