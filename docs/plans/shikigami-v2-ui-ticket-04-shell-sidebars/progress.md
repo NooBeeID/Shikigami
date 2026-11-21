@@ -125,3 +125,14 @@ Tidak ada.
 ## Build guard terakhir
 
 passed = true (`make build` exit 0, diverifikasi ulang pada worktree ini).
+
+## Penyelesaian manual (setelah workflow)
+
+Status PARTIAL di atas berasal dari `shell-wiring` yang berjalan paralel dengan fitur prasyaratnya dan berhenti sesuai aturan (tanpa stub). Langkah Wiring umum kemudian mengerjakan checklist yang sama. Diverifikasi manual:
+
+- Checklist wiring overview bagian 5 terpenuhi: `modules/shell/register.ts` ada, `App.svelte` merender `ShellFrame` dengan `Topbar`, `AgentSidebar`, `LayoutArea`, `RightPanel`, `Palette`, dan `Toast`, dan `SidebarArea.svelte` serta `StatusBar.svelte` v1 dihapus.
+- `make build` exit 0 dan `svelte-check` 0 error (4 peringatan dari kode tiket 03).
+- Pengamatan visual dari biner worktree: bilah atas, sidebar Agent kiri, panel File kanan dengan "Open Folder...", palet perintah terbuka dengan Cmd+K (aksi, sesi, project), dan Cmd+B menyembunyikan sidebar kiri.
+- Belum diverifikasi: Cmd+Opt+B, klik sesi memfokuskan pane, klik file membuka pane file, tab dummy `registerRightTab`, dan tampilan lonceng notifikasi dengan data.
+- Pengamatan: label tab workspace di bilah atas tampak terpotong (hanya penanda tipis terlihat di pojok kiri atas).
+- Alur diperbaiki di commit `2f1e7de`: fitur yang bergantung pada fitur lain kini berjalan berurutan setelah antrean paralel.
