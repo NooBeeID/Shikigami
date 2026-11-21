@@ -37,21 +37,27 @@ const CHECK_SCHEMA = {
   properties: {
     hasOverview: { type: 'boolean' },
     hasFoundation: { type: 'boolean', description: `${planDir}/00-foundation.md ada` },
-    features: { type: 'array', items: { type: 'string' }, description: 'slug fitur = nama file .md di folder plan selain overview.md, 00-foundation.md, progress.md' },
+    features: { type: 'array', items: { type: 'string' }, description: 'slug fitur = nama file .md di folder plan selain overview.md, 00-foundation.md, progress.md (SEMUA, termasuk yang manual)' },
+    manualLast: { type: 'array', items: { type: 'string' }, description: 'subset features yang menurut overview.md dikerjakan MANUAL/TERAKHIR setelah wiring dan butuh daemon/app berjalan (mis. pengukuran/spike). Kosong bila tidak ada.' },
   },
-  required: ['hasOverview', 'hasFoundation', 'features'],
+  required: ['hasOverview', 'hasFoundation', 'features', 'manualLast'],
 }
 const check = await agent(
-  `Lihat folder ${planDir}/ (di root repo). Laporkan: apakah overview.md ada, apakah 00-foundation.md ada, dan daftar slug fitur (nama file .md lain tanpa ekstensi, kecuali progress.md). Hanya baca; jangan mengubah apa pun.`,
+  `Lihat folder ${planDir}/ (di root repo). Laporkan: apakah overview.md ada, apakah 00-foundation.md ada, dan daftar slug fitur (nama file .md lain tanpa ekstensi, kecuali progress.md).
+Baca juga overview.md untuk mengisi manualLast: slug fitur yang di overview dinyatakan dikerjakan terakhir/manual setelah Wiring, tidak paralel, dan butuh daemon atau aplikasi yang sedang berjalan untuk diukur/dicoba (contoh: spike pengukuran RAM/CPU). Fitur kode biasa BUKAN manualLast. Hanya baca; jangan mengubah apa pun.`,
   { label: 'check-plan', schema: CHECK_SCHEMA, model: 'haiku', effort: 'low' }
 )
 if (!check || !check.hasOverview || !check.features.length) {
   return { status: 'NO_PLAN', reason: `Plan untuk ${ticket} belum ada di ${planDir}/ — jalankan /plan-from-tiket ${ticket} dulu` }
 }
 
-const features = check.features
+const deferred = check.features.filter(s => check.manualLast.includes(s))
+const features = check.features.filter(s => !deferred.includes(s))
+if (!features.length) {
+  return { status: 'NO_PLAN', reason: `Semua fitur di ${planDir}/ bersifat manual (${deferred.join(', ')}); tidak ada yang bisa diimplementasikan otomatis` }
+}
 const limit = rawMax === 'full' ? features.length : Math.max(1, parseInt(rawMax, 10) || 3)
-log(`${features.length} fitur, paralel maks ${limit}${check.hasFoundation ? ', ada foundation' : ''}`)
+log(`${features.length} fitur, paralel maks ${limit}${check.hasFoundation ? ', ada foundation' : ''}${deferred.length ? `; ditunda (manual): ${deferred.join(', ')}` : ''}`)
 
 // ---------- Setup worktree ----------
 phase('Setup')
@@ -210,10 +216,11 @@ const report = await agent(
 - foundation: ${foundation ? (foundation.ok ? 'selesai' : 'gagal') : 'tidak ada'}
 - hasil per fitur (JSON): ${JSON.stringify(done)}
 - wiring: ${JSON.stringify(wiring)}
+- langkah manual yang ditunda (tidak dikerjakan workflow, jalankan sendiri setelah build lulus dengan daemon/app berjalan): ${deferred.length ? deferred.join(', ') + ' (lihat plan masing-masing)' : 'tidak ada'}
 - build guard terakhir: passed=${build ? build.passed : false}
 Output build (terakhir):
 ${build ? build.output : '(tidak ada)'}
-2. Ubah baris "status:" di frontmatter ${WT}/docs/tickets/${ticket}.md menjadi ${status === 'OK' ? 'implemented' : 'in-progress'} (hanya baris itu).
+2. Ubah baris "status:" di frontmatter ${WT}/docs/tickets/${ticket}.md menjadi ${status === 'OK' && !deferred.length ? 'implemented' : 'in-progress'} (hanya baris itu).
 3. ${canCommit
     ? `Commit SEMUA perubahan di branch ${BRANCH}, dari dalam worktree: \`git -C ${WT} add -A\` lalu \`git -C ${WT} commit\` dengan pesan "feat(${ticket}): implementasi tiket${failed.length ? ' (sebagian)' : ''}" dan baris terakhir pesan tepat: ${COAUTHOR}. Jangan push, jangan merge, jangan menyentuh branch lain. Laporkan hash commit.`
     : 'Build TIDAK lulus, jadi JANGAN melakukan commit; biarkan perubahan di worktree. committed=false.'}`,
@@ -271,6 +278,7 @@ return {
   branch: BRANCH,
   baseBranch: setup.baseBranch,
   features: done.map(x => ({ slug: x.slug, ok: x.ok, reason: x.reason })),
+  deferredManual: deferred,
   wiring: wiring ? wiring.ok : false,
   buildPassed: build ? build.passed : false,
   committed: report ? report.committed : false,

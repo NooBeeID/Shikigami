@@ -15,7 +15,10 @@ Langkah (tanpa AskUserQuestion; jangan bertanya):
    - `MERGED`: tampilkan hash commit merge di branch utama, hasil build setelah merge (`postMergeBuildPassed`), dan apakah worktree + branch sudah dihapus (`cleaned`).
    - `CONFLICT` / `BLOCKED` / `SKIPPED` / `FAILED`: sebutkan alasannya. Worktree `worktree/feat-<tiket>` dan branch `feat/<tiket>` dibiarkan utuh. Beri tahu cara manual: `git merge --squash feat/<tiket>` dari checkout utama, selesaikan konflik, commit, lalu `git worktree remove worktree/feat-<tiket>` dan `git branch -D feat/<tiket>`.
 
+   Bila `deferredManual` tidak kosong, sebutkan langkah manual yang ditunda (mis. `spike-measure`) dan ingatkan user untuk menjalankannya sendiri dengan daemon/app berjalan. Fitur manual tidak membuat status `PARTIAL` dan tidak menghalangi merge, tetapi status tiket di frontmatter tetap `in-progress` sampai langkah itu selesai.
+
 Catatan:
+- Fitur yang menurut `overview.md` dikerjakan manual/terakhir (butuh daemon atau aplikasi berjalan, mis. pengukuran) dilewati workflow dan dilaporkan sebagai `deferredManual`.
 - Guard hanya build (tanpa unit test). Seluruh kerja terjadi di worktree `worktree/feat-<tiket>` pada branch `feat/<tiket>`.
 - Satu commit dibuat di branch fitur hanya bila build lulus. **Squash merge otomatis ke branch utama hanya bila status `OK`** (semua fitur selesai dan build lulus), lalu worktree dan branch dihapus. Status selain `OK` tidak di-merge.
 - Merge tidak pernah memakai `--force`, tidak menyelesaikan konflik sendiri (konflik = batal dan lapor), dan tidak melakukan push.
