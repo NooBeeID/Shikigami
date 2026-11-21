@@ -210,12 +210,15 @@
     display: flex;
     align-items: center;
     gap: 4px;
+    flex: 1 1 auto;
     min-width: 0;
     height: 100%;
   }
   .tabs {
     display: flex;
     align-items: stretch;
+    flex: 0 1 auto;
+    max-width: 100%;
     height: 100%;
     min-width: 0;
     overflow-x: auto;

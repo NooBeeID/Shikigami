@@ -46,8 +46,7 @@
 <style>
   .topbar {
     --wails-draggable: drag;
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    display: flex;
     height: var(--topbar-h, 38px);
     min-width: 0;
     padding-left: var(--topbar-inset-left, 0px);
@@ -56,8 +55,8 @@
     color: var(--fg, inherit);
   }
   .zone { display: flex; align-items: center; min-width: 0; }
-  .left { max-width: 50%; }
-  .center { justify-content: center; gap: 8px; padding: 0 12px; }
-  .right { justify-content: flex-end; }
+  .left { flex: 0 1 auto; max-width: 50%; }
+  .center { flex: 1 1 0; justify-content: center; gap: 8px; padding: 0 12px; }
+  .right { flex: none; justify-content: flex-end; }
   .slot { --wails-draggable: no-drag; display: inline-flex; align-items: center; }
 </style>
