@@ -2,7 +2,7 @@
 id: ai-terminal-ticket-09-session-mention
 title: Session Mention
 spec: docs/superpowers/specs/2026-11-21-ai-terminal-design.md
-status: ready
+status: implemented
 wave: 6
 depends_on: [ai-terminal-ticket-08-session-status, ai-terminal-ticket-06-ui-shell, ai-terminal-ticket-05-provider-adapters]
 ---
