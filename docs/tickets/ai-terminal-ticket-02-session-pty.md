@@ -2,7 +2,7 @@
 id: ai-terminal-ticket-02-session-pty
 title: Session PTY
 spec: docs/superpowers/specs/2026-11-21-ai-terminal-design.md
-status: in-progress
+status: implemented
 wave: 2
 depends_on: [ai-terminal-ticket-01-app-base]
 ---
