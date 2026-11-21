@@ -3,6 +3,7 @@
 #  - frontmatter `status:` dan `depends_on:` di file tiket
 #  - ada tidaknya docs/plans/<tiket>/overview.md dan progress.md
 #  - git worktree aktif (worktree/feat-<tiket>)
+# Kolom DEPENDS menampilkan dependensi tiap tiket: NN:ok (terpenuhi) atau NN:BELUM.
 # Hanya membaca; tidak mengubah apa pun. Tanpa dependency selain bash, git, sed, grep.
 set -u
 
@@ -20,6 +21,7 @@ fi
 fmval() { grep -m1 "^$1:" "$2" 2>/dev/null | sed -e "s/^$1: *//" -e 's/[[:space:]]*$//'; }
 st_of() { fmval status "docs/tickets/$1.md"; }
 short() { echo "$1" | sed -E 's/^.*-ticket-//'; }
+num() { short "$1" | sed -E 's/-.*$//'; }
 satisfied() { # tiket dianggap memenuhi dependensi bila implemented, atau in-progress dengan kode sudah ter-merge (ada progress.md)
   local s; s="$(st_of "$1")"
   [ "$s" = "implemented" ] && return 0
@@ -29,8 +31,9 @@ satisfied() { # tiket dianggap memenuhi dependensi bila implemented, atau in-pro
 
 worktrees="$(git worktree list 2>/dev/null || true)"
 
-printf '%-34s %-12s %-6s %-9s %s\n' "TIKET" "STATUS" "PLAN" "PROGRESS" "LANGKAH BERIKUTNYA"
-printf '%-34s %-12s %-6s %-9s %s\n' "-----" "------" "----" "--------" "------------------"
+fmt='%-34s %-12s %-6s %-9s %-26s %s\n'
+printf "$fmt" "TIKET" "STATUS" "PLAN" "PROGRESS" "DEPENDS" "LANGKAH BERIKUTNYA"
+printf "$fmt" "-----" "------" "----" "--------" "-------" "------------------"
 
 n_done=0; n_prog=0; n_ready=0; n_noplan=0
 for f in "${files[@]}"; do
@@ -40,11 +43,17 @@ for f in "${files[@]}"; do
   prog="tidak"; [ -f "docs/plans/$n/progress.md" ] && prog="ada"
 
   deps_raw="$(fmval depends_on "$f" | sed -e 's/^\[//' -e 's/\]$//' -e 's/,/ /g')"
-  blocked=""
+  blocked=""; depinfo=""
   for d in $deps_raw; do
     [ -f "docs/tickets/$d.md" ] || continue
-    satisfied "$d" || blocked="$blocked $(short "$d")"
+    if satisfied "$d"; then
+      depinfo="$depinfo $(num "$d"):ok"
+    else
+      depinfo="$depinfo $(num "$d"):BELUM"
+      blocked="$blocked $(short "$d")"
+    fi
   done
+  depinfo="$(echo "$depinfo" | sed -e 's/^ *//')"; [ -z "$depinfo" ] && depinfo="-"
 
   if [ "$st" = "implemented" ]; then
     next="-"; n_done=$((n_done+1))
@@ -59,8 +68,9 @@ for f in "${files[@]}"; do
   else
     next="/implement-feature $n"; n_ready=$((n_ready+1))
   fi
-  printf '%-34s %-12s %-6s %-9s %s\n' "$(short "$n")" "$st" "$plan" "$prog" "$next"
+  printf "$fmt" "$(short "$n")" "$st" "$plan" "$prog" "$depinfo" "$next"
 done
 
 echo
 echo "Ringkasan: selesai=$n_done, sedang/tertunda=$n_prog, siap atau menunggu dependensi=$n_ready, belum diplan=$n_noplan, total=${#files[@]}"
+echo "DEPENDS: NN:ok = tiket NN sudah terpenuhi (implemented, atau kodenya ter-merge); NN:BELUM = belum."
