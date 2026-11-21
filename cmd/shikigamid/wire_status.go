@@ -1,9 +1,9 @@
 package main
 
 import (
-	"aiterm/internal/ipc"
-	"aiterm/internal/session"
-	"aiterm/internal/status"
+	"github.com/NooBeeID/shikigami/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/session"
+	"github.com/NooBeeID/shikigami/internal/status"
 )
 
 func init() {

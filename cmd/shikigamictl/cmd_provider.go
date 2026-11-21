@@ -10,13 +10,13 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"aiterm/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/ipc"
 )
 
 // Catatan: "session new --provider" sudah disediakan epic 02 di cmd_session.go,
 // sehingga "provider new <id>" hanya pintasan ke session.create.
 
-const providerUsage = "penggunaan: aitermctl provider list|new ..."
+const providerUsage = "penggunaan: shikigamictl provider list|new ..."
 
 type providerCaps struct {
 	Hooks     bool `json:"hooks"`
@@ -68,7 +68,7 @@ func providerList(c *ipc.Client, args []string) error {
 		return err
 	}
 	if fs.NArg() > 0 {
-		return errors.New("penggunaan: aitermctl provider list [--json]")
+		return errors.New("penggunaan: shikigamictl provider list [--json]")
 	}
 	var raw json.RawMessage
 	if err := c.Call("provider.list", map[string]any{}, &raw); err != nil {
@@ -105,7 +105,7 @@ func providerList(c *ipc.Client, args []string) error {
 }
 
 func providerNew(c *ipc.Client, args []string) error {
-	const usage = "penggunaan: aitermctl provider new <id> [--cwd DIR] [--workspace ID] [--project ID]"
+	const usage = "penggunaan: shikigamictl provider new <id> [--cwd DIR] [--workspace ID] [--project ID]"
 	fs := flag.NewFlagSet("provider new", flag.ContinueOnError)
 	cwd := fs.String("cwd", "", "direktori kerja")
 	ws := fs.String("workspace", "", "ID workspace")

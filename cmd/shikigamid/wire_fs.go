@@ -1,8 +1,8 @@
 package main
 
 import (
-	"aiterm/internal/fsx"
-	"aiterm/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/fsx"
+	"github.com/NooBeeID/shikigami/internal/ipc"
 )
 
 func init() {

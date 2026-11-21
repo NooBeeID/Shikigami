@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"aiterm/internal/ipc"
-	"aiterm/internal/provider"
+	"github.com/NooBeeID/shikigami/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/provider"
 )
 
 const (
@@ -22,10 +22,10 @@ const (
 // StartNotifier memasang subscriber notifikasi macOS pada engine.
 // Parameter srv dipertahankan sesuai kontrak dan tidak dipakai. Fungsi cancel
 // dari Subscribe tidak dipakai karena notifier hidup selama daemon.
-// Notifikasi dapat dimatikan dengan AITERM_NOTIFY=0 (dibaca sekali di sini).
+// Notifikasi dapat dimatikan dengan SHIKIGAMI_NOTIFY=0 (dibaca sekali di sini).
 func StartNotifier(srv *ipc.Server, eng *Engine) {
 	_ = srv
-	if eng == nil || os.Getenv("AITERM_NOTIFY") == "0" {
+	if eng == nil || os.Getenv("SHIKIGAMI_NOTIFY") == "0" {
 		return
 	}
 	n := &notifier{eng: eng, last: map[string]time.Time{}}

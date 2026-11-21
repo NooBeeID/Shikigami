@@ -259,7 +259,7 @@ func Write(root, relPath, content string, expectedMtime int64) (*WriteResult, er
 		return nil, Wrap(ErrInvalid, "%v", err)
 	}
 
-	tmp, err := os.CreateTemp(dir, "."+filepath.Base(abs)+".aiterm-tmp-*")
+	tmp, err := os.CreateTemp(dir, "."+filepath.Base(abs)+".shikigami-tmp-*")
 	if err != nil {
 		return nil, Wrap(ErrInvalid, "gagal membuat file sementara: %v", err)
 	}

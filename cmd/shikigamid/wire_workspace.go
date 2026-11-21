@@ -1,9 +1,9 @@
 package main
 
 import (
-	"aiterm/internal/ipc"
-	"aiterm/internal/paths"
-	"aiterm/internal/workspace"
+	"github.com/NooBeeID/shikigami/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/paths"
+	"github.com/NooBeeID/shikigami/internal/workspace"
 )
 
 func init() {

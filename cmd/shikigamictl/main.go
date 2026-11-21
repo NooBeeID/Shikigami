@@ -10,8 +10,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"aiterm/internal/ipc"
-	"aiterm/internal/paths"
+	"github.com/NooBeeID/shikigami/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/paths"
 )
 
 func init() {
@@ -36,9 +36,9 @@ func main() {
 }
 
 func run(args []string, stdout, stderr io.Writer) int {
-	fs := flag.NewFlagSet("aitermctl", flag.ContinueOnError)
+	fs := flag.NewFlagSet("shikigamictl", flag.ContinueOnError)
 	fs.SetOutput(stderr)
-	socket := fs.String("socket", "", "path unix socket daemon (default: <DataDir>/aitermd.sock)")
+	socket := fs.String("socket", "", "path unix socket daemon (default: <DataDir>/shikigamid.sock)")
 	fs.Usage = func() { printHelp(stderr) }
 
 	if err := fs.Parse(args); err != nil {
@@ -56,7 +56,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 
 	cmd, ok := lookupCommand(rest[0])
 	if !ok {
-		fmt.Fprintf(stderr, "command tidak dikenal: %q\nJalankan \"aitermctl help\" untuk daftar command.\n", rest[0])
+		fmt.Fprintf(stderr, "command tidak dikenal: %q\nJalankan \"shikigamictl help\" untuk daftar command.\n", rest[0])
 		return 1
 	}
 
@@ -64,7 +64,7 @@ func run(args []string, stdout, stderr io.Writer) int {
 	if sock == "" {
 		p, err := paths.SocketPath()
 		if err != nil {
-			fmt.Fprintf(stderr, "aitermctl: %v\n", err)
+			fmt.Fprintf(stderr, "shikigamictl: %v\n", err)
 			return 1
 		}
 		sock = p
@@ -83,9 +83,9 @@ func run(args []string, stdout, stderr io.Writer) int {
 	if err := cmd.Run(ctx, c, rest[1:]); err != nil {
 		var ipcErr *ipc.Error
 		if errors.As(err, &ipcErr) {
-			fmt.Fprintf(stderr, "aitermctl: galat %d: %s\n", ipcErr.Code, ipcErr.Message)
+			fmt.Fprintf(stderr, "shikigamictl: galat %d: %s\n", ipcErr.Code, ipcErr.Message)
 		} else {
-			fmt.Fprintf(stderr, "aitermctl: %v\n", err)
+			fmt.Fprintf(stderr, "shikigamictl: %v\n", err)
 		}
 		return 1
 	}
@@ -93,10 +93,10 @@ func run(args []string, stdout, stderr io.Writer) int {
 }
 
 func printHelp(w io.Writer) {
-	fmt.Fprintln(w, "Penggunaan: aitermctl [--socket <path>] <command> [argumen]")
+	fmt.Fprintln(w, "Penggunaan: shikigamictl [--socket <path>] <command> [argumen]")
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "Flag:")
-	fmt.Fprintln(w, "  --socket <path>  path unix socket daemon (default: <DataDir>/aitermd.sock)")
+	fmt.Fprintln(w, "  --socket <path>  path unix socket daemon (default: <DataDir>/shikigamid.sock)")
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "Command:")
 	cmds := sortedCommands()

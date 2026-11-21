@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"aiterm/internal/provider"
-	"aiterm/internal/session"
+	"github.com/NooBeeID/shikigami/internal/provider"
+	"github.com/NooBeeID/shikigami/internal/session"
 )
 
 // maxPending membatasi jumlah token tertunda.
@@ -206,7 +206,7 @@ func registerLaunchContribution(rt *Runtime, url string) {
 			if ctx.MCPServers == nil {
 				ctx.MCPServers = make(map[string]any)
 			}
-			ctx.MCPServers["aiterm-mention"] = map[string]any{
+			ctx.MCPServers["shikigami-mention"] = map[string]any{
 				"type": "http",
 				"url":  u,
 				"headers": map[string]any{

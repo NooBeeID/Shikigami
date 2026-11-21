@@ -5,7 +5,7 @@ import (
 	"sort"
 	"sync"
 
-	"aiterm/internal/session"
+	"github.com/NooBeeID/shikigami/internal/session"
 )
 
 // LaunchContext adalah konteks peluncuran yang dapat diperkaya oleh contribution.

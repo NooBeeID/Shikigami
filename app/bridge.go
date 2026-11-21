@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"sync"
 
-	"aiterm/internal/ipc"
-	"aiterm/internal/paths"
+	"github.com/NooBeeID/shikigami/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/paths"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )

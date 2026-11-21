@@ -1,4 +1,4 @@
-// Package paths menentukan lokasi data dan socket daemon aiterm.
+// Package paths menentukan lokasi data dan socket daemon shikigami.
 package paths
 
 import (
@@ -9,9 +9,9 @@ import (
 
 const (
 	// EnvDataDir adalah env var untuk meng-override DataDir (dev/test).
-	EnvDataDir = "AITERM_DATA_DIR"
+	EnvDataDir = "SHIKIGAMI_DATA_DIR"
 	// socketName adalah nama berkas unix socket di dalam DataDir.
-	socketName = "aitermd.sock"
+	socketName = "shikigamid.sock"
 	// maxSocketPath: batas path unix socket macOS ~104 byte; sisakan margin.
 	maxSocketPath = 100
 )
@@ -33,7 +33,7 @@ func DataDir() (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("tidak bisa menentukan direktori home: %w", err)
 		}
-		dir = filepath.Join(home, "Library", "Application Support", "aiterm")
+		dir = filepath.Join(home, "Library", "Application Support", "shikigami")
 	}
 	if err := os.MkdirAll(dir, 0o700); err != nil {
 		return "", fmt.Errorf("gagal membuat direktori data %s: %w", dir, err)
@@ -46,7 +46,7 @@ func DataDir() (string, error) {
 	return dir, nil
 }
 
-// SocketPath mengembalikan path unix socket daemon: <DataDir>/aitermd.sock.
+// SocketPath mengembalikan path unix socket daemon: <DataDir>/shikigamid.sock.
 func SocketPath() (string, error) {
 	dir, err := DataDir()
 	if err != nil {
@@ -54,7 +54,7 @@ func SocketPath() (string, error) {
 	}
 	p := filepath.Join(dir, socketName)
 	if len(p) > maxSocketPath {
-		return "", fmt.Errorf("path socket terlalu panjang (%d byte, maks %d): %s; pendekkan AITERM_DATA_DIR", len(p), maxSocketPath, p)
+		return "", fmt.Errorf("path socket terlalu panjang (%d byte, maks %d): %s; pendekkan SHIKIGAMI_DATA_DIR", len(p), maxSocketPath, p)
 	}
 	return p, nil
 }

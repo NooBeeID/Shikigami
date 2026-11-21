@@ -13,7 +13,7 @@ import (
 	"sync"
 	"time"
 
-	"aiterm/internal/session"
+	"github.com/NooBeeID/shikigami/internal/session"
 )
 
 // State adalah state sebuah pesan mention.

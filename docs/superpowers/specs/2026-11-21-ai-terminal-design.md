@@ -1,4 +1,4 @@
-# AI Terminal — Design (working title)
+# Shikigami — Design (sebelumnya: AI Terminal, working title)
 
 Status: disetujui pembuat (2026-11-21). Folder ini bukan git repo, jadi dokumen belum di-commit.
 Tanda **[call]** = keputusan saya (bukan hasil kesepakatan), silakan koreksi.

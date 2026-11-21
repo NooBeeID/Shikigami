@@ -10,10 +10,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"aiterm/internal/ipc"
-	"aiterm/internal/paths"
-	"aiterm/internal/provider"
-	"aiterm/internal/session"
+	"github.com/NooBeeID/shikigami/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/paths"
+	"github.com/NooBeeID/shikigami/internal/provider"
+	"github.com/NooBeeID/shikigami/internal/session"
 )
 
 var ErrUnknownSession = errors.New("sesi tidak dikenal")

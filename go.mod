@@ -1,4 +1,4 @@
-module aiterm
+module github.com/NooBeeID/shikigami
 
 go 1.26.3
 

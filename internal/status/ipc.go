@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"aiterm/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/ipc"
 )
 
 // RegisterIPC mendaftarkan status.get, status.list, dan status.hook.

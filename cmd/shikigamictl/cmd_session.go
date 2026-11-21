@@ -18,10 +18,10 @@ import (
 	"syscall"
 	"text/tabwriter"
 
-	"aiterm/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/ipc"
 )
 
-const sessionUsage = "penggunaan: aitermctl session new|list|attach|kill ..."
+const sessionUsage = "penggunaan: shikigamictl session new|list|attach|kill ..."
 
 type sessionInfo struct {
 	ID          string `json:"id"`
@@ -129,7 +129,7 @@ func sessionList(ctx context.Context, c *ipc.Client, args []string) error {
 
 func sessionKill(ctx context.Context, c *ipc.Client, args []string) error {
 	if len(args) != 1 {
-		return errors.New("penggunaan: aitermctl session kill <id>")
+		return errors.New("penggunaan: shikigamictl session kill <id>")
 	}
 	id := args[0]
 	if err := c.Call("session.kill", map[string]any{"id": id}, nil); err != nil {
@@ -198,7 +198,7 @@ func sessionRawMode() (restore func(), ok bool) {
 
 func sessionAttach(ctx context.Context, c *ipc.Client, args []string) error {
 	if len(args) != 1 {
-		return errors.New("penggunaan: aitermctl session attach <id>")
+		return errors.New("penggunaan: shikigamictl session attach <id>")
 	}
 	id := args[0]
 

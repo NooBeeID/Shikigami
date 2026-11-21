@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"aiterm/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/ipc"
 )
 
 // Info menggambarkan satu provider beserta ketersediaan binary-nya.

@@ -7,10 +7,10 @@ import (
 	"os"
 	"sort"
 
-	"aiterm/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/ipc"
 )
 
-// Command adalah satu subcommand aitermctl.
+// Command adalah satu subcommand shikigamictl.
 type Command struct {
 	Name    string
 	Summary string

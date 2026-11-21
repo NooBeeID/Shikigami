@@ -9,10 +9,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"aiterm/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/ipc"
 )
 
-const workspaceUsage = `pemakaian: aitermctl workspace <aksi>
+const workspaceUsage = `pemakaian: shikigamictl workspace <aksi>
   list
   create <nama>
   rename <id> <nama>
@@ -40,22 +40,22 @@ func runWorkspace(ctx context.Context, c *ipc.Client, args []string) error {
 		return callAndPrint(c, "workspace.list", struct{}{})
 	case "create":
 		if len(rest) < 1 {
-			return errors.New("pemakaian: aitermctl workspace create <nama>")
+			return errors.New("pemakaian: shikigamictl workspace create <nama>")
 		}
 		return callAndPrint(c, "workspace.create", map[string]any{"name": strings.Join(rest, " ")})
 	case "rename":
 		if len(rest) != 2 {
-			return errors.New("pemakaian: aitermctl workspace rename <id> <nama>")
+			return errors.New("pemakaian: shikigamictl workspace rename <id> <nama>")
 		}
 		return callAndPrint(c, "workspace.rename", map[string]any{"id": rest[0], "name": rest[1]})
 	case "delete":
 		if len(rest) != 1 {
-			return errors.New("pemakaian: aitermctl workspace delete <id>")
+			return errors.New("pemakaian: shikigamictl workspace delete <id>")
 		}
 		return callAndPrint(c, "workspace.delete", map[string]any{"id": rest[0]})
 	case "add-project":
 		if len(rest) < 2 || len(rest) > 3 {
-			return errors.New("pemakaian: aitermctl workspace add-project <workspaceId> <path> [nama]")
+			return errors.New("pemakaian: shikigamictl workspace add-project <workspaceId> <path> [nama]")
 		}
 		p := rest[1]
 		if abs, err := filepath.Abs(p); err == nil {
@@ -68,7 +68,7 @@ func runWorkspace(ctx context.Context, c *ipc.Client, args []string) error {
 		return callAndPrint(c, "workspace.addProject", params)
 	case "remove-project":
 		if len(rest) != 2 {
-			return errors.New("pemakaian: aitermctl workspace remove-project <workspaceId> <projectId>")
+			return errors.New("pemakaian: shikigamictl workspace remove-project <workspaceId> <projectId>")
 		}
 		return callAndPrint(c, "workspace.removeProject", map[string]any{"workspaceId": rest[0], "projectId": rest[1]})
 	case "config":

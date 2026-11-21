@@ -9,8 +9,8 @@ import (
 	"syscall"
 	"time"
 
-	"aiterm/internal/ipc"
-	"aiterm/internal/paths"
+	"github.com/NooBeeID/shikigami/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/paths"
 )
 
 // version di-override lewat -ldflags "-X main.version=<v>".
@@ -57,12 +57,12 @@ func run() int {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	logger.Info("aitermd mulai", "version", version, "pid", os.Getpid(), "socket", socketPath, "modules", moduleNames())
+	logger.Info("shikigamid mulai", "version", version, "pid", os.Getpid(), "socket", socketPath, "modules", moduleNames())
 
 	if err := srv.Serve(ctx); err != nil && !errors.Is(err, context.Canceled) {
 		logger.Error("daemon berhenti dengan galat", "err", err)
 		return 1
 	}
-	logger.Info("aitermd berhenti")
+	logger.Info("shikigamid berhenti")
 	return 0
 }

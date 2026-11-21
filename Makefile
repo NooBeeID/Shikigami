@@ -14,18 +14,18 @@ build-ui:
 
 build-daemon:
 	mkdir -p build/bin
-	go build -ldflags "$(LDFLAGS)" -o build/bin/aitermd ./cmd/aitermd
-	go build -ldflags "$(LDFLAGS)" -o build/bin/aitermctl ./cmd/aitermctl
+	go build -ldflags "$(LDFLAGS)" -o build/bin/shikigamid ./cmd/shikigamid
+	go build -ldflags "$(LDFLAGS)" -o build/bin/shikigamictl ./cmd/shikigamictl
 
 build-app:
 	mkdir -p build/bin app/dist
 	test -d frontend/dist || { echo "frontend/dist belum ada; jalankan 'make build-ui' dulu" >&2; exit 1; }
 	find app/dist -mindepth 1 ! -name .gitkeep -delete
 	cp -R frontend/dist/. app/dist/
-	CGO_LDFLAGS="-framework UniformTypeIdentifiers" go build -tags desktop,production -o build/bin/aiterm ./app
+	CGO_LDFLAGS="-framework UniformTypeIdentifiers" go build -tags desktop,production -o build/bin/shikigami ./app
 
 run-daemon: build-daemon
-	./build/bin/aitermd
+	./build/bin/shikigamid
 
 clean:
 	rm -rf build frontend/dist

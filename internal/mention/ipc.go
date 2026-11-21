@@ -6,7 +6,7 @@ import (
 	"errors"
 	"strings"
 
-	"aiterm/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/ipc"
 )
 
 // IPCOptions mengatur RegisterIPC.

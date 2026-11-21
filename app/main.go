@@ -21,7 +21,7 @@ func main() {
 	}
 	bridge := NewBridge()
 	err = wails.Run(&options.App{
-		Title:       "AI Terminal",
+		Title:       "Shikigami",
 		Width:       1200,
 		Height:      800,
 		AssetServer: &assetserver.Options{Assets: sub},

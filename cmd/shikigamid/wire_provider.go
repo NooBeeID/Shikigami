@@ -1,9 +1,9 @@
 package main
 
 import (
-	"aiterm/internal/ipc"
-	"aiterm/internal/provider"
-	"aiterm/internal/session"
+	"github.com/NooBeeID/shikigami/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/provider"
+	"github.com/NooBeeID/shikigami/internal/session"
 )
 
 // Impor internal/provider menjalankan init() claude/codex/shell sehingga

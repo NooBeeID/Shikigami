@@ -6,11 +6,11 @@ import (
 	"sync"
 	"time"
 
-	"aiterm/internal/ipc"
-	"aiterm/internal/mention"
-	"aiterm/internal/provider"
-	"aiterm/internal/session"
-	"aiterm/internal/status"
+	"github.com/NooBeeID/shikigami/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/mention"
+	"github.com/NooBeeID/shikigami/internal/provider"
+	"github.com/NooBeeID/shikigami/internal/session"
+	"github.com/NooBeeID/shikigami/internal/status"
 )
 
 func init() {

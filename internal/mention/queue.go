@@ -10,9 +10,9 @@ import (
 	"sync"
 	"time"
 
-	"aiterm/internal/provider"
-	"aiterm/internal/session"
-	"aiterm/internal/status"
+	"github.com/NooBeeID/shikigami/internal/provider"
+	"github.com/NooBeeID/shikigami/internal/session"
+	"github.com/NooBeeID/shikigami/internal/status"
 )
 
 const (

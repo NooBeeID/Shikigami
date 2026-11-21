@@ -10,13 +10,13 @@ import (
 	"syscall"
 	"time"
 
-	"aiterm/internal/ipc"
-	"aiterm/internal/paths"
+	"github.com/NooBeeID/shikigami/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/paths"
 )
 
 const (
-	daemonBinaryName   = "aitermd"
-	daemonLogName      = "aitermd.log"
+	daemonBinaryName   = "shikigamid"
+	daemonLogName      = "shikigamid.log"
 	daemonWaitTimeout  = 5 * time.Second
 	daemonWaitInterval = 100 * time.Millisecond
 )
@@ -36,7 +36,7 @@ func daemonPing(socketPath string) error {
 	return c.Call("ping", nil, nil)
 }
 
-// findDaemonBinary mencari biner aitermd di sebelah executable (termasuk
+// findDaemonBinary mencari biner shikigamid di sebelah executable (termasuk
 // bundle .app), lalu di PATH.
 func findDaemonBinary() (string, error) {
 	if exe, err := os.Executable(); err == nil {
@@ -107,7 +107,7 @@ func spawnDaemon(bin string) error {
 	return nil
 }
 
-// EnsureDaemon memastikan daemon hidup: ping dulu, bila gagal spawn aitermd
+// EnsureDaemon memastikan daemon hidup: ping dulu, bila gagal spawn shikigamid
 // lalu tunggu ping berhasil (timeout 5 dtk, interval 100 ms).
 func EnsureDaemon(ctx context.Context) error {
 	sock, err := paths.SocketPath()

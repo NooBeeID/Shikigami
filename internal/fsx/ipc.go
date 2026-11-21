@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"aiterm/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/ipc"
 )
 
 type listParams struct {

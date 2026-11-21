@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"aiterm/internal/session/pty"
+	"github.com/NooBeeID/shikigami/internal/session/pty"
 )
 
 const (

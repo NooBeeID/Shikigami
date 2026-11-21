@@ -8,10 +8,10 @@ import (
 	"io"
 	"strings"
 
-	"aiterm/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/ipc"
 )
 
-const mentionUsage = `pemakaian: aitermctl mention <aksi>
+const mentionUsage = `pemakaian: shikigamictl mention <aksi>
   send [--workspace <id>] [--from <sessionId>] <to> <teks...>
   queue [sessionId]
   cancel <id>
@@ -40,11 +40,11 @@ func runMention(ctx context.Context, c *ipc.Client, args []string) error {
 		ws := fs.String("workspace", "", "id workspace")
 		from := fs.String("from", "", "id sesi pengirim")
 		if err := fs.Parse(rest); err != nil {
-			return fmt.Errorf("%v\npemakaian: aitermctl mention send [--workspace <id>] [--from <sessionId>] <to> <teks...>", err)
+			return fmt.Errorf("%v\npemakaian: shikigamictl mention send [--workspace <id>] [--from <sessionId>] <to> <teks...>", err)
 		}
 		r := fs.Args()
 		if len(r) < 2 {
-			return errors.New("pemakaian: aitermctl mention send [--workspace <id>] [--from <sessionId>] <to> <teks...>")
+			return errors.New("pemakaian: shikigamictl mention send [--workspace <id>] [--from <sessionId>] <to> <teks...>")
 		}
 		params := map[string]any{
 			"workspaceId": *ws,
@@ -57,7 +57,7 @@ func runMention(ctx context.Context, c *ipc.Client, args []string) error {
 		return callAndPrint(c, "mention.send", params)
 	case "queue":
 		if len(rest) > 1 {
-			return errors.New("pemakaian: aitermctl mention queue [sessionId]")
+			return errors.New("pemakaian: shikigamictl mention queue [sessionId]")
 		}
 		params := map[string]any{}
 		if len(rest) == 1 {
@@ -66,22 +66,22 @@ func runMention(ctx context.Context, c *ipc.Client, args []string) error {
 		return callAndPrint(c, "mention.queue.list", params)
 	case "cancel":
 		if len(rest) != 1 {
-			return errors.New("pemakaian: aitermctl mention cancel <id>")
+			return errors.New("pemakaian: shikigamictl mention cancel <id>")
 		}
 		return callAndPrint(c, "mention.queue.cancel", map[string]any{"id": rest[0]})
 	case "confirm":
 		if len(rest) != 1 {
-			return errors.New("pemakaian: aitermctl mention confirm <id>")
+			return errors.New("pemakaian: shikigamictl mention confirm <id>")
 		}
 		return callAndPrint(c, "mention.confirm", map[string]any{"id": rest[0]})
 	case "names":
 		if len(rest) != 1 {
-			return errors.New("pemakaian: aitermctl mention names <workspaceId>")
+			return errors.New("pemakaian: shikigamictl mention names <workspaceId>")
 		}
 		return callAndPrint(c, "mention.names", map[string]any{"workspaceId": rest[0]})
 	case "mode":
 		if len(rest) > 1 {
-			return errors.New("pemakaian: aitermctl mention mode [auto|confirm_agent|user_only]")
+			return errors.New("pemakaian: shikigamictl mention mode [auto|confirm_agent|user_only]")
 		}
 		params := map[string]any{}
 		if len(rest) == 1 {

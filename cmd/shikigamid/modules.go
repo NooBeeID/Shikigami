@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"aiterm/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/ipc"
 )
 
 var (

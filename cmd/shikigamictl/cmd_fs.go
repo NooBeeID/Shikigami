@@ -8,13 +8,13 @@ import (
 	"os"
 	"strconv"
 
-	"aiterm/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/ipc"
 )
 
 const fsUsage = `penggunaan:
-  aitermctl fs ls <root> [relDir]
-  aitermctl fs cat <root> <path>
-  aitermctl fs write <root> <path> <expectedMtime>   (isi dari stdin)`
+  shikigamictl fs ls <root> [relDir]
+  shikigamictl fs cat <root> <path>
+  shikigamictl fs write <root> <path> <expectedMtime>   (isi dari stdin)`
 
 func init() {
 	RegisterCommand(Command{

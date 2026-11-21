@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strings"
 
-	"aiterm/internal/session"
+	"github.com/NooBeeID/shikigami/internal/session"
 )
 
 type toolDef struct {

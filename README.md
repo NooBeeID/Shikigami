@@ -1,12 +1,14 @@
-# aiterm
+# Shikigami
+
+Shikigami (式神) adalah roh pelayan yang dipanggil penyihir; di sini, tiap sesi agent adalah roh yang kamu panggil dan perintah. Go module: `github.com/NooBeeID/shikigami`. Sebelumnya bernama "aiterm" (working title).
 
 Aplikasi desktop macOS untuk menjalankan banyak sesi AI agent (Claude Code, Codex, atau shell biasa) dalam terminal, dikelompokkan per **workspace** yang berisi beberapa project. Dibuat ringan: tanpa Electron, tanpa polling.
 
 Terdiri dari tiga biner:
 
-- `aitermd`: daemon Go. Mengelola workspace, sesi PTY, file, status sesi, dan mention antar sesi. Berjalan terpisah dari UI, jadi sesi tetap hidup walau window ditutup.
-- `aiterm`: aplikasi Wails (WKWebView, bukan Chromium) dengan frontend Svelte + xterm.js. Menyalakan daemon otomatis bila belum berjalan.
-- `aitermctl`: CLI debug untuk daemon.
+- `shikigamid`: daemon Go. Mengelola workspace, sesi PTY, file, status sesi, dan mention antar sesi. Berjalan terpisah dari UI, jadi sesi tetap hidup walau window ditutup.
+- `shikigami`: aplikasi Wails (WKWebView, bukan Chromium) dengan frontend Svelte + xterm.js. Menyalakan daemon otomatis bila belum berjalan.
+- `shikigamictl`: CLI debug untuk daemon.
 
 Status: sembilan tiket pertama (fase 0–3 di spec) sudah ter-merge dan build lulus. Belum ada pengujian dengan agent sungguhan untuk deteksi status dari hooks dan mention antar agent; lihat [Keterbatasan](#keterbatasan-yang-diketahui).
 
@@ -38,10 +40,10 @@ make build
 scripts/build.sh
 ```
 
-Hasil ada di `build/bin/` (`aitermd`, `aitermctl`, `aiterm`). Target lain:
+Hasil ada di `build/bin/` (`shikigamid`, `shikigamictl`, `shikigami`). Target lain:
 
 - `make build-ui`: `npm install` dan build frontend (`frontend/dist`)
-- `make build-daemon`: build `aitermd` dan `aitermctl`
+- `make build-daemon`: build `shikigamid` dan `shikigamictl`
 - `make build-app`: salin `frontend/dist` ke `app/dist` lalu build app Wails
 - `make run-daemon`: build dan jalankan daemon
 - `make clean`: hapus artefak build
@@ -52,36 +54,37 @@ Tidak ada unit test; satu-satunya guard adalah build yang lulus.
 ## Menjalankan
 
 ```
-pkill -x aitermd          # hentikan daemon lama (penting setelah build ulang)
-open build/bin/aiterm     # atau: build/bin/aiterm
+pkill -x shikigamid          # hentikan daemon lama (penting setelah build ulang)
+open build/bin/shikigami     # atau: build/bin/shikigami
 ```
 
-App mencari `aitermd` di folder yang sama dengan `aiterm` (lalu di `PATH`) dan menyalakannya bila belum berjalan. Daemon tetap hidup setelah window ditutup; hentikan dengan `pkill -x aitermd`. Setelah build ulang, hentikan dulu daemon lama, karena app akan tersambung ke daemon yang sedang berjalan.
+App mencari `shikigamid` di folder yang sama dengan `shikigami` (lalu di `PATH`) dan menyalakannya bila belum berjalan. Daemon tetap hidup setelah window ditutup; hentikan dengan `pkill -x shikigamid`. Setelah build ulang, hentikan dulu daemon lama, karena app akan tersambung ke daemon yang sedang berjalan.
 
 Langkah pertama di window: buat workspace di sidebar, tambahkan project dengan mengetik path folder (dialog pilih folder native belum tersedia dari Wails v2), lalu buat sesi.
 
 ### Data
 
-- Direktori data default: `~/Library/Application Support/aiterm` (mode 0700), berisi `workspaces.json`, `config.json`, socket `aitermd.sock`, dan log `aitermd.log`.
-- Override dengan `AITERM_DATA_DIR` (path socket maksimal sekitar 100 byte). Untuk mencoba tanpa menyentuh data nyata: `AITERM_DATA_DIR=$(mktemp -d) build/bin/aiterm`, dijalankan langsung dari shell (bukan lewat `open`).
+- Direktori data default: `~/Library/Application Support/shikigami` (mode 0700), berisi `workspaces.json`, `config.json`, socket `shikigamid.sock`, dan log `shikigamid.log`.
+- Data dari nama lama (`~/Library/Application Support/aiterm`) tidak dipindahkan otomatis. Bila ada workspace di sana: hentikan daemon lama (`pkill -x aitermd`), lalu `mv ~/Library/Application\ Support/aiterm ~/Library/Application\ Support/shikigami`.
+- Override dengan `SHIKIGAMI_DATA_DIR` (path socket maksimal sekitar 100 byte). Untuk mencoba tanpa menyentuh data nyata: `SHIKIGAMI_DATA_DIR=$(mktemp -d) build/bin/shikigami`, dijalankan langsung dari shell (bukan lewat `open`).
 
 ### Daemon dan CLI saja
 
 ```
-build/bin/aitermd                 # atau: make run-daemon
-build/bin/aitermctl ping          # mencetak pong
-build/bin/aitermctl info
-build/bin/aitermctl help
+build/bin/shikigamid                 # atau: make run-daemon
+build/bin/shikigamictl ping          # mencetak pong
+build/bin/shikigamictl info
+build/bin/shikigamictl help
 ```
 
-Perintah `aitermctl`: `fs`, `info`, `mention`, `ping`, `provider`, `session`, `status`, `workspace`. Flag `--socket <path>` mengganti socket default. Contoh: `aitermctl session new`, `aitermctl session list`, `aitermctl workspace list`.
+Perintah `shikigamictl`: `fs`, `info`, `mention`, `ping`, `provider`, `session`, `status`, `workspace`. Flag `--socket <path>` mengganti socket default. Contoh: `shikigamictl session new`, `shikigamictl session list`, `shikigamictl workspace list`.
 
 ## Arsitektur
 
 ```
  Wails UI (Svelte + xterm.js) ──JSON-RPC 2.0 lewat unix socket──┐
                                                                 ▼
-                                          Daemon Go (aitermd)
+                                          Daemon Go (shikigamid)
                                           - workspace, sesi, PTY
                                           - file service
                                           - status sesi (hooks)
@@ -91,13 +94,13 @@ Perintah `aitermctl`: `fs`, `info`, `mention`, `ping`, `provider`, `session`, `s
                               claude / codex / shell (proses di PTY)
 ```
 
-- IPC: JSON-RPC 2.0, satu pesan JSON per baris, di `<DataDir>/aitermd.sock`. Event server ke klien berupa notifikasi `event` dengan `topic`. Tidak ada polling.
+- IPC: JSON-RPC 2.0, satu pesan JSON per baris, di `<DataDir>/shikigamid.sock`. Event server ke klien berupa notifikasi `event` dengan `topic`. Tidak ada polling.
 - App Wails meneruskan semua event daemon ke UI lewat event Wails `daemon:event`.
-- Modul daemon mendaftarkan diri lewat `init()` di `cmd/aitermd/wire_<modul>.go`; subcommand CLI lewat `cmd/aitermctl/cmd_<modul>.go`. Frontend memuat `frontend/src/modules/*/index.ts` otomatis dan mendaftarkan panel/tab lewat `lib/registry.ts`.
+- Modul daemon mendaftarkan diri lewat `init()` di `cmd/shikigamid/wire_<modul>.go`; subcommand CLI lewat `cmd/shikigamictl/cmd_<modul>.go`. Frontend memuat `frontend/src/modules/*/index.ts` otomatis dan mendaftarkan panel/tab lewat `lib/registry.ts`.
 
 ## Struktur
 
-- `cmd/aitermd`, `cmd/aitermctl`: daemon dan CLI debug
+- `cmd/shikigamid`, `cmd/shikigamictl`: daemon dan CLI debug
 - `internal/ipc`: server dan klien JSON-RPC
 - `internal/paths`: direktori data dan path socket
 - `internal/session`: manajer sesi, scrollback, antarmuka PTY (`session/pty`)

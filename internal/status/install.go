@@ -12,8 +12,8 @@ import (
 	"sync"
 	"time"
 
-	"aiterm/internal/paths"
-	"aiterm/internal/provider"
+	"github.com/NooBeeID/shikigami/internal/paths"
+	"github.com/NooBeeID/shikigami/internal/provider"
 )
 
 var installOnce sync.Once
@@ -35,21 +35,21 @@ func shellQuote(s string) string {
 	return "'" + strings.ReplaceAll(s, "'", `'\''`) + "'"
 }
 
-// aitermctlPath mencari biner aitermctl: sebelah executable, lalu PATH, lalu nama polos.
-func aitermctlPath() string {
+// shikigamictlPath mencari biner shikigamictl: sebelah executable, lalu PATH, lalu nama polos.
+func shikigamictlPath() string {
 	if exe, err := os.Executable(); err == nil {
-		p := filepath.Join(filepath.Dir(exe), "aitermctl")
+		p := filepath.Join(filepath.Dir(exe), "shikigamictl")
 		if st, err := os.Stat(p); err == nil && !st.IsDir() {
 			return p
 		}
 	}
-	if p, err := exec.LookPath("aitermctl"); err == nil {
+	if p, err := exec.LookPath("shikigamictl"); err == nil {
 		return p
 	}
-	return "aitermctl"
+	return "shikigamictl"
 }
 
-// hookCommand menyusun command hook. Akhiran "|| true" wajib: aitermctl keluar
+// hookCommand menyusun command hook. Akhiran "|| true" wajib: shikigamictl keluar
 // kode 1 bila daemon mati, dan agent tidak boleh gagal karenanya.
 func hookCommand(ctl, token, event string) string {
 	return shellQuote(ctl) + " status hook --session " + token + " --event " + event + " || true"
@@ -153,7 +153,7 @@ func InstallHooks() {
 
 // contribute mengisi env dan argumen peluncuran sesi.
 //
-// Nilai AITERM_SESSION_ID adalah launch token (overview T1), bukan ID sesi asli,
+// Nilai SHIKIGAMI_SESSION_ID adalah launch token (overview T1), bukan ID sesi asli,
 // karena session.Manager.Create memanggil Launcher sebelum membuat ID.
 // Keterbatasan: Launcher.Command bisa dipanggil tanpa sesi benar-benar terbentuk
 // (mis. gagal start), sehingga launch tertunda dan berkas bisa yatim; dibersihkan
@@ -176,11 +176,11 @@ func contribute(ctx *provider.LaunchContext) {
 		slog.Warn("status: gagal membuat launch token", "err", err)
 		return
 	}
-	ctx.Env["AITERM_SESSION_ID"] = token
+	ctx.Env["SHIKIGAMI_SESSION_ID"] = token
 	if serr == nil {
-		ctx.Env["AITERM_SOCK"] = sock
+		ctx.Env["SHIKIGAMI_SOCK"] = sock
 	} else {
-		slog.Warn("status: SocketPath tidak tersedia, AITERM_SOCK dilewati", "err", serr)
+		slog.Warn("status: SocketPath tidak tersedia, SHIKIGAMI_SOCK dilewati", "err", serr)
 	}
 
 	providerID := ctx.Session.ProviderID
@@ -188,7 +188,7 @@ func contribute(ctx *provider.LaunchContext) {
 		providerID = ctx.Provider.ID()
 	}
 	if providerID == provider.IDClaude && ctx.Provider != nil && ctx.Provider.Capabilities().Hooks {
-		path, err := writeHooksFile(dataDir, token, aitermctlPath())
+		path, err := writeHooksFile(dataDir, token, shikigamictlPath())
 		if err != nil {
 			slog.Warn("status: gagal menulis berkas hooks, lanjut tanpa --settings", "err", err)
 		} else {

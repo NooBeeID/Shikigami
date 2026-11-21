@@ -10,7 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"aiterm/internal/paths"
+	"github.com/NooBeeID/shikigami/internal/paths"
 )
 
 var claudeCapabilities = Capabilities{Hooks: true, MCP: true, IdleEvent: true}

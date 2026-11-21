@@ -13,10 +13,10 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"aiterm/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/ipc"
 )
 
-const statusUsage = "penggunaan: aitermctl status list|get <sessionId>|watch|hook --session <id> --event <Nama>"
+const statusUsage = "penggunaan: shikigamictl status list|get <sessionId>|watch|hook --session <id> --event <Nama>"
 
 type statusRow struct {
 	SessionID string `json:"sessionId"`
@@ -97,7 +97,7 @@ func statusWatch(ctx context.Context, c *ipc.Client) error {
 	return nil
 }
 
-// statusHook selalu mengembalikan nil; galat hanya ke stderr. main.go aitermctl
+// statusHook selalu mengembalikan nil; galat hanya ke stderr. main.go shikigamictl
 // keluar kode 1 bila Dial gagal sebelum command jalan; itu ditangani dengan
 // pembungkus `|| true` pada command di berkas hooks (milik hook-receiver).
 func statusHook(c *ipc.Client, args []string) error {

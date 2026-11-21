@@ -42,5 +42,5 @@ export function decodeFileTab(props: Record<string, unknown>): FileTabData {
 
 // ui-shell belum punya API tab kotor; kirim CustomEvent.
 export function setTabDirty(path: string, dirty: boolean): void {
-  window.dispatchEvent(new CustomEvent('aiterm:tab-dirty', { detail: { path, dirty } }));
+  window.dispatchEvent(new CustomEvent('shikigami:tab-dirty', { detail: { path, dirty } }));
 }

@@ -169,7 +169,7 @@ func handler(rt *Runtime) http.HandlerFunc {
 			writeRPC(w, req.ID, map[string]any{
 				"protocolVersion": "2025-03-26",
 				"capabilities":    map[string]any{"tools": map[string]any{}},
-				"serverInfo":      map[string]any{"name": "aiterm-mention", "version": "1"},
+				"serverInfo":      map[string]any{"name": "shikigami-mention", "version": "1"},
 			}, nil)
 		case "ping":
 			writeRPC(w, req.ID, map[string]any{}, nil)
