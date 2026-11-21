@@ -2,7 +2,7 @@
 id: ai-terminal-ticket-03-file-service
 title: File Service
 spec: docs/superpowers/specs/2026-11-21-ai-terminal-design.md
-status: ready
+status: implemented
 wave: 2
 depends_on: [ai-terminal-ticket-01-app-base]
 ---

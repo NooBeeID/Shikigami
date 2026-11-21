@@ -2,7 +2,10 @@ module aiterm
 
 go 1.26.3
 
-require github.com/wailsapp/wails/v2 v2.17.1
+require (
+	github.com/fsnotify/fsnotify v1.10.1
+	github.com/wailsapp/wails/v2 v2.17.1
+)
 
 require (
 	git.sr.ht/~jackmordaunt/go-toast/v2 v2.0.3 // indirect
