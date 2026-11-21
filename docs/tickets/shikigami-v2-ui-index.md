@@ -12,9 +12,9 @@ Sumber: `docs/superpowers/specs/2026-11-22-shikigami-v2-ui-design.md`
 | shikigami-v2-ui-ticket-04-shell-sidebars | Bilah atas dan dua sidebar | 4 | 03-pane-layout | 7 |
 | shikigami-v2-ui-ticket-05-activity-feed | Feed aktivitas (tab Activity) | 5 | 04-shell-sidebars | 2 |
 | shikigami-v2-ui-ticket-06-workspace-persist | Save workspace otomatis dan pemulihan | 5 | 04-shell-sidebars | 4 |
-| shikigami-v2-ui-ticket-07-session-groups | Grup sesi sebagai tab | 6 | 06-workspace-persist | 2 |
+| shikigami-v2-ui-ticket-07-session-groups | Grup sesi sebagai tab | 6 | 06-workspace-persist | 3 |
 
-Total: 7 tiket, 28 fitur.
+Total: 7 tiket, 29 fitur.
 
 Fitur per tiket:
 - 01: loginenv-path, app-bundle-script, make-install-targets
@@ -23,7 +23,7 @@ Fitur per tiket:
 - 04: shell-frame, topbar, sidebar-left-agent, sidebar-right-files, command-palette, notification-bell, shell-wiring
 - 05: activity-daemon, activity-ui
 - 06: schema-v2-daemon, autosave-restore, restart-dead-session, window-state
-- 07: groups-store, group-tabs-ui
+- 07: group-daemon, groups-store, group-tabs-ui
 
 ## Urutan Eksekusi per Wave
 
@@ -80,6 +80,8 @@ Semua tiket wajib mematuhi kontrak berikut. Tiket baru menambah file/modul sendi
 - UI state: `{leftSidebar: {visible, width}, rightSidebar: {visible, width, activeTab}, activeWorkspaceId}`
 - Method IPC: `workspace.layout.get` / `workspace.layout.set` (`{workspaceId, groupId, layout?}`), `workspace.ui.get` / `workspace.ui.set`.
 - Sesi hanya dimiliki tepat satu grup. Menghapus grup memindahkan sesinya ke `Utama` (dipakai juga oleh tiket 07).
+- Tambahan tiket 07 (aditif, skema tetap v2, tanpa menaikkan versi): `Workspace.membership` (`{sessionId: groupId}`, selalu objek, tanpa entri = grup `Utama`, dikosongkan saat daemon start karena sesi tidak dipersist) dan penanda grup bawaan `Group.main` (tepat satu per workspace; file v2 lama dinormalisasi di memori: grup "Utama" atau ber-order terkecil).
+- Method IPC grup (tiket 07): `workspace.group.create` (`{workspaceId, name?}`), `workspace.group.rename` (`{workspaceId, groupId, name}`), `workspace.group.delete` (`{workspaceId, groupId}`; grup `Utama` ditolak), `workspace.group.reorder` (`{workspaceId, groupId, toIndex}`), `workspace.group.setActive` (`{workspaceId, groupId}`), `workspace.group.moveSession` (`{workspaceId, sessionId, toGroupId}`). Event `workspace.groupsChanged` (payload tanpa layout). Daemon satu-satunya sumber kebenaran grup; frontend tidak menyimpan state grup sendiri.
 
 ### 6. Aktivitas (tiket 05)
 - IPC `activity.list` dengan parameter `{sessionId?, limit?}` mengembalikan `[{ts, sessionId, tool, summary}]`.
