@@ -7,6 +7,7 @@ export const meta = {
     { title: 'Setup', detail: 'git worktree + branch feat/<tiket>, salin plan' },
     { title: 'Foundation', detail: 'kerja bersama sebelum paralel (bila ada)' },
     { title: 'Features', detail: 'satu agent per plan fitur, paralel terbatas' },
+    { title: 'Fitur lanjutan', detail: 'fitur yang bergantung pada fitur lain (mis. wiring), berurutan setelah antrean paralel' },
     { title: 'Wiring', detail: 'sambungkan semua fitur' },
     { title: 'Build guard', detail: 'build harus lulus, perbaiki maks 2x' },
     { title: 'Report', detail: 'tulis progress.md + commit di branch fitur' },
@@ -39,12 +40,15 @@ const CHECK_SCHEMA = {
     hasFoundation: { type: 'boolean', description: `${planDir}/00-foundation.md ada` },
     features: { type: 'array', items: { type: 'string' }, description: 'slug fitur = nama file .md di folder plan selain overview.md, 00-foundation.md, progress.md (SEMUA, termasuk yang manual)' },
     manualLast: { type: 'array', items: { type: 'string' }, description: 'subset features yang menurut overview.md dikerjakan MANUAL/TERAKHIR setelah wiring dan butuh daemon/app berjalan (mis. pengukuran/spike). Kosong bila tidak ada.' },
+    afterParallel: { type: 'array', items: { type: 'string' }, description: 'subset features (BUKAN manual) yang bergantung pada hasil fitur lain dan HARUS dikerjakan setelah fitur-fitur itu selesai, mis. fitur wiring/penyambung yang menurut overview "dikerjakan setelah semua fitur lain tergabung" atau berurutan. Kosong bila semua fitur mandiri.' },
   },
-  required: ['hasOverview', 'hasFoundation', 'features', 'manualLast'],
+  required: ['hasOverview', 'hasFoundation', 'features', 'manualLast', 'afterParallel'],
 }
 const check = await agent(
   `Lihat folder ${planDir}/ (di root repo). Laporkan: apakah overview.md ada, apakah 00-foundation.md ada, dan daftar slug fitur (nama file .md lain tanpa ekstensi, kecuali progress.md).
-Baca juga overview.md untuk mengisi manualLast: slug fitur yang di overview dinyatakan dikerjakan terakhir/manual setelah Wiring, tidak paralel, dan butuh daemon atau aplikasi yang sedang berjalan untuk diukur/dicoba (contoh: spike pengukuran RAM/CPU). Fitur kode biasa BUKAN manualLast. Hanya baca; jangan mengubah apa pun.`,
+Baca juga overview.md untuk mengisi manualLast: slug fitur yang di overview dinyatakan dikerjakan terakhir/manual setelah Wiring, tidak paralel, dan butuh daemon atau aplikasi yang sedang berjalan untuk diukur/dicoba (contoh: spike pengukuran RAM/CPU). Fitur kode biasa BUKAN manualLast.
+Isi juga afterParallel: slug fitur (yang bukan manual) yang di overview/plan-nya jelas bergantung pada fitur lain dan harus dikerjakan SETELAH fitur-fitur itu selesai, misalnya fitur wiring/penyambung ("dikerjakan setelah semua fitur lain tergabung", "berurutan", "menyambungkan hasil fitur X, Y, Z"), atau fitur yang membaca/mengimpor kode yang dibuat fitur lain. Fitur yang mandiri (hanya menyentuh path miliknya) BUKAN afterParallel.
+Hanya baca; jangan mengubah apa pun.`,
   { label: 'check-plan', schema: CHECK_SCHEMA, model: 'haiku', effort: 'low' }
 )
 if (!check || !check.hasOverview || !check.features.length) {
@@ -52,12 +56,13 @@ if (!check || !check.hasOverview || !check.features.length) {
 }
 
 const deferred = check.features.filter(s => check.manualLast.includes(s))
-const features = check.features.filter(s => !deferred.includes(s))
-if (!features.length) {
+const afterParallel = check.features.filter(s => !deferred.includes(s) && (check.afterParallel || []).includes(s))
+const features = check.features.filter(s => !deferred.includes(s) && !afterParallel.includes(s))
+if (!features.length && !afterParallel.length) {
   return { status: 'NO_PLAN', reason: `Semua fitur di ${planDir}/ bersifat manual (${deferred.join(', ')}); tidak ada yang bisa diimplementasikan otomatis` }
 }
-const limit = rawMax === 'full' ? features.length : Math.max(1, parseInt(rawMax, 10) || 3)
-log(`${features.length} fitur, paralel maks ${limit}${check.hasFoundation ? ', ada foundation' : ''}${deferred.length ? `; ditunda (manual): ${deferred.join(', ')}` : ''}`)
+const limit = rawMax === 'full' ? Math.max(1, features.length) : Math.max(1, parseInt(rawMax, 10) || 3)
+log(`${features.length} fitur paralel (maks ${limit})${afterParallel.length ? `, lalu berurutan: ${afterParallel.join(', ')}` : ''}${check.hasFoundation ? ', ada foundation' : ''}${deferred.length ? `; ditunda (manual): ${deferred.join(', ')}` : ''}`)
 
 // ---------- Setup worktree ----------
 phase('Setup')
@@ -130,16 +135,23 @@ ${NO_STOPPING_NOTE}`,
 
 // ---------- Features ----------
 phase('Features')
-function featurePrompt(slug, retry) {
+function featurePrompt(slug, retry, sequential) {
+  const rules = sequential
+    ? `Fitur ini berjalan SETELAH semua fitur paralel lain selesai dan sudah ada di worktree (tidak ada agent lain yang bekerja sekarang).
+- Baca kode fitur-fitur yang kamu sambungkan; jangan menulis ulang atau mengubahnya di luar yang diizinkan plan-mu.
+- Kamu boleh menyentuh path yang disebut di plan-mu, termasuk file wiring/entry point milik plan-mu (mis. registrasi, App.svelte) bila plan memintanya.
+- Jalankan build/check untuk bagian yang kamu sentuh; build penuh boleh dijalankan.
+- Guard hanya build; tidak ada unit test. Jangan melakukan git commit (commit dilakukan sekali di akhir).`
+    : `Aturan paralel (WAJIB): agent lain sedang mengerjakan fitur lain di worktree yang sama saat ini.
+- Hanya sentuh file/folder di bagian "Path yang dimiliki" plan-mu.
+- JANGAN menyentuh file wiring (registrasi, entry point, rute) atau path fitur lain. Langkah wiring terpisah menyambungkan semuanya di akhir.
+- Jangan menjalankan build seluruh project (fitur lain bisa belum selesai dan membuat build gagal karena bukan salahmu). Build/vet hanya paket/folder milikmu.
+- Guard hanya build; tidak ada unit test. Jangan melakukan git commit (commit dilakukan sekali di akhir).`
   return `Implementasikan SATU fitur dari tiket ${ticket}: ${slug}.
 ${WORKTREE_NOTE}
 Baca penuh plan-nya: ${P}/${slug}.md. Baca juga ${P}/overview.md untuk kontrak bersama (jangan diubah).${check.hasFoundation ? ` Foundation sudah selesai dikerjakan (${P}/00-foundation.md); pakai apa yang sudah ada, jangan menulis ulang.` : ''}
 
-Aturan paralel (WAJIB): agent lain sedang mengerjakan fitur lain di worktree yang sama saat ini.
-- Hanya sentuh file/folder di bagian "Path yang dimiliki" plan-mu.
-- JANGAN menyentuh file wiring (registrasi, entry point, rute) atau path fitur lain. Langkah wiring terpisah menyambungkan semuanya di akhir.
-- Jangan menjalankan build seluruh project (fitur lain bisa belum selesai dan membuat build gagal karena bukan salahmu). Build/vet hanya paket/folder milikmu.
-- Guard hanya build; tidak ada unit test. Jangan melakukan git commit (commit dilakukan sekali di akhir).
+${rules}
 ${retry ? 'Ini percobaan ulang: periksa apa yang sudah ada dari percobaan sebelumnya, lalu lengkapi; jangan mulai dari nol.' : ''}
 ${NO_STOPPING_NOTE}`
 }
@@ -156,7 +168,29 @@ const featureResults = await runWithLimit(
   },
   limit
 )
-const done = featureResults.filter(Boolean)
+const parallelDone = featureResults.filter(Boolean)
+
+// ---------- Fitur lanjutan (bergantung pada fitur lain, berurutan) ----------
+const sequentialDone = []
+if (afterParallel.length) {
+  phase('Fitur lanjutan')
+  const parallelFailed = parallelDone.filter(x => !x.ok).map(x => x.slug)
+  for (const slug of afterParallel) {
+    if (parallelFailed.length) {
+      // Prasyarat gagal: jangan membuat stub; catat dan lewati.
+      log(`${slug}: dilewati karena fitur prasyarat gagal (${parallelFailed.join(', ')})`)
+      sequentialDone.push({ slug, ok: false, filesChanged: [], reason: `dilewati: fitur paralel gagal (${parallelFailed.join(', ')})` })
+      continue
+    }
+    let res = await agent(featurePrompt(slug, false, true), { label: `impl-seq:${slug}`, phase: 'Fitur lanjutan', schema: IMPL_RESULT, model: 'sonnet' })
+    if ((!res || !res.ok) && !(res && res.needsHumanInput)) {
+      log(`${slug}: percobaan pertama gagal, ulang sekali`)
+      res = await agent(featurePrompt(slug, true, true), { label: `impl-seq-retry:${slug}`, phase: 'Fitur lanjutan', schema: IMPL_RESULT, model: 'sonnet' })
+    }
+    sequentialDone.push({ slug, ...(res || { ok: false, filesChanged: [], reason: 'agent mati/dilewati' }) })
+  }
+}
+const done = parallelDone.concat(sequentialDone)
 const failed = done.filter(x => !x.ok)
 if (failed.length) log(`Fitur gagal: ${failed.map(x => `${x.slug} (${x.reason || '?'})`).join(', ')}`)
 

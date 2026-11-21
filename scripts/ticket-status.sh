@@ -66,7 +66,14 @@ for f in "${files[@]}"; do
   if [ "$st" = "implemented" ]; then
     next="-"; n_done=$((n_done+1))
   elif echo "$worktrees" | grep -q "worktree/feat-$n"; then
-    next="sedang dikerjakan (worktree aktif)"; n_prog=$((n_prog+1))
+    # progress.md ditulis di fase Report (akhir workflow). Bila sudah ada di worktree, workflow
+    # sudah selesai tetapi belum ter-merge (mis. PARTIAL): butuh keputusan, bukan sedang berjalan.
+    if [ -f "worktree/feat-$n/docs/plans/$n/progress.md" ]; then
+      next="workflow selesai, BELUM ter-merge (worktree tersisa); lihat worktree/feat-$n/docs/plans/$n/progress.md"
+    else
+      next="sedang dikerjakan (worktree aktif)"
+    fi
+    n_prog=$((n_prog+1))
   elif [ "$plan" = "tidak" ]; then
     next="/plan-from-tiket $n"; n_noplan=$((n_noplan+1))
   elif [ "$st" = "in-progress" ] && [ "$prog" = "ada" ]; then
