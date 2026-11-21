@@ -61,7 +61,7 @@
 
 <style>
   .wrap { position: relative; min-width: 0; }
-  .head { display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%; text-align: left; font: inherit; color: var(--fg, #222); background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 6px 8px; cursor: pointer; }
+  .head { display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%; text-align: left; font: inherit; color: var(--fg, #222); background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 10px 12px; cursor: pointer; }
   .head:hover { background: var(--bg-hover, #0001); }
   .text { display: flex; flex-direction: column; min-width: 0; }
   .name { font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

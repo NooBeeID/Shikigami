@@ -37,9 +37,9 @@
 
 <style>
   .right-panel { display: flex; flex-direction: column; height: 100%; min-width: 0; min-height: 0; overflow: hidden; }
-  .header { padding: 8px 12px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: var(--fg-muted); border-bottom: 1px solid var(--border); }
+  .header { padding: 12px 16px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: var(--fg-muted); border-bottom: 1px solid var(--border); }
   .tabbar { display: flex; border-bottom: 1px solid var(--border); }
-  .tabbar button { flex: 1; border: 0; border-radius: 0; background: transparent; color: var(--fg-muted); padding: 7px 8px; }
+  .tabbar button { flex: 1; border: 0; border-radius: 0; background: transparent; color: var(--fg-muted); padding: 10px 12px; }
   .tabbar button.active { color: var(--fg); box-shadow: inset 0 -2px var(--accent); }
   .body { flex: 1; min-height: 0; min-width: 0; overflow: auto; }
   .empty { flex: 1; }

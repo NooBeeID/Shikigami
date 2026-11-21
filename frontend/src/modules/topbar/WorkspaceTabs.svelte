@@ -232,7 +232,7 @@
   .tab {
     flex: none;
     max-width: 160px;
-    padding: 0 12px;
+    padding: 0 16px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

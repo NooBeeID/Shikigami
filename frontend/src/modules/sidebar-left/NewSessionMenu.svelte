@@ -69,8 +69,8 @@
 </div>
 
 <style>
-  .wrap { position: relative; padding: 8px; border-top: 1px solid var(--border, #8884); }
-  .main { width: 100%; font: inherit; font-size: 12px; color: var(--fg, #222); background: transparent; border: 1px solid var(--accent, #3b82f6); border-radius: 5px; padding: 6px 10px; cursor: pointer; }
+  .wrap { position: relative; padding: 12px; border-top: 1px solid var(--border, #8884); }
+  .main { width: 100%; font: inherit; font-size: 12px; color: var(--fg, #222); background: transparent; border: 1px solid var(--accent, #3b82f6); border-radius: 5px; padding: 8px 12px; cursor: pointer; }
   .main:hover { background: var(--bg-hover, #0001); }
   .pop { position: absolute; bottom: 100%; left: 8px; right: 8px; z-index: 20; margin-bottom: 2px; padding: 6px; display: flex; flex-direction: column; gap: 3px; max-height: 300px; overflow: auto; background: var(--bg-elev, #fff); border: 1px solid var(--border, #8884); border-radius: 6px; box-shadow: 0 6px 18px #0004; }
   .lbl { font-size: 11px; color: var(--fg-muted, #888); padding: 2px 2px 0; }

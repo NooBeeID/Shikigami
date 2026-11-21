@@ -92,7 +92,7 @@
 </div>
 
 <style>
-  .wrap { --wails-draggable: no-drag; position: relative; display: inline-flex; align-items: center; padding: 0 6px; }
+  .wrap { --wails-draggable: no-drag; position: relative; display: inline-flex; align-items: center; padding: 0 10px; }
   .gear {
     display: inline-flex;
     align-items: center;

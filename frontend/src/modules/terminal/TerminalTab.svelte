@@ -178,6 +178,6 @@
 
 <style>
   .term-host { width: 100%; height: 100%; min-height: 0; }
-  .term-host :global(.xterm) { padding: 4px; height: 100%; }
+  .term-host :global(.xterm) { padding: 8px 10px; height: 100%; }
   .term-error { font-size: 0.8rem; color: #c33; padding: 0.25rem 0.5rem; }
 </style>

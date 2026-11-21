@@ -286,8 +286,8 @@
     flex: none;
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 6px 8px;
+    gap: 6px;
+    padding: 10px 12px;
     border-bottom: 1px solid var(--border, color-mix(in srgb, currentColor 20%, transparent));
   }
   .header select {
@@ -298,7 +298,7 @@
   }
   .footer {
     flex: none;
-    padding: 6px 8px;
+    padding: 10px 12px;
     border-top: 1px solid var(--border, color-mix(in srgb, currentColor 20%, transparent));
   }
   .primary {
@@ -318,7 +318,7 @@
     background: var(--bg-hover, color-mix(in srgb, currentColor 10%, transparent));
   }
   .msg {
-    padding: 8px;
+    padding: 12px;
     color: var(--fg-muted, inherit);
   }
   .empty {
@@ -327,8 +327,8 @@
     overflow: auto;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding: 8px;
+    gap: 10px;
+    padding: 12px 16px;
   }
   .empty .msg {
     padding: 0;
@@ -362,7 +362,7 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    height: 22px;
+    height: 28px;
     box-sizing: border-box;
     white-space: nowrap;
     overflow: hidden;

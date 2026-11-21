@@ -374,7 +374,7 @@
 <style>
   .group-tabs { display: flex; flex-wrap: nowrap; align-items: stretch; overflow-x: auto; background: var(--bg-elev); border-bottom: 1px solid var(--border); min-height: 2rem; }
   .tab-wrap { flex: 0 0 auto; display: flex; }
-  .tab { position: relative; display: flex; align-items: center; gap: 0.375rem; padding: 0 0.625rem; font-size: 0.75rem; color: var(--fg-muted); cursor: pointer; border-bottom: 2px solid transparent; user-select: none; outline: none; }
+  .tab { position: relative; display: flex; align-items: center; gap: 0.375rem; padding: 0 1rem; font-size: 0.75rem; color: var(--fg-muted); cursor: pointer; border-bottom: 2px solid transparent; user-select: none; outline: none; }
   .tab:hover, .tab:focus-visible { background: var(--bg-hover); }
   .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
   .tab.drop { outline: 1px dashed var(--border); outline-offset: -3px; }
@@ -389,7 +389,7 @@
   .tab:hover .more, .tab:focus-within .more, .tab.active .more { visibility: visible; }
   .more:hover { color: var(--fg); background: var(--bg-hover); }
   .edit { font: inherit; font-size: 0.75rem; color: var(--fg); background: var(--bg); border: 1px solid var(--accent); border-radius: 0.25rem; padding: 0.125rem 0.25rem; width: 9rem; outline: none; }
-  .add { flex: 0 0 auto; font: inherit; font-size: 0.875rem; color: var(--fg-muted); background: transparent; border: 0; padding: 0 0.75rem; cursor: pointer; }
+  .add { flex: 0 0 auto; font: inherit; font-size: 0.875rem; color: var(--fg-muted); background: transparent; border: 0; padding: 0 1rem; cursor: pointer; }
   .add:hover { color: var(--fg); background: var(--bg-hover); }
   .err { margin-left: auto; flex: 0 1 auto; min-width: 0; display: flex; align-items: center; gap: 0.25rem; padding: 0 0.5rem; font-size: 0.6875rem; color: var(--danger); }
   .err-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 20rem; }

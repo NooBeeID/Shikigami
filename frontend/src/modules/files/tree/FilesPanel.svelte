@@ -185,7 +185,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 4px 8px;
+    padding: 8px 12px;
     flex: none;
   }
   .title {
@@ -207,7 +207,7 @@
     background: var(--bg-hover, color-mix(in srgb, currentColor 10%, transparent));
   }
   .msg {
-    padding: 8px;
+    padding: 12px;
     color: var(--fg-muted, inherit);
   }
   .tree {
@@ -219,7 +219,7 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    height: 22px;
+    height: 28px;
     box-sizing: border-box;
     white-space: nowrap;
     overflow: hidden;

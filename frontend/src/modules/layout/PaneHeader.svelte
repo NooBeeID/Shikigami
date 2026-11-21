@@ -185,10 +185,10 @@
   .pane-header {
     display: flex;
     align-items: center;
-    gap: 6px;
-    height: 28px;
+    gap: 8px;
+    height: 34px;
     box-sizing: border-box;
-    padding: 0 6px;
+    padding: 0 10px;
     background: var(--bg-elev, #222);
     border-bottom: 1px solid var(--border, #444);
     color: var(--fg, #ddd);

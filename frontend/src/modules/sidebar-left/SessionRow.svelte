@@ -102,7 +102,7 @@
   .row { position: relative; display: flex; align-items: center; min-width: 0; border-radius: 5px; }
   .row:hover { background: var(--bg-hover, #0001); }
   .row.exited { opacity: 0.5; }
-  .main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; text-align: left; font: inherit; font-size: 12px; color: var(--fg, #222); background: transparent; border: 0; padding: 5px 4px 5px 14px; cursor: pointer; }
+  .main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; text-align: left; font: inherit; font-size: 12px; color: var(--fg, #222); background: transparent; border: 0; padding: 7px 6px 7px 18px; cursor: pointer; }
   .title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .prov { font-size: 10px; color: var(--fg-muted, #888); border: 1px solid var(--border, #8884); border-radius: 3px; padding: 0 3px; flex: none; }
   .in { width: 6px; height: 6px; border-radius: 50%; background: var(--accent, #3b82f6); flex: none; }

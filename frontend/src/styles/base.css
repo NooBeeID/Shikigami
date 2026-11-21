@@ -13,7 +13,7 @@ button {
   background: var(--bg-elev);
   border: 1px solid var(--border);
   border-radius: 4px;
-  padding: 4px 10px;
+  padding: 6px 12px;
   cursor: pointer;
 }
 button:hover:not(:disabled) { background: var(--bg-hover); }
@@ -24,7 +24,7 @@ input {
   background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 4px;
-  padding: 4px 8px;
+  padding: 6px 10px;
 }
 input:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
 * { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }

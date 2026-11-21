@@ -29,7 +29,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 0 8px;
+    padding: 0 12px;
     font-size: 12px;
     color: var(--fg-muted, #888);
     white-space: nowrap;
