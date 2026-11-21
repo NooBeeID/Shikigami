@@ -1,0 +1,35 @@
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --bg-elev: #f5f5f7;
+  --bg-hover: #e9e9ee;
+  --fg: #1b1b1f;
+  --fg-muted: #6b6b76;
+  --border: #d9d9df;
+  --accent: #2f6fed;
+  --danger: #d1344b;
+  --ok: #1e9e5a;
+  --term-bg: #ffffff;
+  --term-fg: #1b1b1f;
+  --term-cursor: #1b1b1f;
+  --sidebar-w: 260px;
+  --tabbar-h: 34px;
+  --statusbar-h: 24px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1b1b1f;
+    --bg-elev: #24242a;
+    --bg-hover: #2f2f37;
+    --fg: #e6e6ea;
+    --fg-muted: #9b9ba6;
+    --border: #35353d;
+    --accent: #5b94ff;
+    --danger: #ff6b81;
+    --ok: #4cc788;
+    --term-bg: #1e1e1e;
+    --term-fg: #d4d4d4;
+    --term-cursor: #d4d4d4;
+  }
+}

@@ -2,7 +2,7 @@
 id: ai-terminal-ticket-06-ui-shell
 title: UI Shell
 spec: docs/superpowers/specs/2026-11-21-ai-terminal-design.md
-status: ready
+status: implemented
 wave: 4
 depends_on: [ai-terminal-ticket-02-session-pty, ai-terminal-ticket-04-workspace-model, ai-terminal-ticket-05-provider-adapters]
 ---

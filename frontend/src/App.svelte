@@ -1,63 +1,73 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { call, inWails } from './lib/ipc';
-  import { panels, tabTypes } from './lib/registry';
+  import './styles/theme.css';
+  import './styles/base.css';
+  import { onMount, onDestroy } from 'svelte';
+  import { connection, initStores } from './lib/stores';
+  import TabBar from './modules/tabs/TabBar.svelte';
+  import TabContent from './modules/tabs/TabContent.svelte';
+  import SidebarArea from './modules/shell/SidebarArea.svelte';
+  import StatusBar from './modules/shell/StatusBar.svelte';
 
-  let status = $state<'idle' | 'loading' | 'ok' | 'error'>('idle');
-  let result = $state<unknown>(null);
-  let errorMessage = $state('');
+  let dispose: (() => void) | null = null;
 
-  async function ping() {
-    status = 'loading';
-    try {
-      result = await call('ping');
-      status = 'ok';
-    } catch (e) {
-      errorMessage = e instanceof Error ? e.message : String(e);
-      status = 'error';
-    }
+  async function start() {
+    dispose?.();
+    dispose = null;
+    dispose = await initStores();
   }
 
-  onMount(ping);
-
-  const sidebar = panels('sidebar');
-  const mainTab = panels('main-tab');
-  const statusbar = panels('statusbar');
-  const tabs = tabTypes();
+  onMount(() => {
+    void start();
+  });
+  onDestroy(() => dispose?.());
 </script>
 
-<main>
-  <h1>Hello World</h1>
-  <p>
-    {#if status === 'loading' || status === 'idle'}
-      Memeriksa daemon...
-    {:else if status === 'ok'}
-      pong: {JSON.stringify(result)}
-    {:else}
-      Galat: {errorMessage}
-    {/if}
-  </p>
-  <button onclick={ping}>Ping ulang</button>
-  <p>
-    Panel terdaftar: sidebar {$sidebar.length}, main-tab {$mainTab.length}, statusbar {$statusbar.length}, tipe tab {Object.keys($tabs).length}
-  </p>
-  {#each $mainTab as panel (panel.id)}
-    <section class="panel-main-tab"><panel.component /></section>
-  {/each}
-  <small>{inWails ? 'Mode: Wails' : 'Mode: browser (bukan di dalam Wails)'}</small>
-</main>
+{#if $connection.state === 'error'}
+  <div class="center">
+    <h2>Tidak bisa terhubung ke daemon</h2>
+    <p class="msg">{$connection.message}</p>
+    <button onclick={start}>Coba lagi</button>
+  </div>
+{:else if $connection.state === 'connecting'}
+  <div class="center"><p>Menghubungkan ke daemon...</p></div>
+{:else}
+  <div class="shell">
+    <div class="side"><SidebarArea /></div>
+    <main class="main">
+      <TabBar />
+      <div class="content"><TabContent /></div>
+    </main>
+    <div class="status"><StatusBar /></div>
+  </div>
+{/if}
 
 <style>
-  :global(body) {
-    margin: 0;
-    font-family: system-ui, sans-serif;
-    background: #fff;
-    color: #111;
+  .center {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-align: center;
   }
-  main { padding: 2rem; }
-  button { padding: 0.4rem 0.8rem; }
-  .panel-main-tab { height: 70vh; margin-top: 1rem; }
-  @media (prefers-color-scheme: dark) {
-    :global(body) { background: #1b1b1f; color: #eee; }
+  .msg { color: var(--fg-muted); max-width: 60ch; margin: 0; }
+  h2 { margin: 0; }
+  .shell {
+    height: 100%;
+    display: grid;
+    grid-template-columns: var(--sidebar-w) 1fr;
+    grid-template-rows: 1fr var(--statusbar-h);
   }
+  .side { grid-column: 1; grid-row: 1 / span 2; min-height: 0; }
+  .main {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .content { flex: 1; min-height: 0; overflow: hidden; }
+  .status { grid-column: 2; grid-row: 2; min-width: 0; }
 </style>
