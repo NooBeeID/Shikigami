@@ -1,6 +1,6 @@
 export const meta = {
   name: 'implement-feature',
-  description: 'Implementasi satu tiket di git worktree: foundation -> fitur paralel -> wiring -> build guard -> commit di branch fitur',
+  description: 'Implementasi satu tiket di git worktree: foundation -> fitur paralel -> wiring -> build guard -> commit -> squash merge ke branch utama -> hapus worktree dan branch',
   whenToUse: 'Dipanggil oleh /implement-feature dengan args {ticket, maxAgentParalel}',
   phases: [
     { title: 'Check plan', detail: 'pastikan plan ada, jika tidak keluar' },
@@ -10,6 +10,7 @@ export const meta = {
     { title: 'Wiring', detail: 'sambungkan semua fitur' },
     { title: 'Build guard', detail: 'build harus lulus, perbaiki maks 2x' },
     { title: 'Report', detail: 'tulis progress.md + commit di branch fitur' },
+    { title: 'Merge', detail: 'squash merge ke branch utama, hapus worktree + branch (hanya bila OK)' },
   ],
 }
 
@@ -219,6 +220,50 @@ ${build ? build.output : '(tidak ada)'}
   { label: 'report-and-commit', schema: REPORT_SCHEMA, model: 'haiku', effort: 'low' }
 )
 
+// ---------- Merge ----------
+phase('Merge')
+const MERGE_SCHEMA = {
+  type: 'object',
+  properties: {
+    outcome: { type: 'string', enum: ['MERGED', 'SKIPPED', 'BLOCKED', 'CONFLICT', 'FAILED'] },
+    reason: { type: 'string' },
+    mergeCommit: { type: 'string' },
+    conflicts: { type: 'array', items: { type: 'string' } },
+    cleaned: { type: 'boolean', description: 'worktree dan branch fitur sudah dihapus' },
+    postMergeBuildPassed: { type: 'boolean' },
+    postMergeBuildOutput: { type: 'string', description: 'ekor output build di branch utama setelah merge' },
+  },
+  required: ['outcome'],
+}
+let merge = { outcome: 'SKIPPED', reason: '' }
+if (status === 'OK' && report && report.committed) {
+  merge = await agent(
+    `Squash merge branch fitur ${BRANCH} ke branch utama (${setup.baseBranch}), lalu bersihkan. Jalankan perintah nyata, periksa tiap hasil, dan ikuti aturan keselamatan ini TANPA pengecualian:
+- JANGAN pernah memakai --force, reset --hard, clean, atau checkout yang membuang perubahan. JANGAN push.
+- JANGAN menyelesaikan konflik sendiri. Konflik = batalkan dan laporkan.
+- Jangan mengubah file apa pun kecuali lewat merge itu sendiri.
+
+Langkah:
+1. Tentukan ROOT = checkout utama: \`dirname "$(git rev-parse --path-format=absolute --git-common-dir)"\`. Semua perintah git berikutnya memakai \`git -C "$ROOT" ...\`, bukan cwd (cwd-mu bisa berada di dalam worktree).
+2. Pastikan di ROOT branch aktif = ${setup.baseBranch} (\`git -C "$ROOT" branch --show-current\`). Bila tidak: outcome=SKIPPED, reason jelas. Pastikan tidak ada perubahan pada file TERLACAK di ROOT (\`git -C "$ROOT" status --porcelain --untracked-files=no\` kosong). Bila ada: outcome=SKIPPED, reason berisi daftar file.
+3. Cek tabrakan dengan file TAK-TERLACAK di ROOT: ambil \`git -C "$ROOT" diff --name-only ${setup.baseBranch}...${BRANCH}\`. Untuk tiap path yang ada di ROOT sebagai file tak-terlacak (git ls-files --error-unmatch gagal): bila isinya identik dengan versi di branch (\`git -C "$ROOT" show ${BRANCH}:<path> | cmp - "$ROOT/<path>"\`), hapus salinan tak-terlacak itu di ROOT (aman, akan dikembalikan oleh merge). Bila isinya berbeda: outcome=BLOCKED, sebutkan path-nya, jangan menghapus apa pun.
+4. \`git -C "$ROOT" merge --squash ${BRANCH}\`. Bila gagal atau ada path berstatus konflik (\`git -C "$ROOT" diff --name-only --diff-filter=U\`): jalankan \`git -C "$ROOT" reset --merge\` untuk membatalkan, outcome=CONFLICT, conflicts=daftar path. Worktree dan branch dibiarkan utuh.
+5. Bila sukses: \`git -C "$ROOT" commit\` dengan subjek "feat(${ticket}): implementasi tiket (squash)", body satu-dua kalimat ringkasan fitur, dan baris terakhir pesan tepat: ${COAUTHOR}. Catat hash sebagai mergeCommit.
+6. Verifikasi build di ROOT setelah merge (cd "$ROOT"). ${BUILD_GUARD} Catat postMergeBuildPassed dan ekor outputnya (maks 3000 karakter). JANGAN membatalkan merge bila build gagal; cukup laporkan.
+7. Bersihkan: \`git -C "$ROOT" worktree remove ${WT}\` (tanpa --force; bila gagal, jangan paksa, laporkan reason dan cleaned=false), lalu \`git -C "$ROOT" branch -D ${BRANCH}\` (-D wajib karena squash merge membuat branch tampak belum ter-merge). Set cleaned=true bila keduanya berhasil.
+8. outcome=MERGED bila commit merge terbentuk (walau cleanup atau build bermasalah; jelaskan di reason).`,
+    { label: 'squash-merge', schema: MERGE_SCHEMA, model: 'sonnet' }
+  ) || { outcome: 'FAILED', reason: 'agent merge mati/dilewati' }
+} else {
+  merge = {
+    outcome: 'SKIPPED',
+    reason: status !== 'OK'
+      ? `status ${status}: merge otomatis hanya untuk status OK; worktree dan branch dibiarkan untuk diperiksa`
+      : 'commit di branch fitur tidak terbentuk',
+  }
+}
+log(`merge: ${merge.outcome}${merge.reason ? ' — ' + merge.reason : ''}`)
+
 return {
   status,
   ticket,
@@ -230,5 +275,6 @@ return {
   buildPassed: build ? build.passed : false,
   committed: report ? report.committed : false,
   commit: report ? report.commit : undefined,
-  progress: `${P}/progress.md`,
+  merge,
+  progress: merge.outcome === 'MERGED' ? `${planDir}/progress.md` : `${P}/progress.md`,
 }
