@@ -1,5 +1,12 @@
-.DS_Store
-worktree/
-node_modules/
+# Artefak build
 build/
-dist/
+frontend/node_modules/
+frontend/dist/
+
+# Aset embed app (disalin dari frontend/dist saat build-app), kecuali .gitkeep
+app/dist/*
+!app/dist/.gitkeep
+
+# Lain-lain
+.DS_Store
+*.sock

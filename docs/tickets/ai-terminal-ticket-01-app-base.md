@@ -2,7 +2,7 @@
 id: ai-terminal-ticket-01-app-base
 title: App Base
 spec: docs/superpowers/specs/2026-11-21-ai-terminal-design.md
-status: ready
+status: implemented
 wave: 1
 depends_on: []
 ---
