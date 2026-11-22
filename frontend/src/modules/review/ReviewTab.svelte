@@ -272,7 +272,7 @@
           </div>
         {/if}
         {#if diffData}
-          <DiffView diff={diffData} path={selectedPath} selectedHunkId={selectedHunk?.id} {hunkActions} />
+          <DiffView diff={diffData} path={selectedPath} selectedHunkId={selectedHunk?.id} {hunkActions} sessionId={sessionId ?? undefined} />
         {:else if diffLoading}
           <div class="empty">Memuat diff...</div>
         {/if}

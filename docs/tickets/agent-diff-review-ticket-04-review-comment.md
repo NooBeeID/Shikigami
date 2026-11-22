@@ -2,7 +2,7 @@
 id: agent-diff-review-ticket-04-review-comment
 title: Review: komentar ke agent
 spec: docs/superpowers/specs/2026-11-22-agent-diff-review-design.md
-status: ready
+status: implemented
 wave: 4
 depends_on: [agent-diff-review-ticket-03-review-actions]
 ---

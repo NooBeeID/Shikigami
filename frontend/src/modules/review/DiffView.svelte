@@ -5,18 +5,21 @@
   - footer: Snippet (nama slot publik `footer`), dirender di bawah semua hunk/pesan status.
   - onLineClick: callback klik baris.
   - selectedHunkId: id hunk yang disorot (kelas `selected`, atribut data-hunk-id pada header hunk).
+  - sessionId: bila ada, klik nomor baris membuka CommentBox di bawah baris.
 -->
 <script lang="ts">
-  import type { Snippet } from 'svelte';
+  import { untrack, type Snippet } from 'svelte';
+  import CommentBox from './CommentBox.svelte';
   import { hunkSummary, type DiffLine, type DiffResult, type Hunk } from './diff';
 
-  let { diff, path, onLineClick, hunkActions, footer, selectedHunkId }: {
+  let { diff, path, onLineClick, hunkActions, footer, selectedHunkId, sessionId }: {
     diff: DiffResult;
     path: string;
     onLineClick?: (line: DiffLine, hunk: Hunk) => void;
     hunkActions?: Snippet<[Hunk]>;
     footer?: Snippet;
     selectedHunkId?: string;
+    sessionId?: string;
   } = $props();
 
   const status = $derived(
@@ -25,6 +28,21 @@
       : diff.hunks.length === 0 ? 'Tidak ada perubahan terhadap baseline'
       : null,
   );
+
+  let commentTarget = $state<{ hunkId: string; lineIndex: number; line: number } | null>(null);
+  let commentSending = $state(false);
+  function openComment(e: MouseEvent, h: Hunk, li: number, ln: DiffLine) {
+    if (!sessionId) return;
+    e.stopPropagation();
+    if (commentSending) return;
+    const line = ln.newNo || ln.oldNo;
+    if (!line || line < 1) return;
+    commentTarget = { hunkId: h.id, lineIndex: li, line };
+  }
+  $effect(() => {
+    diff;
+    if (!untrack(() => commentSending)) commentTarget = null;
+  });
 
   function onKey(e: KeyboardEvent, ln: DiffLine, h: Hunk) {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -49,18 +67,25 @@
           <span class="sum">{hunkSummary(h)}</span>
           {#if hunkActions}<span class="actions">{@render hunkActions(h)}</span>{/if}
         </div>
-        {#each h.lines as ln}
+        {#each h.lines as ln, li}
           {#if onLineClick}
-            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <!-- svelte-ignore a11y_no_static_element_interactions, a11y_click_events_have_key_events -->
             <div
               class="line {ln.kind} clickable"
               role="button"
               tabindex="0"
               onclick={() => onLineClick?.(ln, h)}
               onkeydown={(e) => onKey(e, ln, h)}
-            ><span class="no">{ln.oldNo || ''}</span><span class="no">{ln.newNo || ''}</span><span class="mk">{marker(ln.kind)}</span><span class="tx">{ln.text}</span></div>
+            ><span class="no" class:cm={!!sessionId} title={sessionId ? 'Komentar ke agent' : undefined} onclick={sessionId ? (e) => openComment(e, h, li, ln) : undefined}>{ln.oldNo || ''}</span><span class="no" class:cm={!!sessionId} title={sessionId ? 'Komentar ke agent' : undefined} onclick={sessionId ? (e) => openComment(e, h, li, ln) : undefined}>{ln.newNo || ''}</span><span class="mk">{marker(ln.kind)}</span><span class="tx">{ln.text}</span></div>
           {:else}
-            <div class="line {ln.kind}"><span class="no">{ln.oldNo || ''}</span><span class="no">{ln.newNo || ''}</span><span class="mk">{marker(ln.kind)}</span><span class="tx">{ln.text}</span></div>
+            <!-- svelte-ignore a11y_no_static_element_interactions, a11y_click_events_have_key_events -->
+            <div class="line {ln.kind}"><span class="no" class:cm={!!sessionId} title={sessionId ? 'Komentar ke agent' : undefined} onclick={sessionId ? (e) => openComment(e, h, li, ln) : undefined}>{ln.oldNo || ''}</span><span class="no" class:cm={!!sessionId} title={sessionId ? 'Komentar ke agent' : undefined} onclick={sessionId ? (e) => openComment(e, h, li, ln) : undefined}>{ln.newNo || ''}</span><span class="mk">{marker(ln.kind)}</span><span class="tx">{ln.text}</span></div>
+          {/if}
+          {#if sessionId && commentTarget && commentTarget.hunkId === h.id && commentTarget.lineIndex === li}
+            <div class="comment-slot">
+              <CommentBox {sessionId} {path} line={commentTarget.line} bind:sending={commentSending}
+                          onclose={() => { commentTarget = null; commentSending = false; }} />
+            </div>
           {/if}
         {/each}
       {/each}
@@ -87,4 +112,7 @@
   .clickable { cursor: pointer; }
   .clickable:hover { filter: brightness(1.1); }
   .clickable:focus-visible { outline: 1px solid var(--accent, currentColor); outline-offset: -1px; }
+  .no.cm { cursor: pointer; }
+  .no.cm:hover { color: var(--accent, currentColor); text-decoration: underline; }
+  .comment-slot { position: sticky; left: 0; width: min(100%, 640px); box-sizing: border-box; padding: 4px 8px 6px 64px; white-space: normal; }
 </style>

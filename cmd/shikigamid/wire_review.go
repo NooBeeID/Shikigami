@@ -9,6 +9,8 @@ package main
 // Bila kunci path tidak ada atau bukan string non-kosong, event diabaikan tanpa galat.
 
 import (
+	"errors"
+	"fmt"
 	"log/slog"
 	"sync"
 	"time"
@@ -16,6 +18,7 @@ import (
 	"github.com/NooBeeID/shikigami/internal/ipc"
 	"github.com/NooBeeID/shikigami/internal/provider"
 	"github.com/NooBeeID/shikigami/internal/review"
+	"github.com/NooBeeID/shikigami/internal/session"
 	"github.com/NooBeeID/shikigami/internal/status"
 )
 
@@ -66,6 +69,39 @@ func reviewWireSupported(eng *status.Engine) func(sessionID string) bool {
 			return false
 		}
 		return p.Capabilities().Hooks
+	}
+}
+
+func reviewWireWarnNoManager(d *Deps) {
+	if d.Logger != nil {
+		d.Logger.Warn("review: session.manager tidak tersedia, review.comment dilewati")
+	}
+}
+
+// reviewWireCommentDeps mengadaptasi session.Manager dan status engine ke review.CommentDeps.
+func reviewWireCommentDeps(mgr *session.Manager, eng *status.Engine) review.CommentDeps {
+	return review.CommentDeps{
+		Cwd: func(id string) (string, error) {
+			s, err := mgr.Get(id)
+			if err != nil {
+				return "", err
+			}
+			return s.Cwd, nil
+		},
+		Write: func(id string, data []byte) error {
+			err := mgr.Write(id, data)
+			if errors.Is(err, session.ErrNotRunning) || errors.Is(err, session.ErrNotFound) {
+				return fmt.Errorf("%w", review.ErrSessionGone)
+			}
+			return err
+		},
+		State: func(id string) (bool, bool) {
+			st, ok := eng.Get(id)
+			if !ok {
+				return false, false
+			}
+			return st.Status == status.StatusRunning, true
+		},
 	}
 }
 
@@ -121,6 +157,15 @@ func init() {
 			review.RegisterIPC(srv, store, reviewWireSupported(eng))
 			review.RegisterDiffIPC(srv, store, reviewWireSupported(eng))
 			review.RegisterActions(srv, store, reviewWireSupported(eng))
+			if mv, mok := d.Lookup("session.manager"); mok {
+				if mgr, mok2 := mv.(*session.Manager); mok2 && mgr != nil {
+					review.RegisterCommentIPC(srv, reviewWireCommentDeps(mgr, eng))
+				} else {
+					reviewWireWarnNoManager(d)
+				}
+			} else {
+				reviewWireWarnNoManager(d)
+			}
 			log := d.Logger
 			if log == nil {
 				log = slog.Default()
