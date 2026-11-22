@@ -226,5 +226,6 @@ func wireThread(srv *ipc.Server, d *Deps) {
 	} else {
 		d.Logger.Warn("thread: status.engine tidak tersedia, kartu aktivitas dinonaktifkan")
 	}
+	thread.RegisterClose(m)
 	m.FireStart()
 }

@@ -6,12 +6,14 @@ import ThreadSection from './ThreadSection.svelte';
 import ThreadTab from './ThreadTab.svelte';
 import { subscribeThreadEvents } from './thread-store';
 import { installParticipants } from './participants';
+import { installClose } from './close';
 
 registerPaneKind({ kind: 'thread', component: ThreadPane, titleFor: (leaf) => leaf.title || 'Thread' });
 registerSidebarSection({ id: 'thread-sidebar', component: ThreadSection, order: 0 });
 registerTabType({ type: 'thread', component: ThreadTab }); // jalur legacy; tidak dirender siapa pun saat ini
 subscribeThreadEvents();
 installParticipants();
+installClose();
 
 export { registerThreadSlot } from './slots';
 export type { ThreadSlotName } from './slots';

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { activeWorkspaceId } from '../../lib/stores';
   import { statusStore } from '../status/store';
+  import { ReadyBadge } from './close';
   import NewThreadDialog from './NewThreadDialog.svelte';
   import { openThreadPane, threadError, threads } from './thread-store';
 
@@ -27,6 +28,7 @@
         <button type="button" class="row" class:closed={t.state === 'closed'} onclick={() => openThreadPane(t)}>
           <span class="dot" class:on={active} title={active ? 'aktif' : 'idle'}></span>
           <span class="title">{t.title}</span>
+          <ReadyBadge thread={t} />
           {#if t.state === 'closed'}<span class="tag">ditutup</span>{/if}
         </button>
       </li>

@@ -40,7 +40,8 @@ const (
 	MethodMessages      = "thread.messages"
 	MethodSend          = "thread.send"
 	MethodOwnedSessions = "thread.ownedSessions"
-	// Ditambah tiket thread-close: "thread.closePreview", "thread.close" (lewat RegisterMethod).
+	MethodClosePreview  = "thread.closePreview"
+	MethodClose         = "thread.close"
 
 	EventUpdated = "thread.updated"
 	EventMessage = "thread.message"
@@ -58,6 +59,7 @@ type Thread struct {
 	ClosedAt     *time.Time    `json:"closedAt,omitempty"`
 	Participants []Participant `json:"participants"` // selalu [] (bukan null)
 	ReadyToClose bool          `json:"readyToClose"`
+	CloseSummary string        `json:"closeSummary,omitempty"` // ringkasan usul tutup dari master (tiket thread-close)
 }
 
 // Participant adalah sesi yang terlibat dalam thread (ProjectID kosong untuk master). Bentuk stabil; tiket lain hanya boleh menambah field opsional dengan omitempty.

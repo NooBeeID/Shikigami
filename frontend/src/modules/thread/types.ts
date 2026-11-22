@@ -6,6 +6,7 @@ export interface Participant { sessionId: string; projectId: string; role: Threa
 export interface Thread {
   id: string; workspaceId: string; title: string; goal: string; state: ThreadState;
   createdAt: string; closedAt?: string; participants: Participant[]; readyToClose: boolean;
+  closeSummary?: string;
 }
 export interface ThreadMessage {
   id: string; threadId: string; from: string; to: string; text: string; ts: string; kind: ThreadKind;
@@ -16,6 +17,7 @@ export interface ThreadMessage {
 export const THREAD_METHODS = {
   create: 'thread.create', list: 'thread.list', get: 'thread.get',
   messages: 'thread.messages', send: 'thread.send', ownedSessions: 'thread.ownedSessions',
+  closePreview: 'thread.closePreview', close: 'thread.close',
 } as const;
 export const THREAD_EVENTS = { updated: 'thread.updated', message: 'thread.message' } as const;
 export const FROM_USER = 'user';
