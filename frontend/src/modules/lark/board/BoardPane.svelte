@@ -8,6 +8,7 @@
   import { copyLink, sendToAgent } from '../actions';
   import {
     buildBaseLink,
+    defaultGroupField,
     eligibleExtraFields,
     filterRecords,
     listTables,
@@ -202,6 +203,15 @@
       syncFieldSelections();
     } catch (e) {
       if (my === seq) setError(e);
+      return;
+    }
+    // Muat sisa halaman otomatis agar semua tiket (dan semua kolom kanban) tampil.
+    await loadRest(my);
+  }
+
+  async function loadRest(my: number) {
+    while (my === seq && nextOffset !== undefined && !moreError) {
+      await loadMore();
     }
   }
 
@@ -235,7 +245,7 @@
 
   function syncFieldSelections() {
     const ks = singleSelectFields(fields);
-    if (!ks.some((f) => f.id === groupFieldId)) groupFieldId = ks[0]?.id ?? '';
+    if (!ks.some((f) => f.id === groupFieldId)) groupFieldId = defaultGroupField(ks)?.id ?? '';
     const eligible = eligibleExtraFields(fields);
     let ids = extraFieldIds.filter((id) => eligible.some((f) => f.id === id));
     if (ids.length === 0 && !extraTouched) {

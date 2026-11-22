@@ -25,6 +25,9 @@ type Field struct {
 	Name      string `json:"name"`
 	Type      string `json:"type"`
 	IsPrimary bool   `json:"isPrimary"`
+	// Options berisi nama opsi select sesuai urutan di Lark (kosong bila bukan
+	// select atau +field-list gagal). Dipakai untuk urutan kolom kanban.
+	Options []string `json:"options,omitempty"`
 }
 
 type Record struct {
@@ -189,6 +192,9 @@ func ListTickets(ctx context.Context, q TicketListQuery) (TicketPage, error) {
 		return TicketPage{}, err
 	}
 	page := TicketPage{Fields: ticketFields(m), Records: []Record{}}
+	if offset == 0 {
+		attachFieldOptions(ctx, q, page.Fields)
+	}
 	for r, row := range m.Rows {
 		rec := Record{Values: map[string]string{}}
 		if r < len(m.RecordIDList) {
@@ -314,4 +320,42 @@ func ticketDate(s string) string {
 		}
 	}
 	return s
+}
+
+// attachFieldOptions mengisi Field.Options dari +field-list. Gagal tidak fatal:
+// kanban tetap jalan dengan urutan kolom bawaan.
+func attachFieldOptions(ctx context.Context, q TicketListQuery, fields []Field) {
+	out, err := Run(ctx, "base", "+field-list", "--base-token", q.BaseToken, "--table-id", q.TableID)
+	if err != nil {
+		return
+	}
+	var env struct {
+		Data struct {
+			Fields []struct {
+				ID      string `json:"id"`
+				Options []struct {
+					Name string `json:"name"`
+				} `json:"options"`
+			} `json:"fields"`
+		} `json:"data"`
+	}
+	if json.Unmarshal(out, &env) != nil {
+		return
+	}
+	byID := make(map[string][]string, len(env.Data.Fields))
+	for _, f := range env.Data.Fields {
+		if len(f.Options) == 0 {
+			continue
+		}
+		names := make([]string, 0, len(f.Options))
+		for _, o := range f.Options {
+			names = append(names, o.Name)
+		}
+		byID[f.ID] = names
+	}
+	for i := range fields {
+		if opts, ok := byID[fields[i].ID]; ok && fields[i].Type == FieldTypeSingleSelect {
+			fields[i].Options = opts
+		}
+	}
 }

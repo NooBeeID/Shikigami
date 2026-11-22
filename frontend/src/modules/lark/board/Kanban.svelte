@@ -30,7 +30,13 @@
       if (arr) arr.push(r);
       else map.set(k, [r]);
     }
-    const cols = [...map.entries()].map(([name, items]) => ({ name, items }));
+    // Urutan kolom mengikuti urutan opsi di Lark (kolom kosong tetap tampil);
+    // nilai di luar opsi menyusul sesuai kemunculan.
+    const options = fields.find((f) => f.id === groupFieldId)?.options ?? [];
+    const cols: { name: string; items: BoardRecord[] }[] = options.map((name) => ({ name, items: map.get(name) ?? [] }));
+    for (const [name, items] of map) {
+      if (!options.includes(name)) cols.push({ name, items });
+    }
     if (empty.length > 0 || cols.length === 0) cols.push({ name: NO_VALUE_LABEL, items: empty });
     return cols;
   });

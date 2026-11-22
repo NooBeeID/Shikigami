@@ -4,7 +4,7 @@ export const FIELD_TYPE_SINGLE_SELECT = 'single_select';
 
 export type TicketSource = { id: string; name: string; baseToken: string; host: string; tableId?: string; viewId?: string };
 export type LarkError = { code: string; message: string };
-export type BoardField = { id: string; name: string; type: string; isPrimary: boolean };
+export type BoardField = { id: string; name: string; type: string; isPrimary: boolean; options?: string[] };
 export type BoardRecord = { id: string; title: string; values: Record<string, string> };
 export type TicketsPage = { fields: BoardField[]; records: BoardRecord[]; nextOffset?: number };
 export type TicketDetail = { fields: { name: string; text: string }[]; url?: string; recordLinkAvailable: boolean };
@@ -70,6 +70,11 @@ export function isSingleSelect(f: BoardField): boolean {
 
 export function primaryField(fields: BoardField[]): BoardField | undefined {
   return fields.find((f) => f.isPrimary) ?? fields[0];
+}
+
+// Field group default untuk kanban: "Status" bila ada, jika tidak single-select pertama.
+export function defaultGroupField(candidates: BoardField[]): BoardField | undefined {
+  return candidates.find((f) => f.name.trim().toLowerCase() === 'status') ?? candidates[0];
 }
 
 export function singleSelectFields(fields: BoardField[]): BoardField[] {
