@@ -3,6 +3,7 @@ import { get } from 'svelte/store';
 import { toggleLeft, toggleRight } from '../../lib/stores/shell';
 import { activeProjectId } from '../../lib/stores';
 import { createAndOpenSession, openFolder } from './helpers';
+import { openNewSessionPicker } from './picker';
 
 const DEDUPE_MS = 250;
 
@@ -36,7 +37,7 @@ export function installShellShortcuts(): () => void {
   };
   window.addEventListener('keydown', onKey, true);
 
-  // ⌘T = sesi claude baru, ⇧⌘T = sesi shell baru (project aktif).
+  // ⌘T = popup pilihan sesi (shell/claude/codex), ⇧⌘T = sesi shell baru langsung (project aktif).
   let newInflight = false;
   const onNewSession = (e: KeyboardEvent) => {
     if (!e.metaKey || e.code !== 'KeyT' || e.ctrlKey || e.altKey) return;
@@ -49,8 +50,12 @@ export function installShellShortcuts(): () => void {
       openFolder();
       return;
     }
+    if (!e.shiftKey) {
+      openNewSessionPicker();
+      return;
+    }
     newInflight = true;
-    createAndOpenSession(e.shiftKey ? 'shell' : 'claude', projectId)
+    createAndOpenSession('shell', projectId)
       .catch((err) => console.error('[shell] gagal membuat sesi baru:', err))
       .finally(() => { newInflight = false; });
   };

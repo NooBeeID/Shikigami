@@ -8,6 +8,7 @@
   import RailPanelHost from './RailPanelHost.svelte';
   import LayoutHeaderHost from './LayoutHeaderHost.svelte';
   import { installShellShortcuts } from './shortcuts';
+  import NewSessionPicker from './NewSessionPicker.svelte';
 
   let { topbar, left, center, right }: { topbar: Snippet; left?: Snippet; center: Snippet; right: Snippet } = $props();
 
@@ -35,6 +36,7 @@
     </aside>
   </div>
 </div>
+<NewSessionPicker />
 
 <style>
   .topbar-slot { position: relative; z-index: 30; min-width: 0; min-height: 0; overflow: visible; }
