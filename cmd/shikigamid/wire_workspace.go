@@ -23,6 +23,7 @@ func init() {
 			return
 		}
 		workspace.Register(srv, store)
+		d.Provide("workspace.store", store)
 	})
 }
 

@@ -17,8 +17,34 @@ type Project struct {
 
 // WorkspaceConfig adalah override konfigurasi per workspace.
 type WorkspaceConfig struct {
-	GrimoireURL string `json:"grimoireUrl,omitempty"`
-	GrimoireKey string `json:"grimoireKey,omitempty"`
+	GrimoireURL string      `json:"grimoireUrl,omitempty"`
+	GrimoireKey string      `json:"grimoireKey,omitempty"`
+	Lark        *LarkConfig `json:"lark,omitempty"`
+}
+
+// LarkConfig berisi sumber Lark per workspace.
+type LarkConfig struct {
+	Tickets []TicketSource `json:"tickets"`
+	Wiki    []WikiSource   `json:"wiki"`
+}
+
+// TicketSource adalah satu Base Lark sebagai sumber tiket.
+type TicketSource struct {
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	BaseToken string `json:"baseToken"`
+	Host      string `json:"host"`
+	TableID   string `json:"tableId,omitempty"`
+	ViewID    string `json:"viewId,omitempty"`
+}
+
+// WikiSource adalah satu ruang/simpul wiki Lark.
+type WikiSource struct {
+	ID        string `json:"id"`
+	Name      string `json:"name"`
+	SpaceID   string `json:"spaceId"`
+	RootToken string `json:"rootToken,omitempty"`
+	Host      string `json:"host"`
 }
 
 // Workspace berisi nama, daftar project, dan konfigurasi.

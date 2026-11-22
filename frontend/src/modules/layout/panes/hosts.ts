@@ -29,7 +29,7 @@ function mountInto(entry: Entry): void {
   entry.instance = null;
   entry.unmountFn = null;
   if (!spec) {
-    showText(entry, 'Jenis pane tidak dikenal');
+    showText(entry, `Pane tidak dikenal: ${entry.kind}`);
     return;
   }
   try {

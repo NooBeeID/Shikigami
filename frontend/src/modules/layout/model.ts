@@ -1,6 +1,6 @@
 // Model pohon pane: tipe dan fungsi murni (tanpa IPC, tanpa mutasi masukan).
 
-export type PaneKind = 'terminal' | 'file' | 'thread'; // string terbuka lewat registerPaneKind
+export type PaneKind = 'terminal' | 'file' | 'thread' | 'lark-board' | 'lark-doc'; // string terbuka lewat registerPaneKind
 export interface Leaf {
   type: 'pane';
   id: string;
@@ -16,6 +16,10 @@ export interface Leaf {
   readOnly?: boolean;
   // Satu-satunya pane terminal untuk agent thread; membuka agent lain mengganti sesinya.
   threadAgent?: boolean;
+  sourceId?: string;
+  tableId?: string;
+  viewId?: string;
+  nodeToken?: string;
 }
 export interface Split {
   type: 'split';
@@ -45,6 +49,10 @@ export interface NewLeaf {
   root?: string;
   readOnly?: boolean;
   title?: string;
+  sourceId?: string;
+  tableId?: string;
+  viewId?: string;
+  nodeToken?: string;
 }
 
 export const emptyDoc = (): LayoutDoc => ({ version: 1, root: null });
@@ -145,6 +153,10 @@ function makeLeaf(nl: NewLeaf): Leaf {
   if (nl.workspaceId !== undefined) leaf.workspaceId = nl.workspaceId;
   if (nl.root !== undefined) leaf.root = nl.root;
   if (nl.readOnly !== undefined) leaf.readOnly = nl.readOnly;
+  if (nl.sourceId !== undefined) leaf.sourceId = nl.sourceId;
+  if (nl.tableId !== undefined) leaf.tableId = nl.tableId;
+  if (nl.viewId !== undefined) leaf.viewId = nl.viewId;
+  if (nl.nodeToken !== undefined) leaf.nodeToken = nl.nodeToken;
   return leaf;
 }
 
@@ -207,6 +219,8 @@ export function openPane(
     if (nl.sessionId !== undefined && l.sessionId === nl.sessionId) return true;
     if (nl.filePath !== undefined && l.filePath === nl.filePath && l.projectId === nl.projectId) return true;
     if (nl.threadId !== undefined && l.threadId === nl.threadId) return true;
+    if (nl.kind === 'lark-board' && l.kind === 'lark-board' && nl.sourceId !== undefined && l.sourceId === nl.sourceId) return true;
+    if (nl.kind === 'lark-doc' && l.kind === 'lark-doc' && nl.sourceId !== undefined && l.sourceId === nl.sourceId && (l.nodeToken ?? '') === (nl.nodeToken ?? '')) return true;
     return false;
   });
   if (existing) return { doc: setFocus(doc, existing.id), id: existing.id };
@@ -361,7 +375,7 @@ function hydrateNode(raw: unknown): Node | null {
       kind: r.kind as PaneKind,
       title: isStr(r.title) && r.title ? r.title : 'Pane',
     };
-    for (const k of ['sessionId', 'projectId', 'provider', 'filePath', 'workspaceId', 'root', 'threadId'] as const) {
+    for (const k of ['sessionId', 'projectId', 'provider', 'filePath', 'workspaceId', 'root', 'threadId', 'sourceId', 'tableId', 'viewId', 'nodeToken'] as const) {
       if (isStr(r[k])) leaf[k] = r[k] as string;
     }
     if (typeof r.readOnly === 'boolean') leaf.readOnly = r.readOnly;
