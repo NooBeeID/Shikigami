@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"os"
 	"sort"
 	"strings"
 
@@ -95,5 +96,18 @@ func runGrimoire(ctx context.Context, c *ipc.Client, args []string) error {
 		}
 	}
 	params := map[string]any{"projectId": id}
+	if sub == "status" {
+		var out map[string]any
+		if err := c.Call("grimoire.status", params, &out); err != nil {
+			return grimoireError(err)
+		}
+		if err := printJSON(out); err != nil {
+			return err
+		}
+		num := func(k string) int { f, _ := out[k].(float64); return int(f) }
+		fmt.Fprintf(os.Stderr, "index: %d byte, ~%d token, %d halaman, laws: %d byte\n",
+			num("indexBytes"), num("estTokens"), num("pages"), num("lawsBytes"))
+		return nil
+	}
 	return grimoireError(callAndPrint(c, "grimoire."+sub, params))
 }

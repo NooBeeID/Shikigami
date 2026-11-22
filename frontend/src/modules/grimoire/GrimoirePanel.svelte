@@ -3,6 +3,8 @@
   import { activeProject } from '../../lib/stores';
   import { openGrimoirePage } from './openPage';
   import type { GrimoireChapter } from './client';
+  import LawsSlot from './laws/LawsSlot.svelte';
+  import { lawsViewOpen } from './laws/lawsStore';
 
   let s = $state<GrimoireState>({ projectId: null, exists: false, building: false, books: [], error: null });
   let expanded = $state<Record<string, boolean>>({});
@@ -51,8 +53,10 @@
       <button class="icon" type="button" title="Bangun ulang grimoire" aria-label="Bangun ulang grimoire" onclick={rebuild}>&#8635;</button>
     {/if}
   </div>
-  <!-- slot: laws (tiket 2) -->
-  {#if !$activeProject || !s.projectId}
+  <LawsSlot projectId={s.projectId} exists={s.exists} />
+  {#if $lawsViewOpen && s.projectId && s.exists}
+    <!-- editor laws menggantikan daftar buku -->
+  {:else if !$activeProject || !s.projectId}
     <div class="msg">Pilih project</div>
   {:else}
     {#if s.building}

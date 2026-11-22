@@ -211,6 +211,14 @@ func (s *service) status(id string) statusResult {
 		}
 	}
 	res.EstTokens = res.IndexBytes / 4
+	// Ukuran suntikan penuh (index + laws) dari tiket 02; galat hanya dicatat.
+	if m, err := MeasureInjection(id); err != nil {
+		if s.d.Logger != nil {
+			s.d.Logger.Warn("ukur suntikan grimoire gagal", "project", id, "err", err)
+		}
+	} else {
+		res.IndexBytes, res.EstTokens, res.Pages, res.LawsBytes = m.IndexBytes, m.EstTokens, m.Pages, m.LawsBytes
+	}
 	return res
 }
 

@@ -2,7 +2,7 @@
 id: grimoire-ticket-02-grimoire-inject
 title: Grimoire: suntik index + laws ke agent
 spec: docs/superpowers/specs/2026-11-22-grimoire-design.md
-status: ready
+status: implemented
 wave: 2
 depends_on: [grimoire-ticket-01-grimoire-build]
 ---
