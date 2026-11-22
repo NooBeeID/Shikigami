@@ -85,3 +85,37 @@ func TestReconcile(t *testing.T) {
 		t.Fatalf("changed kedua = %v", c)
 	}
 }
+
+func TestReconcileKeepsLiveUnconfirmedRuns(t *testing.T) {
+	tp := folderFixture(t, map[string]string{"subagents/other.txt": "agent.meta.json"})
+	build := func() *Registry {
+		reg := NewRegistry()
+		reg.mu.Lock()
+		reg.transcripts["s1"] = tp
+		reg.runs["w"] = &Run{ID: "w", SessionID: "s1", Kind: KindWorkflow, RunID: ""}
+		reg.runs["a"] = &Run{ID: "a", SessionID: "s1", Kind: KindSubagent, AgentID: "belum-ada"}
+		reg.mu.Unlock()
+		return reg
+	}
+	reg := build()
+	if c := Reconcile(reg, fakeLookup{"s1": "ws1"}, "ws1"); len(c) != 0 {
+		t.Fatalf("changed = %v", c)
+	}
+	list := reg.List(nil)
+	if len(list) != 2 {
+		t.Fatalf("list = %+v", list)
+	}
+	for _, r := range list {
+		if r.Confirmed {
+			t.Fatalf("%s harus Confirmed=false", r.ID)
+		}
+	}
+	// Kontras: sesi sudah hilang -> keduanya dibuang.
+	reg = build()
+	if c := Reconcile(reg, fakeLookup{}, "ws1"); len(c) != 1 || c[0] != "s1" {
+		t.Fatalf("changed = %v", c)
+	}
+	if l := reg.List(nil); len(l) != 0 {
+		t.Fatalf("list = %+v", l)
+	}
+}

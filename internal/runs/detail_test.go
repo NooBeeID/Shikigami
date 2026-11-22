@@ -123,12 +123,37 @@ func TestReadDetailRejectsPathTraversal(t *testing.T) {
 		"subagents/workflows/r1/journal.jsonl": "journal.jsonl",
 		"workflows/wf_r1.json":                 "wf_completed.json",
 	})
-	for _, id := range []string{"../r1", "r1/../r1", `r1\..\r1`, "..", "a/b", ""} {
+	// Setelah filepath.Join membersihkan path, ID ini mendarat di berkas nyata.
+	for _, id := range []string{"r1/../r1", "x/../r1", "../r1/../r1"} {
 		if d := ReadDetail(tp, Run{Kind: KindWorkflow, RunID: id}); d != (Detail{}) {
-			t.Fatalf("runId %q = %+v", id, d)
+			t.Errorf("runId %q = %+v", id, d)
 		}
+	}
+	// "agent-" + "x/../agent-ag1" bersih menjadi agent-ag1 (fixture ada).
+	for _, id := range []string{"x/../agent-ag1", "../subagents/agent-ag1"} {
 		if d := ReadDetail(tp, Run{Kind: KindSubagent, AgentID: id}); d != (Detail{}) {
-			t.Fatalf("agentId %q = %+v", id, d)
+			t.Errorf("agentId %q = %+v", id, d)
+		}
+	}
+	// Kontrol: ID sah memang menemukan berkasnya.
+	if d := ReadDetail(tp, Run{Kind: KindSubagent, AgentID: "ag1"}); !d.Found {
+		t.Fatalf("kontrol ag1 = %+v", d)
+	}
+	if d := ReadDetail(tp, Run{Kind: KindWorkflow, RunID: "r1"}); !d.Found {
+		t.Fatalf("kontrol r1 = %+v", d)
+	}
+}
+
+func TestSafeID(t *testing.T) {
+	bad := []string{"", ".", "..", "a/b", `a\b`, "/etc/passwd", "../x", "x/..", "a..b", "a\x00b"}
+	for _, id := range bad {
+		if safeID(id) {
+			t.Errorf("safeID(%q) = true, harus ditolak", id)
+		}
+	}
+	for _, id := range []string{"r1", "wf_e8ae7cd1-a8d", "a760caa2a8227c09d"} {
+		if !safeID(id) {
+			t.Errorf("safeID(%q) = false", id)
 		}
 	}
 }
