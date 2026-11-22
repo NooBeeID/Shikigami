@@ -3,12 +3,14 @@
   import type { Session } from '../../lib/stores';
   import { layout } from '../../lib/stores/layout';
   import { groupSessionsByProject } from './groups';
+  import { sessionFilter } from './registry';
   import SessionRow from './SessionRow.svelte';
 
   let { onerror, filter }: { onerror: (msg: string) => void; filter?: (s: Session) => boolean } = $props();
 
   const leaves = layout.leaves;
-  const groups = $derived(groupSessionsByProject(filter ? $sessions.filter(filter) : $sessions, $activeWorkspace?.projects ?? [], $activeWorkspaceId));
+  const visible = $derived(((s: Session) => $sessionFilter(s) && (filter ? filter(s) : true)));
+  const groups = $derived(groupSessionsByProject($sessions.filter(visible), $activeWorkspace?.projects ?? [], $activeWorkspaceId));
   const shown = $derived(new Set($leaves.filter((l) => l.kind === 'terminal' && l.sessionId).map((l) => l.sessionId!)));
   let collapsed = $state<Record<string, boolean>>({});
 </script>

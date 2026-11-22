@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"path/filepath"
 	"sync"
@@ -180,7 +181,16 @@ func wireThread(srv *ipc.Server, d *Deps) {
 	if err := q.SetMode(mention.ModeAuto); err != nil {
 		d.Logger.Warn("thread: gagal set mode antrean", "err", err)
 	}
-	threadWireSubscribeExit(d, q.HandleExit)
+	var exitMu sync.Mutex
+	exitFns := []func(string){q.HandleExit}
+	threadWireSubscribeExit(d, func(id string) {
+		exitMu.Lock()
+		fns := append([]func(string){}, exitFns...)
+		exitMu.Unlock()
+		for _, fn := range fns {
+			fn(id)
+		}
+	})
 
 	m := thread.NewManager(thread.ManagerConfig{
 		Store:      store,
@@ -193,5 +203,19 @@ func wireThread(srv *ipc.Server, d *Deps) {
 	})
 	d.Provide("thread.manager", m)
 	thread.RegisterIPC(srv, m)
+	if _, err := thread.InstallAgents(context.Background(), thread.AgentsConfig{
+		Manager:    m,
+		Sessions:   mgr,
+		Workspaces: dir,
+		DataDir:    dataDir,
+		Logger:     d.Logger,
+		OnSessionExit: func(fn func(string)) {
+			exitMu.Lock()
+			exitFns = append(exitFns, fn)
+			exitMu.Unlock()
+		},
+	}); err != nil {
+		d.Logger.Warn("thread: gagal memasang tool agent", "err", err)
+	}
 	m.FireStart()
 }

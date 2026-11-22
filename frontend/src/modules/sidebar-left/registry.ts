@@ -35,3 +35,12 @@ export interface SidebarSectionSpec { id: string; component: Component<any>; ord
 const sectionStore = writable<Record<string, SidebarSectionSpec>>({});
 export function registerSidebarSection(spec: SidebarSectionSpec): void { sectionStore.update((m) => ({ ...m, [spec.id]: spec })); }
 export function sidebarSections(): Readable<SidebarSectionSpec[]> { return derived(sectionStore, (m) => Object.values(m).sort(byOrder)); }
+
+export interface SessionFilterSpec { id: string; predicate: Readable<(s: Session) => boolean> } // true = tampil
+const filterStore = writable<Record<string, SessionFilterSpec>>({});
+export function registerSessionFilter(spec: SessionFilterSpec): void { filterStore.update((m) => ({ ...m, [spec.id]: spec })); }
+export const sessionFilter: Readable<(s: Session) => boolean> = derived(filterStore, ($m, set: (v: (s: Session) => boolean) => void) => {
+  const stores = Object.values($m).map((f) => f.predicate);
+  if (stores.length === 0) { set(() => true); return; }
+  return derived(stores, (fns) => (s: Session) => fns.every((f) => f(s))).subscribe(set);
+});
