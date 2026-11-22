@@ -3,8 +3,8 @@ import { get } from 'svelte/store';
 import { tabs, activeTabId, closeTab, sessions } from '../../lib/stores';
 import type { Tab } from '../../lib/stores';
 import { layout } from '../../lib/stores/layout';
-import { leaves } from '../layout/model';
-import type { Leaf, NewLeaf, LayoutDoc } from '../layout/model';
+import { allTabs, findTab, activeTab, findLeaf } from '../layout/model';
+import type { Tab as LayoutTab, Leaf, NewLeaf, LayoutDoc } from '../layout/model';
 
 let syncing = false;
 let known = new Set<string>(); // tabId yang pernah punya pane
@@ -19,23 +19,20 @@ function run(fn: () => void): void {
   }
 }
 
-function tabIdOfLeaf(l: Leaf): string | null {
-  if (l.kind === 'terminal' && l.sessionId) return `session:${l.sessionId}`;
-  if (l.kind === 'file' && l.filePath !== undefined) {
-    return `file:${JSON.stringify({ path: l.filePath, projectId: l.projectId, workspaceId: l.workspaceId })}`;
+function tabIdOfLayoutTab(t: LayoutTab): string | null {
+  if (t.kind === 'terminal' && t.sessionId) return `session:${t.sessionId}`;
+  if (t.kind === 'file' && t.filePath !== undefined) {
+    return `file:${JSON.stringify({ path: t.filePath, projectId: t.projectId, workspaceId: t.workspaceId })}`;
   }
   return null;
 }
 
-function leafOfTab(tab: Tab, doc: LayoutDoc): Leaf | null {
-  for (const l of leaves(doc)) {
-    if (tab.type === 'session') {
-      if (l.kind === 'terminal' && l.sessionId === tab.refId) return l;
-    } else if (l.kind === 'file' && tabIdOfLeaf(l) === tab.id) {
-      return l;
-    }
-  }
-  return null;
+function layoutTabOf(tab: Tab, doc: LayoutDoc): { pane: Leaf; tab: LayoutTab } | null {
+  return findTab(doc, (t) =>
+    tab.type === 'session'
+      ? t.kind === 'terminal' && t.sessionId === tab.refId
+      : t.kind === 'file' && tabIdOfLayoutTab(t) === tab.id,
+  );
 }
 
 function newLeafOfTab(tab: Tab): NewLeaf | null {
@@ -62,9 +59,9 @@ function newLeafOfTab(tab: Tab): NewLeaf | null {
 }
 
 function ensurePane(tab: Tab): void {
-  const leaf = leafOfTab(tab, get(layout));
-  if (leaf) {
-    layout.setFocus(leaf.id);
+  const r = layoutTabOf(tab, get(layout));
+  if (r) {
+    layout.activateTab(r.pane.id, r.tab.id);
     return;
   }
   const nl = newLeafOfTab(tab);
@@ -72,8 +69,8 @@ function ensurePane(tab: Tab): void {
 }
 
 function focusedTabId(doc: LayoutDoc): string | null {
-  const f = doc.focusId ? leaves(doc).find((l) => l.id === doc.focusId) : undefined;
-  return f ? tabIdOfLeaf(f) : null;
+  const f = doc.focusId ? findLeaf(doc, doc.focusId) : null;
+  return f ? tabIdOfLayoutTab(activeTab(f)) : null;
 }
 
 // tab -> pane
@@ -82,18 +79,19 @@ tabs.subscribe((list) => {
   const ids = new Set(list.map((t) => t.id));
   run(() => {
     // tab hilang tetapi pane masih ada
-    const doc = get(layout);
-    for (const l of leaves(doc)) {
-      const tid = tabIdOfLeaf(l);
-      if (tid && known.has(tid) && !ids.has(tid)) {
-        layout.closePane(l.id);
-        known.delete(tid);
-      }
+    const toClose: { paneId: string; tabId: string; tid: string }[] = [];
+    for (const { pane, tab } of allTabs(get(layout))) {
+      const tid = tabIdOfLayoutTab(tab);
+      if (tid && known.has(tid) && !ids.has(tid)) toClose.push({ paneId: pane.id, tabId: tab.id, tid });
+    }
+    for (const c of toClose) {
+      layout.closeTab(c.paneId, c.tabId);
+      known.delete(c.tid);
     }
     // tab baru tanpa pane
     const active = get(activeTabId);
     for (const t of list) {
-      if (leafOfTab(t, get(layout))) continue;
+      if (layoutTabOf(t, get(layout))) continue;
       const nl = newLeafOfTab(t);
       if (!nl) continue;
       const id = layout.openPane(nl);
@@ -114,8 +112,8 @@ activeTabId.subscribe((id) => {
 layout.subscribe((doc) => {
   const tabIds = new Set(get(tabs).map((t) => t.id));
   const present = new Set<string>();
-  for (const l of leaves(doc)) {
-    const tid = tabIdOfLeaf(l);
+  for (const { tab } of allTabs(doc)) {
+    const tid = tabIdOfLayoutTab(tab);
     if (tid) present.add(tid);
   }
   if (!syncing) {

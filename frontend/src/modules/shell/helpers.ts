@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { layout } from '../../lib/stores/layout';
-import { findLeafBy, type Leaf } from '../layout/model';
+import { activeTab, findLeaf, findTab } from '../layout/model';
 import {
   sessions,
   providers,
@@ -11,15 +11,27 @@ import {
 } from '../../lib/stores';
 import { emitMenuEvent } from '../appmenu';
 
-export function findSessionPane(sessionId: string): Leaf | null {
-  return findLeafBy(get(layout), (l) => l.kind === 'terminal' && l.sessionId === sessionId);
+export interface TabRef {
+  paneId: string;
+  tabId: string;
 }
 
-export function findFilePane(projectId: string, filePath: string): Leaf | null {
-  return findLeafBy(
+export function findSessionPane(sessionId: string): TabRef | null {
+  const r = findTab(get(layout), (t) => t.kind === 'terminal' && t.sessionId === sessionId);
+  return r ? { paneId: r.pane.id, tabId: r.tab.id } : null;
+}
+
+export function findFilePane(projectId: string, filePath: string): TabRef | null {
+  const r = findTab(
     get(layout),
-    (l) => l.kind === 'file' && !!l.filePath && l.filePath === filePath && l.projectId === projectId,
+    (t) => t.kind === 'file' && !!t.filePath && t.filePath === filePath && t.projectId === projectId,
   );
+  return r ? { paneId: r.pane.id, tabId: r.tab.id } : null;
+}
+
+function refOfPane(paneId: string): TabRef | null {
+  const p = findLeaf(get(layout), paneId);
+  return p ? { paneId: p.id, tabId: activeTab(p).id } : null;
 }
 
 export function basename(path: string): string {
@@ -29,44 +41,45 @@ export function basename(path: string): string {
 }
 
 export function sessionTitle(sessionId: string): string {
-  const pane = findSessionPane(sessionId);
-  if (pane) return pane.title;
+  const r = findTab(get(layout), (t) => t.kind === 'terminal' && t.sessionId === sessionId);
+  if (r) return r.tab.title;
   const s = get(sessions).find((x) => x.id === sessionId);
   if (!s) return sessionId.slice(0, 6);
   return get(providers).find((p) => p.id === s.providerId)?.name ?? s.providerId;
 }
 
-export function focusOrOpenSession(sessionId: string): boolean {
+export function focusOrOpenSession(sessionId: string): TabRef | null {
   const s = get(sessions).find((x) => x.id === sessionId);
-  if (!s) return false;
-  const pane = findSessionPane(sessionId);
-  if (pane) {
-    layout.setFocus(pane.id);
-    return true;
+  if (!s) return null;
+  const ref = findSessionPane(sessionId);
+  if (ref) {
+    layout.activateTab(ref.paneId, ref.tabId);
+    return ref;
   }
-  layout.openPane({
+  const paneId = layout.openPane({
     kind: 'terminal',
     sessionId,
     projectId: s.projectId,
     provider: s.providerId,
     title: sessionTitle(sessionId),
   });
-  return true;
+  return refOfPane(paneId);
 }
 
-export function openFilePane(a: { projectId: string; filePath: string; workspaceId?: string; title?: string }): string {
-  const existing = findFilePane(a.projectId, a.filePath);
-  if (existing) {
-    layout.setFocus(existing.id);
-    return existing.id;
+export function openFilePane(a: { projectId: string; filePath: string; workspaceId?: string; title?: string }): TabRef {
+  const ref = findFilePane(a.projectId, a.filePath);
+  if (ref) {
+    layout.activateTab(ref.paneId, ref.tabId);
+    return ref;
   }
-  return layout.openPane({
+  const paneId = layout.openPane({
     kind: 'file',
     projectId: a.projectId,
     filePath: a.filePath,
     workspaceId: a.workspaceId ?? get(activeWorkspaceId) ?? undefined,
     title: a.title ?? basename(a.filePath),
   });
+  return refOfPane(paneId) ?? { paneId, tabId: '' };
 }
 
 export async function createAndOpenSession(providerId: string, projectId?: string): Promise<Session> {

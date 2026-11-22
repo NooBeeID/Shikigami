@@ -37,7 +37,7 @@ export function applyUi(ui: unknown): void {
   });
 }
 
-// Tipis: hanya kloning + penjagaan bentuk. Tidak ada daun yang dibuang
+// Tipis: hanya kloning + penjagaan bentuk. Tidak ada tab yang dibuang
 // (sesi mati / berkas hilang ditangani overlay dan viewer masing-masing).
 export function sanitizeDoc(raw: unknown, _wsId: string, _liveIds: Set<string>): unknown {
   if (!raw || typeof raw !== 'object') return raw;

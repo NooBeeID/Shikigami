@@ -1,6 +1,6 @@
 <script lang="ts">
   import { untrack } from 'svelte';
-  import type { Leaf } from '../../layout/model';
+  import type { Tab } from '../../layout/model';
   import { activeWorkspaceId } from '../../../lib/stores/workspaces';
   import { onEvent } from '../../../lib/ipc';
   import { copyLink, sendToAgent } from '../actions';
@@ -9,7 +9,7 @@
   import MarkdownView from './MarkdownView.svelte';
   import SheetView from './SheetView.svelte';
 
-  let { pane, visible }: { pane: Leaf; visible: boolean } = $props();
+  let { pane, visible }: { pane: Tab; visible: boolean } = $props();
 
   type View =
     | { status: 'loading' }

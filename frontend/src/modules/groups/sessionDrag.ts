@@ -2,7 +2,7 @@
 import { get, writable, type Readable } from 'svelte/store';
 import { activeGroupId, groupOfSession, mainGroupId, moveSession, setActiveGroup } from '../../lib/stores/groups';
 import { layout } from '../../lib/stores/layout';
-import { findLeaf } from '../layout/model';
+import { activeTab, findLeaf } from '../layout/model';
 import { dragState } from '../layout/dnd';
 
 export interface GroupDropState { sessionId: string; overGroupId: string | null }
@@ -165,9 +165,10 @@ export function watchPaneDrag(): () => void {
 
   const unsub = dragState.subscribe((st) => {
     if (st && !sessionId) {
-      const leaf = findLeaf(get(layout), st.paneId);
-      if (leaf?.kind !== 'terminal' || !leaf.sessionId) return;
-      const sid = leaf.sessionId;
+      const pane = findLeaf(get(layout), st.paneId);
+      const tab = pane ? activeTab(pane) : null;
+      if (tab?.kind !== 'terminal' || !tab.sessionId) return;
+      const sid = tab.sessionId;
       sessionId = sid;
       const h = createHoverTracker(sid);
       hover = h;

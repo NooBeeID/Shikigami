@@ -1,7 +1,7 @@
 <script lang="ts">
   import { untrack } from 'svelte';
   import { get } from 'svelte/store';
-  import type { Leaf, Node } from '../../layout/model';
+  import { findTab, type Tab } from '../../layout/model';
   import { layout } from '../../../lib/stores/layout';
   import { activeWorkspaceId } from '../../../lib/stores/workspaces';
   import { larkSources, larkState, refreshSources } from '../store';
@@ -30,7 +30,7 @@
   import Kanban from './Kanban.svelte';
   import TicketDrawer from './TicketDrawer.svelte';
 
-  let { pane, visible }: { pane: Leaf; visible: boolean } = $props();
+  let { pane, paneId, visible }: { pane: Tab; paneId: string; visible: boolean } = $props();
 
   type Phase = 'loading' | 'ready' | 'error';
   let phase = $state<Phase>('loading');
@@ -316,21 +316,16 @@
     else void loadTickets(true);
   }
 
-  // Layout store tidak punya setter props leaf; solusi lokal lewat renamePane yang memancarkan store.
+  // Layout store tidak punya setter props tab; mutasi lokal lalu renameTab memancarkan store.
   function persistPane() {
     try {
-      const find = (n: Node | null): Leaf | null => {
-        if (!n) return null;
-        if (n.type === 'pane') return n.id === pane.id ? n : null;
-        return find(n.a) ?? find(n.b);
-      };
-      const leaf = find(get(layout).root);
+      const leaf = findTab(get(layout), (t) => t.id === pane.id)?.tab;
       if (!leaf) return;
       if (leaf.tableId === tableId && (leaf.viewId ?? '') === viewId) return;
       leaf.tableId = tableId;
       if (viewId) leaf.viewId = viewId;
       else delete leaf.viewId;
-      layout.renamePane(pane.id, leaf.title || 'Tiket Lark');
+      layout.renameTab(paneId, pane.id, leaf.title || 'Tiket Lark');
     } catch {
       /* persist gagal tidak boleh mengganggu pane */
     }

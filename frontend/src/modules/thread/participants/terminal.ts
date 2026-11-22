@@ -1,13 +1,14 @@
 import { get } from 'svelte/store';
+import { findTab } from '../../layout/model';
 import { layout } from '../../../lib/stores/layout';
 import { sessions, loadSessions } from '../../../lib/stores/sessions';
 import { providers } from '../../../lib/stores/providers';
 import type { Participant, Thread } from '../types';
 
 function focusExisting(sessionId: string): boolean {
-  const l = get(layout.leaves).find((x) => x.kind === 'terminal' && x.sessionId === sessionId);
-  if (!l) return false;
-  layout.setFocus(l.id);
+  const hit = findTab(get(layout), (t) => t.kind === 'terminal' && t.sessionId === sessionId);
+  if (!hit) return false;
+  layout.activateTab(hit.pane.id, hit.tab.id);
   return true;
 }
 

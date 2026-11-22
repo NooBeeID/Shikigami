@@ -3,6 +3,7 @@ import * as M from '../../modules/layout/model';
 import type { DropZone, Leaf, LayoutDoc, NewLeaf, SplitPath } from '../../modules/layout/model';
 
 export interface LayoutStore extends Readable<LayoutDoc> {
+  // opts.dir diterima demi kompatibilitas dan diabaikan (openPane kini menambah tab).
   openPane(leaf: NewLeaf, opts?: { dir?: 'h' | 'v' }): string;
   splitPane(paneId: string, dir: 'h' | 'v', newLeaf: NewLeaf | Leaf, side?: 'after' | 'before'): string;
   openThreadAgent(leaf: NewLeaf): string;
@@ -14,6 +15,10 @@ export interface LayoutStore extends Readable<LayoutDoc> {
   restore(): void;
   tidyGrid(): void;
   setFocus(paneId: string): void;
+  activateTab(paneId: string, tabId: string): void;
+  closeTab(paneId: string, tabId: string): void;
+  renameTab(paneId: string, tabId: string, title: string): void;
+  // Pembungkus: ganti judul tab aktif pane.
   renamePane(paneId: string, title: string): void;
   hydrate(doc: unknown): void;
   serialize(): LayoutDoc;
@@ -26,12 +31,12 @@ export function createLayoutStore(initial?: LayoutDoc): LayoutStore {
   const { subscribe, update, set } = store;
   return {
     subscribe,
-    openPane(leaf, opts) {
+    openPane(leaf) {
       let id = '';
       update((d) => {
-        const r = M.openPane(d, leaf, opts);
-        id = r.id;
-        return r.doc;
+        const next = M.openPane(d, leaf);
+        id = next.focusId ?? '';
+        return next;
       });
       return id;
     },
@@ -61,7 +66,14 @@ export function createLayoutStore(initial?: LayoutDoc): LayoutStore {
     restore: () => update((d) => M.restore(d)),
     tidyGrid: () => update((d) => M.tidyGrid(d)),
     setFocus: (id) => update((d) => M.setFocus(d, id)),
-    renamePane: (id, title) => update((d) => M.renamePane(d, id, title)),
+    activateTab: (paneId, tabId) => update((d) => M.setFocus(M.activateTab(d, paneId, tabId), paneId)),
+    closeTab: (paneId, tabId) => update((d) => M.closeTab(d, paneId, tabId)),
+    renameTab: (paneId, tabId, title) => update((d) => M.renameTab(d, paneId, tabId, title)),
+    renamePane: (id, title) =>
+      update((d) => {
+        const p = M.findLeaf(d, id);
+        return p ? M.renameTab(d, id, M.activeTab(p).id, title) : d;
+      }),
     hydrate: (raw) => set(M.hydrateDoc(raw)),
     serialize: () => JSON.parse(JSON.stringify(get(store))) as LayoutDoc,
     paneCount: derived(store, (d) => M.leaves(d).length),

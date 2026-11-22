@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { Leaf } from '../model';
+  import type { Tab } from '../model';
   import ReadOnlyFileView from './ReadOnlyFileView.svelte';
   import FileTab from '../../files/editor/FileTab.svelte';
 
-  let { pane }: { pane: Leaf; visible: boolean } = $props();
+  let { pane }: { pane: Tab; paneId?: string; visible?: boolean } = $props();
 
   const refId = $derived(
     JSON.stringify({ path: pane.filePath ?? '', projectId: pane.projectId ?? '', workspaceId: pane.workspaceId ?? '' }),

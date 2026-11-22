@@ -6,7 +6,7 @@ import { layout } from './layout';
 import { flushNow } from './persist';
 import { providers } from './providers';
 import type { Workspace, WorkspaceGroup } from './types';
-import { closePane as closePaneDoc, findLeafBy, hydrateDoc, leaves } from '../../modules/layout/model';
+import { closeTab as closeTabDoc, findTab, hydrateDoc } from '../../modules/layout/model';
 import { switchGroup } from '../../modules/persist/autosave';
 
 export interface SessionGroup { id: string; name: string; order: number; main: boolean }
@@ -190,23 +190,23 @@ export async function moveSession(sessionId: string, toGroupId: string): Promise
       const from = groupOfSession(sessionId) ?? get(mainGroupId);
       if (!get(groups).some((g) => g.id === toGroupId)) throw new Error('Grup tujuan tidak ditemukan');
       if (from === toGroupId) return null;
-      const isTerm = (l: { kind: string; sessionId?: string }) => l.kind === 'terminal' && l.sessionId === sessionId;
+      const isTerm = (t: { kind: string; sessionId?: string }) => t.kind === 'terminal' && t.sessionId === sessionId;
       if (from === get(activeGroupId)) {
-        for (let leaf = findLeafBy(get(layout), isTerm); leaf; leaf = findLeafBy(get(layout), isTerm)) {
-          layout.closePane(leaf.id);
+        for (let r = findTab(get(layout), isTerm); r; r = findTab(get(layout), isTerm)) {
+          layout.closeTab(r.pane.id, r.tab.id);
         }
       } else {
         const res = await call<{ layout?: unknown }>('workspace.layout.get', { workspaceId, groupId: from });
         let doc = hydrateDoc(res?.layout ?? null);
         let closed = false;
-        for (let leaf = leaves(doc).find(isTerm); leaf; leaf = leaves(doc).find(isTerm)) {
-          doc = closePaneDoc(doc, leaf.id);
+        for (let r = findTab(doc, isTerm); r; r = findTab(doc, isTerm)) {
+          doc = closeTabDoc(doc, r.pane.id, r.tab.id);
           closed = true;
         }
         if (closed) await call('workspace.layout.set', { workspaceId, groupId: from, layout: doc });
       }
       await groupCall('workspace.group.moveSession', { sessionId, toGroupId });
-      if (toGroupId === get(activeGroupId) && !findLeafBy(get(layout), isTerm)) {
+      if (toGroupId === get(activeGroupId) && !findTab(get(layout), isTerm)) {
         const s = get(sessions).find((x) => x.id === sessionId);
         if (s) {
           const title = get(providers).find((p) => p.id === s.providerId)?.name ?? s.providerId;

@@ -4,14 +4,14 @@
   import { activeWorkspaceId } from '../../lib/stores/workspaces';
   import { layout } from '../../lib/stores/layout';
   import { openSettings } from '../settings';
-  import type { Leaf } from '../layout/model';
+  import type { Tab } from '../layout/model';
   import { parseGitError, type GitError } from './client';
   import { getMrDetail, type MergeRequestDetail } from './mrDetailClient';
   import { openInBrowser, copyLink, sendToAgent } from './actions';
   import StatusBadge from './StatusBadge.svelte';
   import ReviewerList from './ReviewerList.svelte';
 
-  let { pane, visible }: { pane: Leaf; visible: boolean } = $props();
+  let { pane, visible }: { pane: Tab; paneId?: string; visible: boolean } = $props();
 
   type Phase = 'loading' | 'ready' | 'error' | 'missing';
   let phase = $state<Phase>('loading');

@@ -3,14 +3,14 @@
   import { untrack } from 'svelte';
   import { activeWorkspaceId } from '../../lib/stores/workspaces';
   import { openSettings } from '../settings';
-  import type { Leaf } from '../layout/model';
+  import type { Tab } from '../layout/model';
   import { parseGitError, type GitError } from './client';
   import { getPipeline, type PipelineDetail } from './pipelineClient';
   import { openInBrowser, copyLink, sendToAgent } from './actions';
   import StatusBadge from './StatusBadge.svelte';
   import StageList from './StageList.svelte';
 
-  let { pane, visible }: { pane: Leaf; visible: boolean } = $props();
+  let { pane, visible }: { pane: Tab; paneId?: string; visible: boolean } = $props();
 
   type Phase = 'loading' | 'ready' | 'error' | 'missing';
   let phase = $state<Phase>('loading');

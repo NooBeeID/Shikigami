@@ -1,6 +1,6 @@
 import { get } from 'svelte/store';
 import { layout } from '../../lib/stores/layout';
-import { findLeafBy } from '../layout/model';
+import { findTab } from '../layout/model';
 import { call } from '../../lib/ipc';
 
 export async function openGrimoirePage(projectId: string, relPath: string): Promise<string> {
@@ -13,10 +13,10 @@ export async function openGrimoirePage(projectId: string, relPath: string): Prom
   const dir = st.dir.replace(/\/+$/, '');
   const filePath = dir + '/' + relPath;
 
-  const existing = findLeafBy(get(layout), (l) => l.kind === 'file' && l.filePath === filePath && l.projectId === projectId);
+  const existing = findTab(get(layout), (t) => t.kind === 'file' && t.filePath === filePath && t.projectId === projectId);
   if (existing) {
-    layout.setFocus(existing.id);
-    return existing.id;
+    layout.activateTab(existing.pane.id, existing.tab.id);
+    return existing.pane.id;
   }
 
   const title = (relPath.split('/').pop() ?? relPath).replace(/\.md$/, '');

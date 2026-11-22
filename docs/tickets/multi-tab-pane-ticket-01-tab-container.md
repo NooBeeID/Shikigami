@@ -2,7 +2,7 @@
 id: multi-tab-pane-ticket-01-tab-container
 title: Pane sebagai wadah tab
 spec: docs/superpowers/specs/2026-11-22-multi-tab-pane-design.md
-status: ready
+status: implemented
 wave: 1
 depends_on: []
 ---

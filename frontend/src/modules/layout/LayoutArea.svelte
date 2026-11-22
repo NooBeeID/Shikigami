@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { layout, type LayoutStore } from '../../lib/stores/layout';
-  import { emptyDoc, leaves, findLeaf, pathOf, type Leaf, type Node, type LayoutDoc } from './model';
+  import { emptyDoc, leaves, findLeaf, pathOf, allTabs, activeTab, type Leaf, type Tab, type Node, type LayoutDoc } from './model';
   import { getPaneKind } from './registry';
   import { ensureHost, getHost, attachHost, detachHost, syncPanes } from './panes/hosts';
   import PaneHeader from './PaneHeader.svelte';
@@ -22,10 +22,13 @@
   const indexOf = $derived(new Map(all.map((l, i) => [l.id, i + 1])));
   const maxId = $derived(doc.maximizedId && findLeaf(doc, doc.maximizedId) ? doc.maximizedId : null);
   const maxPath = $derived(maxId ? pathOf(doc, maxId) : null);
-  const visibleIds = $derived(new Set(maxId ? [maxId] : all.map((l) => l.id)));
+  const tabs = $derived(allTabs(doc));
+  const visibleTabIds = $derived(
+    new Set(all.filter((l) => !maxId || l.id === maxId).map((l) => activeTab(l).id)),
+  );
 
   $effect.pre(() => {
-    syncPanes(all, visibleIds);
+    syncPanes(tabs, visibleTabIds);
   });
 
   onMount(() => installLayoutShortcuts(store));
@@ -34,11 +37,16 @@
     return maxPath === null || maxPath === path || path === '' || maxPath.startsWith(path + '.');
   }
 
-  function hostSlot(node: HTMLElement, p: { leaf: Leaf; visible: boolean }) {
-    ensureHost(p.leaf, p.visible);
-    attachHost(p.leaf.id, node);
-    const id = p.leaf.id;
+  function hostSlot(node: HTMLElement, p: { tab: Tab; paneId: string; visible: boolean }) {
+    ensureHost(p.tab, p.paneId, p.visible);
+    attachHost(p.tab.id, node);
+    let id = p.tab.id;
     return {
+      update(np: { tab: Tab; paneId: string; visible: boolean }) {
+        id = np.tab.id;
+        ensureHost(np.tab, np.paneId, np.visible);
+        attachHost(np.tab.id, node);
+      },
       destroy() {
         const h = getHost(id);
         if (h && h.parentElement === node) detachHost(id);
@@ -47,14 +55,16 @@
   }
 
   // Tutup pane = akhiri sesinya juga, supaya hilang dari sidebar.
-  async function closeAndEnd(leaf: Leaf) {
-    store.closePane(leaf.id);
-    if (leaf.kind === 'terminal' && leaf.sessionId) await endSession(leaf);
+  async function closeAndEnd(pane: Leaf) {
+    store.closePane(pane.id);
+    for (const tab of pane.tabs) {
+      if (tab.kind === 'terminal' && tab.sessionId) await endSession(tab);
+    }
   }
 
-  async function endSession(leaf: Leaf) {
+  async function endSession(tab: Tab) {
     try {
-      await getPaneKind(leaf.kind)?.onEndSession?.(leaf);
+      await getPaneKind(tab.kind)?.onEndSession?.(tab);
     } catch (err) {
       console.error('[layout] gagal mengakhiri sesi:', err);
     }
@@ -64,6 +74,7 @@
 {#snippet renderNode(n: Node, path: string, grow: number)}
   {#if n.type === 'pane'}
     {#key n.id}
+      {@const at = activeTab(n)}
       <div
         class="pane"
         class:focused={doc.focusId === n.id}
@@ -83,12 +94,14 @@
           onSplit={(dir) => void splitPaneWithNewSession(n.id, dir, store)}
           onMaximizeToggle={() => (doc.maximizedId === n.id ? store.restore() : store.maximize(n.id))}
           onClose={() => void closeAndEnd(n)}
-          onMinimize={() => store.closePane(n.id)}
-          onRename={(t) => store.renamePane(n.id, t)}
-          onEndSession={() => void endSession(n)}
+          onMinimize={() => store.closeTab(n.id, at.id)}
+          onRename={(t) => store.renameTab(n.id, at.id, t)}
+          onEndSession={() => void endSession(at)}
           onTidy={() => store.tidyGrid()}
         />
-        <div class="pane-slot" use:hostSlot={{ leaf: n, visible: visibleIds.has(n.id) }}></div>
+        {#key at.id}
+          <div class="pane-slot" use:hostSlot={{ tab: at, paneId: n.id, visible: visibleTabIds.has(at.id) }}></div>
+        {/key}
       </div>
     {/key}
   {:else}

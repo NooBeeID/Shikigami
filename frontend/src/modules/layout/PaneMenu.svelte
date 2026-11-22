@@ -7,10 +7,10 @@
     onEndSession: () => void;
     onRename: () => void;
     onTidy: () => void;
-    onClose: () => void;
+    onClosePane: () => void;
     onDismiss: () => void;
   }
-  let { anchor, canEndSession, onEndSession, onRename, onTidy, onClose, onDismiss }: Props = $props();
+  let { anchor, canEndSession, onEndSession, onRename, onTidy, onClosePane, onDismiss }: Props = $props();
 
   let root: HTMLDivElement | undefined = $state();
   let confirming = $state(false);
@@ -78,7 +78,7 @@
 
 <div class="pane-menu" role="menu" bind:this={root} style="left:{pos.left}px;top:{pos.top}px">
   {#if confirming}
-    <div class="confirm">Akhiri sesi ini?</div>
+    <div class="confirm">Akhiri sesi tab ini?</div>
     <div class="row">
       <button type="button" class="danger" onclick={() => run(onEndSession)}>Akhiri</button>
       <button type="button" onclick={() => (confirming = false)}>Batal</button>
@@ -87,10 +87,10 @@
     {#if canEndSession}
       <button type="button" role="menuitem" onclick={() => (confirming = true)}>Akhiri sesi</button>
     {/if}
-    <button type="button" role="menuitem" onclick={() => run(onRename)}>Ganti nama</button>
+    <button type="button" role="menuitem" onclick={() => run(onRename)}>Ganti nama tab</button>
     <button type="button" role="menuitem" onclick={() => run(onTidy)}>Susun grid</button>
     <div class="sep"></div>
-    <button type="button" role="menuitem" onclick={() => run(onClose)}>Tutup pane</button>
+    <button type="button" role="menuitem" title="Menutup semua tab; sesi terminal diakhiri" onclick={() => run(onClosePane)}>Tutup pane</button>
   {/if}
 </div>
 

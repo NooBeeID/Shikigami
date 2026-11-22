@@ -1,13 +1,13 @@
 import type { Component } from 'svelte';
 import { writable, type Readable } from 'svelte/store';
-import type { Leaf } from './model';
+import type { Tab } from './model';
 
 export interface PaneKindSpec {
   kind: string;
-  component: Component<{ pane: Leaf; visible: boolean }>;
-  titleFor?: (leaf: Leaf) => string;
-  onEndSession?: (leaf: Leaf) => Promise<void>;
-  badgeFor?: (leaf: Leaf) => string | null;
+  component: Component<{ pane: Tab; paneId: string; visible: boolean }>;
+  titleFor?: (tab: Tab) => string;
+  onEndSession?: (tab: Tab) => Promise<void>;
+  badgeFor?: (tab: Tab) => string | null;
 }
 
 const kindStore = writable<Record<string, PaneKindSpec>>({});

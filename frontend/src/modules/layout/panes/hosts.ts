@@ -1,14 +1,15 @@
 import { mount, unmount } from 'svelte';
-import type { Leaf } from '../model';
+import type { Leaf, Tab } from '../model';
 import { getPaneKind } from '../registry';
 import PaneHostRoot from './PaneHostRoot.svelte';
 
 interface Entry {
   host: HTMLElement;
   kind: string;
-  instance: { update(pane: Leaf, visible: boolean): void } | null;
+  instance: { update(pane: Tab, paneId: string, visible: boolean): void } | null;
   unmountFn: (() => void) | null;
-  pane: Leaf;
+  tab: Tab;
+  paneId: string;
   visible: boolean;
 }
 
@@ -35,8 +36,8 @@ function mountInto(entry: Entry): void {
   try {
     const inst = mount(PaneHostRoot, {
       target: entry.host,
-      props: { component: spec.component, pane: entry.pane, visible: entry.visible },
-    }) as unknown as { update(pane: Leaf, visible: boolean): void };
+      props: { component: spec.component, pane: entry.tab, paneId: entry.paneId, visible: entry.visible },
+    }) as unknown as { update(pane: Tab, paneId: string, visible: boolean): void };
     entry.instance = inst;
     entry.unmountFn = () => {
       try { unmount(inst as unknown as Record<string, unknown>); } catch { /* sudah lepas */ }
@@ -46,14 +47,15 @@ function mountInto(entry: Entry): void {
   }
 }
 
-function updateEntry(entry: Entry, leaf: Leaf, visible: boolean): void {
-  entry.pane = leaf;
+function updateEntry(entry: Entry, tab: Tab, paneId: string, visible: boolean): void {
+  entry.tab = tab;
+  entry.paneId = paneId;
   entry.visible = visible;
-  if (leaf.kind !== entry.kind) {
+  if (tab.kind !== entry.kind) {
     entry.unmountFn?.();
     entry.host.textContent = '';
     resetHostStyle(entry);
-    entry.kind = leaf.kind;
+    entry.kind = tab.kind;
     mountInto(entry);
     return;
   }
@@ -66,48 +68,55 @@ function updateEntry(entry: Entry, leaf: Leaf, visible: boolean): void {
     return;
   }
   try {
-    entry.instance.update(leaf, visible);
+    entry.instance.update(tab, paneId, visible);
   } catch { /* abaikan */ }
 }
 
-export function ensureHost(leaf: Leaf, visible: boolean): HTMLElement {
-  const existing = entries.get(leaf.id);
+export function ensureHost(tab: Tab, paneId: string, visible: boolean): HTMLElement {
+  const existing = entries.get(tab.id);
   if (existing) {
-    updateEntry(existing, leaf, visible);
+    updateEntry(existing, tab, paneId, visible);
     return existing.host;
   }
   const host = document.createElement('div');
   host.className = 'pane-host';
   host.style.cssText = 'width:100%;height:100%;min-height:0;display:flex;flex-direction:column';
-  const entry: Entry = { host, kind: leaf.kind, instance: null, unmountFn: null, pane: leaf, visible };
-  entries.set(leaf.id, entry);
+  const entry: Entry = { host, kind: tab.kind, instance: null, unmountFn: null, tab, paneId, visible };
+  entries.set(tab.id, entry);
   mountInto(entry);
   return host;
 }
 
-export function getHost(paneId: string): HTMLElement | null {
-  return entries.get(paneId)?.host ?? null;
+export function getHost(tabId: string): HTMLElement | null {
+  return entries.get(tabId)?.host ?? null;
 }
 
-export function attachHost(paneId: string, slot: HTMLElement): void {
-  const e = entries.get(paneId);
+export function attachHost(tabId: string, slot: HTMLElement): void {
+  const e = entries.get(tabId);
   if (e && e.host.parentElement !== slot) slot.appendChild(e.host);
 }
 
-export function detachHost(paneId: string): void {
-  entries.get(paneId)?.host.remove();
+// Lepas dari DOM, TIDAK unmount.
+export function detachHost(tabId: string): void {
+  entries.get(tabId)?.host.remove();
 }
 
-export function releaseHost(paneId: string): void {
-  const e = entries.get(paneId);
+export function releaseHost(tabId: string): void {
+  const e = entries.get(tabId);
   if (!e) return;
   e.unmountFn?.();
   e.host.remove();
-  entries.delete(paneId);
+  entries.delete(tabId);
 }
 
-export function syncPanes(leaves: Leaf[], visibleIds: ReadonlySet<string>): void {
-  const ids = new Set(leaves.map((l) => l.id));
-  for (const l of leaves) ensureHost(l, visibleIds.has(l.id));
+export function syncPanes(
+  list: { pane: Leaf; tab: Tab }[],
+  visibleTabIds: ReadonlySet<string>,
+): void {
+  const ids = new Set<string>();
+  for (const { pane, tab } of list) {
+    ids.add(tab.id);
+    ensureHost(tab, pane.id, visibleTabIds.has(tab.id));
+  }
   for (const id of [...entries.keys()]) if (!ids.has(id)) releaseHost(id);
 }

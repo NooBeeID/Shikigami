@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { Leaf } from '../layout/model';
+  import type { Tab } from '../layout/model';
   import ThreadTab from './ThreadTab.svelte';
 
-  let { pane, visible }: { pane: Leaf; visible: boolean } = $props();
+  let { pane, visible }: { pane: Tab; paneId?: string; visible: boolean } = $props();
 </script>
 
 {#if pane.threadId}

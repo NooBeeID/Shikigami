@@ -5,7 +5,7 @@ import { sessions, createSession } from '../../lib/stores/sessions';
 import { activeWorkspace } from '../../lib/stores/workspaces';
 import type { Session } from '../../lib/stores/types';
 import { sessionTitle } from '../shell';
-import { findLeaf, type NewLeaf } from './model';
+import { activeTab, findLeaf, type NewLeaf } from './model';
 
 // Mencegah Cmd+D beruntun membuat banyak sesi.
 let inflight = false;
@@ -16,8 +16,10 @@ export async function splitPaneWithNewSession(
   store: LayoutStore = layout,
 ): Promise<void> {
   if (inflight) return;
-  const src = findLeaf(get(store), paneId);
-  if (!src || src.kind !== 'terminal') return;
+  const pane = findLeaf(get(store), paneId);
+  if (!pane) return;
+  const src = activeTab(pane);
+  if (src.kind !== 'terminal') return;
   if (!get(activeWorkspace)) return;
   const providerId =
     src.provider ?? get(sessions).find((s) => s.id === src.sessionId)?.providerId;
@@ -50,7 +52,7 @@ export async function splitPaneWithNewSession(
     };
     if (get(store).maximizedId) store.restore();
     if (findLeaf(get(store), paneId)) store.splitPane(paneId, dir, nl, 'after');
-    else store.openPane(nl, { dir });
+    else store.openPane(nl);
   } catch (err) {
     console.error('[layout] gagal membuat sesi split:', err);
   } finally {

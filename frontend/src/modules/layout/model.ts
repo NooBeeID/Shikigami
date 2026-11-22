@@ -1,20 +1,18 @@
 // Model pohon pane: tipe dan fungsi murni (tanpa IPC, tanpa mutasi masukan).
 
 export type PaneKind = 'terminal' | 'file' | 'thread' | 'lark-board' | 'lark-doc' | 'git-mr' | 'git-pipeline'; // string terbuka lewat registerPaneKind
-export interface Leaf {
-  type: 'pane';
-  id: string;
+export interface Tab {
+  id: string; // prefix 't_'
   kind: PaneKind;
   sessionId?: string;
   projectId?: string;
   provider?: string;
   filePath?: string;
   threadId?: string;
-  title: string;
-  workspaceId?: string; // tambahan: untuk pane file
-  root?: string; // root eksplisit untuk pane file read-only (mis. direktori grimoire)
+  workspaceId?: string; // untuk tab file
+  root?: string; // root eksplisit untuk tab file read-only (mis. direktori grimoire)
   readOnly?: boolean;
-  // Satu-satunya pane terminal untuk agent thread; membuka agent lain mengganti sesinya.
+  // Satu-satunya tab terminal untuk agent thread; membuka agent lain mengganti sesinya.
   threadAgent?: boolean;
   sourceId?: string;
   tableId?: string;
@@ -22,6 +20,13 @@ export interface Leaf {
   nodeToken?: string;
   number?: number; // nomor MR/PR
   pipelineId?: string;
+  title: string;
+}
+export interface Leaf {
+  type: 'pane';
+  id: string; // prefix 'p_'
+  tabs: Tab[]; // tidak pernah kosong
+  activeTabId: string; // selalu menunjuk tab di tabs
 }
 export interface Split {
   type: 'split';
@@ -67,7 +72,7 @@ export const clampRatio = (r: number): number => {
 };
 
 let counter = 0;
-function newLeafId(): string {
+function newId(prefix: string): string {
   let hex = '';
   try {
     hex = crypto.randomUUID().replace(/-/g, '').slice(0, 10);
@@ -75,8 +80,10 @@ function newLeafId(): string {
     counter += 1;
     hex = (Date.now().toString(16) + counter.toString(16).padStart(4, '0')).slice(-10).padStart(8, '0');
   }
-  return `p_${hex}`;
+  return `${prefix}${hex}`;
 }
+export const newPaneId = (): string => newId('p_');
+export const newTabId = (): string => newId('t_');
 
 const isDoc = (n: Node | LayoutDoc | null): n is LayoutDoc =>
   !!n && (n as LayoutDoc).version === 1 && 'root' in (n as LayoutDoc);
@@ -100,6 +107,16 @@ export const findLeafBy = (doc: LayoutDoc, pred: (l: Leaf) => boolean): Leaf | n
   leaves(doc).find(pred) ?? null;
 
 export const findLeaf = (doc: LayoutDoc, id: string): Leaf | null => findLeafBy(doc, (l) => l.id === id);
+
+export const activeTab = (leaf: Leaf): Tab => leaf.tabs.find((t) => t.id === leaf.activeTabId) ?? leaf.tabs[0];
+
+export const allTabs = (doc: LayoutDoc): { pane: Leaf; tab: Tab }[] =>
+  leaves(doc).flatMap((pane) => pane.tabs.map((tab) => ({ pane, tab })));
+
+export const findTab = (
+  doc: LayoutDoc,
+  pred: (tab: Tab, pane: Leaf) => boolean,
+): { pane: Leaf; tab: Tab } | null => allTabs(doc).find((e) => pred(e.tab, e.pane)) ?? null;
 
 export const pathOf = (doc: LayoutDoc, id: string): SplitPath | null => {
   const walk = (n: Node | null, path: string[]): string[] | null => {
@@ -141,10 +158,9 @@ const basename = (p?: string): string | undefined => {
   return parts.length ? parts[parts.length - 1] : undefined;
 };
 
-function makeLeaf(nl: NewLeaf): Leaf {
-  const leaf: Leaf = {
-    type: 'pane',
-    id: newLeafId(),
+export function makeLeaf(nl: NewLeaf): Tab {
+  const leaf: Tab = {
+    id: newTabId(),
     kind: nl.kind,
     title: nl.title ?? nl.provider ?? basename(nl.filePath) ?? 'Pane',
   };
@@ -166,6 +182,11 @@ function makeLeaf(nl: NewLeaf): Leaf {
   return leaf;
 }
 
+// Bungkus satu tab menjadi pane baru.
+function wrapTab(tab: Tab): Leaf {
+  return { type: 'pane', id: newPaneId(), tabs: [tab], activeTabId: tab.id };
+}
+
 // Pastikan tidak ada Split dengan anak null.
 function normalizeNode(n: Node | null): Node | null {
   if (!n) return null;
@@ -177,7 +198,7 @@ function normalizeNode(n: Node | null): Node | null {
   return { ...n, a, b };
 }
 
-function normalize(doc: LayoutDoc): LayoutDoc {
+export function normalize(doc: LayoutDoc): LayoutDoc {
   const root = normalizeNode(doc.root);
   const ids = new Set(leaves(root).map((l) => l.id));
   const out: LayoutDoc = { version: 1, root };
@@ -192,19 +213,74 @@ export function setFocus(doc: LayoutDoc, paneId: string): LayoutDoc {
   return { ...doc, focusId: paneId };
 }
 
-export function splitPane(
+// Ganti leaf dengan id paneId memakai hasil fn; node lain dipakai ulang.
+function mapLeaf(doc: LayoutDoc, paneId: string, fn: (l: Leaf) => Leaf): LayoutDoc {
+  if (!findLeaf(doc, paneId)) return doc;
+  const rec = (n: Node): Node => (n.type === 'pane' ? (n.id === paneId ? fn(n) : n) : { ...n, a: rec(n.a), b: rec(n.b) });
+  return { ...doc, root: doc.root ? rec(doc.root) : null };
+}
+
+// Aturan dedupe: apakah tab sudah memuat konten yang diminta.
+function sameContent(nl: NewLeaf, t: Tab): boolean {
+  if (nl.sessionId !== undefined && t.sessionId === nl.sessionId) return true;
+  if (nl.filePath !== undefined && t.filePath === nl.filePath && t.projectId === nl.projectId) return true;
+  if (nl.threadId !== undefined && t.threadId === nl.threadId) return true;
+  if (nl.kind === 'lark-board' && t.kind === 'lark-board' && nl.sourceId !== undefined && t.sourceId === nl.sourceId) return true;
+  if (
+    nl.kind === 'lark-doc' &&
+    t.kind === 'lark-doc' &&
+    nl.sourceId !== undefined &&
+    t.sourceId === nl.sourceId &&
+    (t.nodeToken ?? '') === (nl.nodeToken ?? '')
+  )
+    return true;
+  return false;
+}
+
+function focusPaneId(doc: LayoutDoc): string | null {
+  if (doc.focusId && findLeaf(doc, doc.focusId)) return doc.focusId;
+  const all = leaves(doc);
+  return all.length ? all[all.length - 1].id : null;
+}
+
+function revealTab(doc: LayoutDoc, paneId: string, tabId: string): LayoutDoc {
+  return setFocus(activateTab(doc, paneId, tabId), paneId);
+}
+
+export function activateTab(doc: LayoutDoc, paneId: string, tabId: string): LayoutDoc {
+  const pane = findLeaf(doc, paneId);
+  if (!pane || !pane.tabs.some((t) => t.id === tabId) || pane.activeTabId === tabId) return doc;
+  return mapLeaf(doc, paneId, (l) => ({ ...l, activeTabId: tabId }));
+}
+
+export function renameTab(doc: LayoutDoc, paneId: string, tabId: string, title: string): LayoutDoc {
+  const t = (title ?? '').trim();
+  const tab = findLeaf(doc, paneId)?.tabs.find((x) => x.id === tabId);
+  if (!t || !tab || tab.title === t) return doc;
+  return mapLeaf(doc, paneId, (l) => ({ ...l, tabs: l.tabs.map((x) => (x.id === tabId ? { ...x, title: t } : x)) }));
+}
+
+export function closeTab(doc: LayoutDoc, paneId: string, tabId: string): LayoutDoc {
+  const pane = findLeaf(doc, paneId);
+  if (!pane || !pane.tabs.some((t) => t.id === tabId)) return doc;
+  if (pane.tabs.length === 1) return closePane(doc, paneId);
+  const idx = pane.tabs.findIndex((t) => t.id === tabId);
+  const tabs = pane.tabs.filter((t) => t.id !== tabId);
+  const activeTabId = pane.activeTabId !== tabId ? pane.activeTabId : (tabs[idx] ?? tabs[idx - 1]).id;
+  return mapLeaf(doc, paneId, (l) => ({ ...l, tabs, activeTabId }));
+}
+
+// Split dengan leaf utuh (dipakai splitPane dan movePane).
+function splitWith(
   doc: LayoutDoc,
   paneId: string,
   dir: 'h' | 'v',
-  newLeaf: NewLeaf | Leaf,
-  side: 'after' | 'before' = 'after',
+  leaf: Leaf,
+  side: 'after' | 'before',
 ): { doc: LayoutDoc; id: string } {
   const target = pathOf(doc, paneId);
   const targetNode = findLeaf(doc, paneId);
-  const leaf: Leaf = (newLeaf as Leaf).type === 'pane' && (newLeaf as Leaf).id ? (newLeaf as Leaf) : makeLeaf(newLeaf as NewLeaf);
-  if (target === null || !targetNode) {
-    return { doc, id: '' };
-  }
+  if (target === null || !targetNode) return { doc, id: '' };
   const split: Split = {
     type: 'split',
     dir,
@@ -216,27 +292,36 @@ export function splitPane(
   return { doc: { ...doc, root, focusId: leaf.id }, id: leaf.id };
 }
 
-export function openPane(
+export function splitPane(
   doc: LayoutDoc,
-  nl: NewLeaf,
-  opts?: { dir?: 'h' | 'v' },
+  paneId: string,
+  dir: 'h' | 'v',
+  content: NewLeaf | Leaf,
+  side: 'after' | 'before' = 'after',
 ): { doc: LayoutDoc; id: string } {
-  const existing = findLeafBy(doc, (l) => {
-    if (nl.sessionId !== undefined && l.sessionId === nl.sessionId) return true;
-    if (nl.filePath !== undefined && l.filePath === nl.filePath && l.projectId === nl.projectId) return true;
-    if (nl.threadId !== undefined && l.threadId === nl.threadId) return true;
-    if (nl.kind === 'lark-board' && l.kind === 'lark-board' && nl.sourceId !== undefined && l.sourceId === nl.sourceId) return true;
-    if (nl.kind === 'lark-doc' && l.kind === 'lark-doc' && nl.sourceId !== undefined && l.sourceId === nl.sourceId && (l.nodeToken ?? '') === (nl.nodeToken ?? '')) return true;
-    return false;
-  });
-  if (existing) return { doc: setFocus(doc, existing.id), id: existing.id };
-  if (!doc.root) {
-    const leaf = makeLeaf(nl);
-    return { doc: { ...doc, root: leaf, focusId: leaf.id }, id: leaf.id };
+  const target = findLeaf(doc, paneId);
+  if (!target) return { doc, id: '' };
+  if ('tabs' in content) return splitWith(doc, paneId, dir, content, side);
+  // Cmd+D hanya berlaku pada tab terminal aktif.
+  if (activeTab(target).kind !== 'terminal') return { doc, id: '' };
+  return splitWith(doc, paneId, dir, wrapTab(makeLeaf(content)), side);
+}
+
+export function openPane(doc: LayoutDoc, nl: NewLeaf): LayoutDoc {
+  const hit = findTab(doc, (t) => sameContent(nl, t));
+  if (hit) return revealTab(doc, hit.pane.id, hit.tab.id);
+  const tab = makeLeaf(nl);
+  const pid = doc.root ? focusPaneId(doc) : null;
+  if (pid === null) {
+    const pane = wrapTab(tab);
+    return { ...doc, root: pane, focusId: pane.id };
   }
-  const all = leaves(doc);
-  const focus = doc.focusId && findLeaf(doc, doc.focusId) ? doc.focusId : all[all.length - 1].id;
-  return splitPane(doc, focus, opts?.dir ?? 'h', nl, 'after');
+  const next = mapLeaf(doc, pid, (l) => {
+    const at = l.tabs.findIndex((x) => x.id === l.activeTabId);
+    const i = at < 0 ? l.tabs.length : at + 1;
+    return { ...l, tabs: [...l.tabs.slice(0, i), tab, ...l.tabs.slice(i)], activeTabId: tab.id };
+  });
+  return { ...next, focusId: pid };
 }
 
 // Cabut leaf dari pohon tanpa mengubah fokus; kembalikan akar baru.
@@ -306,7 +391,7 @@ export function movePane(doc: LayoutDoc, paneId: string, targetId: string, zone:
   const stripped: LayoutDoc = { ...d, root };
   const dir: 'h' | 'v' = zone === 'top' || zone === 'bottom' ? 'v' : 'h';
   const side: 'after' | 'before' = zone === 'top' || zone === 'left' ? 'before' : 'after';
-  const res = splitPane(stripped, targetId, dir, leaf, side);
+  const res = splitWith(stripped, targetId, dir, leaf, side);
   return normalize({ ...res.doc, focusId: leaf.id });
 }
 
@@ -338,97 +423,31 @@ export function tidyGrid(doc: LayoutDoc): LayoutDoc {
   return out;
 }
 
-// Buka agent thread di satu pane khusus: bila pane itu sudah ada, ganti sesinya; bila belum, buat.
+// Buka agent thread di satu tab khusus: bila tab itu sudah ada, ganti sesinya; bila belum, buat.
 export function openThreadAgent(doc: LayoutDoc, nl: NewLeaf): { doc: LayoutDoc; id: string } {
-  const sameSession = findLeafBy(doc, (l) => l.sessionId !== undefined && l.sessionId === nl.sessionId);
-  if (sameSession) return { doc: setFocus(doc, sameSession.id), id: sameSession.id };
-  const slot = findLeafBy(doc, (l) => !!l.threadAgent);
-  if (!slot) return openPane(doc, { ...nl, threadAgent: true });
-  const rec = (n: Node): Node =>
-    n.type === 'pane'
-      ? n.id === slot.id
-        ? {
-            ...n,
-            sessionId: nl.sessionId,
-            projectId: nl.projectId,
-            provider: nl.provider,
-            workspaceId: nl.workspaceId,
-            title: nl.title ?? n.title,
-          }
-        : n
-      : { ...n, a: rec(n.a), b: rec(n.b) };
-  return { doc: setFocus({ ...doc, root: doc.root ? rec(doc.root) : null }, slot.id), id: slot.id };
-}
-
-export function renamePane(doc: LayoutDoc, paneId: string, title: string): LayoutDoc {
-  const t = (title ?? '').trim();
-  if (!t || !findLeaf(doc, paneId)) return doc;
-  const rec = (n: Node): Node =>
-    n.type === 'pane' ? (n.id === paneId ? { ...n, title: t } : n) : { ...n, a: rec(n.a), b: rec(n.b) };
-  return { ...doc, root: doc.root ? rec(doc.root) : null };
-}
-
-const isStr = (v: unknown): v is string => typeof v === 'string';
-
-function hydrateNode(raw: unknown): Node | null {
-  if (!raw || typeof raw !== 'object') return null;
-  const r = raw as Record<string, unknown>;
-  if (r.type === 'pane') {
-    if (!isStr(r.id) || !r.id || !isStr(r.kind)) return null;
-    const leaf: Leaf = {
-      type: 'pane',
-      id: r.id,
-      kind: r.kind as PaneKind,
-      title: isStr(r.title) && r.title ? r.title : 'Pane',
-    };
-    for (const k of ['sessionId', 'projectId', 'provider', 'filePath', 'workspaceId', 'root', 'threadId', 'sourceId', 'tableId', 'viewId', 'nodeToken', 'pipelineId'] as const) {
-      if (isStr(r[k])) leaf[k] = r[k] as string;
-    }
-    if (typeof r.readOnly === 'boolean') leaf.readOnly = r.readOnly;
-    if (typeof r.threadAgent === 'boolean') leaf.threadAgent = r.threadAgent;
-    if (typeof r.number === 'number' && Number.isFinite(r.number)) leaf.number = r.number;
-    return leaf;
+  const sameSession = nl.sessionId !== undefined ? findTab(doc, (t) => t.sessionId === nl.sessionId) : null;
+  if (sameSession) return { doc: revealTab(doc, sameSession.pane.id, sameSession.tab.id), id: sameSession.pane.id };
+  const slot = findTab(doc, (t) => !!t.threadAgent);
+  if (slot) {
+    const swapped = mapLeaf(doc, slot.pane.id, (l) => ({
+      ...l,
+      tabs: l.tabs.map((t) =>
+        t.id === slot.tab.id
+          ? {
+              ...t,
+              sessionId: nl.sessionId,
+              projectId: nl.projectId,
+              provider: nl.provider,
+              workspaceId: nl.workspaceId,
+              title: nl.title ?? t.title,
+            }
+          : t,
+      ),
+    }));
+    return { doc: revealTab(swapped, slot.pane.id, slot.tab.id), id: slot.pane.id };
   }
-  if (r.type === 'split') {
-    if (r.dir !== 'h' && r.dir !== 'v') return null;
-    if (typeof r.ratio !== 'number') return null;
-    const a = hydrateNode(r.a);
-    const b = hydrateNode(r.b);
-    if (!a) return b;
-    if (!b) return a;
-    return { type: 'split', dir: r.dir, ratio: clampRatio(r.ratio), a, b };
-  }
-  return null;
+  const next = openPane(doc, { ...nl, threadAgent: true });
+  return { doc: next, id: next.focusId ?? '' };
 }
 
-export function hydrateDoc(raw: unknown): LayoutDoc {
-  try {
-    if (!raw || typeof raw !== 'object') return emptyDoc();
-    const r = raw as Record<string, unknown>;
-    if (r.version !== 1) return emptyDoc();
-    const root = hydrateNode(r.root);
-    const seen = new Set<string>();
-    // buang duplikat id agar pohon konsisten
-    const dedupe = (n: Node | null): Node | null => {
-      if (!n) return null;
-      if (n.type === 'pane') {
-        if (seen.has(n.id)) return null;
-        seen.add(n.id);
-        return n;
-      }
-      const a = dedupe(n.a);
-      const b = dedupe(n.b);
-      if (!a) return b;
-      if (!b) return a;
-      return { ...n, a, b };
-    };
-    const clean = dedupe(root);
-    const doc: LayoutDoc = { version: 1, root: clean };
-    if (isStr(r.focusId)) doc.focusId = r.focusId;
-    if (isStr(r.maximizedId)) doc.maximizedId = r.maximizedId;
-    else if (r.maximizedId === null) doc.maximizedId = null;
-    return JSON.parse(JSON.stringify(normalize(doc)));
-  } catch {
-    return emptyDoc();
-  }
-}
+export { hydrateDoc } from '../persist/hydrate';

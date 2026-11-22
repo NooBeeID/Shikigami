@@ -1,37 +1,41 @@
 <script lang="ts">
-  import type { Leaf, Node } from '../layout/model';
+  import type { Tab, Node } from '../layout/model';
   import { call } from '../../lib/ipc';
   import { sessions } from '../../lib/stores/sessions';
   import { workspaces, activeWorkspaceId } from '../../lib/stores/workspaces';
   import type { Session } from '../../lib/stores/types';
   import { layout } from '../../lib/stores/layout';
 
-  let { leaf, onRestarted }: { leaf: Leaf; onRestarted?: (newSessionId: string) => void } = $props();
+  let { tab, paneId, onRestarted }: { tab: Tab; paneId: string; onRestarted?: (newSessionId: string) => void } = $props();
 
   let busy = $state(false);
   let error = $state<string | null>(null);
 
   const project = $derived(
-    $workspaces.find((w) => w.id === $activeWorkspaceId)?.projects?.find((p) => p.id === leaf.projectId) ?? null,
+    $workspaces.find((w) => w.id === $activeWorkspaceId)?.projects?.find((p) => p.id === tab.projectId) ?? null,
   );
-  const providerLabel = $derived(leaf.provider ?? 'tidak diketahui');
-  const missingProject = $derived(!leaf.projectId || !project);
-  const canRestart = $derived(!busy && !missingProject && !!leaf.provider && !!$activeWorkspaceId);
+  const providerLabel = $derived(tab.provider ?? 'tidak diketahui');
+  const missingProject = $derived(!tab.projectId || !project);
+  const canRestart = $derived(!busy && !missingProject && !!tab.provider && !!$activeWorkspaceId);
 
-  // Ganti sessionId daun target; mengembalikan node baru dan apakah daun ditemukan.
-  function replaceSessionId(node: Node | null, leafId: string, newId: string, found: { v: boolean }): Node | null {
+  // Ganti sessionId tab target di dalam pane target; found.v true bila tab ditemukan.
+  function replaceSessionId(node: Node | null, paneId: string, tabId: string, newId: string, found: { v: boolean }): Node | null {
     if (!node) return null;
     if (node.type === 'pane') {
-      if (node.id === leafId) {
-        found.v = true;
-        return { ...node, sessionId: newId };
-      }
-      return node;
+      if (node.id !== paneId) return node;
+      return {
+        ...node,
+        tabs: node.tabs.map((t) => {
+          if (t.id !== tabId) return t;
+          found.v = true;
+          return { ...t, sessionId: newId };
+        }),
+      };
     }
     return {
       ...node,
-      a: replaceSessionId(node.a, leafId, newId, found)!,
-      b: replaceSessionId(node.b, leafId, newId, found)!,
+      a: replaceSessionId(node.a, paneId, tabId, newId, found)!,
+      b: replaceSessionId(node.b, paneId, tabId, newId, found)!,
     };
   }
 
@@ -39,7 +43,7 @@
     if (!canRestart) return;
     const wsId = $activeWorkspaceId;
     const p = project;
-    const providerId = leaf.provider;
+    const providerId = tab.provider;
     if (!wsId || !p || !providerId) return;
     busy = true;
     error = null;
@@ -53,7 +57,7 @@
       sessions.update((l) => (l.some((x) => x.id === s.id) ? l : [...l, s]));
       const doc = layout.serialize();
       const found = { v: false };
-      doc.root = replaceSessionId(doc.root, leaf.id, s.id, found);
+      doc.root = replaceSessionId(doc.root, paneId, tab.id, s.id, found);
       if (found.v) layout.hydrate(doc);
       onRestarted?.(s.id);
     } catch (e) {
@@ -64,7 +68,7 @@
   }
 </script>
 
-{#if leaf.kind === 'terminal'}
+{#if tab.kind === 'terminal'}
   <div class="dead" role="alert">
     <div class="card">
       <div class="title">Sesi berakhir</div>
