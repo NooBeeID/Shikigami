@@ -12,6 +12,7 @@
   let focusedKey = $state<string | null>(null);
   let treeEl: HTMLDivElement | undefined = $state();
   let lastSig: string | null = null;
+  const autoOpened = new Set<string>();
 
   let pathInput = $state('');
   let busy = $state(false);
@@ -54,22 +55,31 @@
     return unsub;
   });
 
-  const selected = $derived(projects.find((p) => p.id === activeId) ?? projects[0] ?? null);
-
   $effect(() => {
-    const sel = selected;
-    const sig = sel ? sel.id + '|' + sel.path : '';
+    const sig = projects.map((p) => p.id + '|' + p.path).join('\n');
     if (sig === lastSig) return;
     lastSig = sig;
     focusedKey = null;
-    model.setProjects(sel ? [sel] : []);
+    model.setProjects(projects);
+  });
+
+  // Root project aktif dibuka otomatis supaya isinya langsung tampil.
+  $effect(() => {
+    const p = projects.find((x) => x.id === activeId) ?? projects[0];
+    if (!p) return;
+    const root = model.rows.find((r) => r.kind === 'project' && r.path === p.path);
+    if (!root || autoOpened.has(p.path)) return;
+    autoOpened.add(p.path);
+    if (!root.expanded) model.toggle(root);
   });
 
   const nodeRows = $derived(model.rows.filter((r) => !r.placeholder));
 
   function openFile(row: TreeRow) {
-    if (!selected) return;
-    openFilePane({ projectId: selected.id, filePath: row.path, workspaceId, title: basename(row.path) });
+    const project = projects.find((p) => p.path === row.root);
+    if (!project) return;
+    selectProject(project.id);
+    openFilePane({ projectId: project.id, filePath: row.path, workspaceId, title: basename(row.path) });
   }
 
   function activate(row: TreeRow) {
@@ -171,15 +181,7 @@
 <div class="files-tab">
   {#if hasWorkspace && projects.length > 0}
     <div class="header">
-      <select
-        aria-label="Pilih project"
-        value={selected?.id ?? ''}
-        onchange={(e) => selectProject(e.currentTarget.value)}
-      >
-        {#each projects as p (p.id)}
-          <option value={p.id} title={p.path}>{p.name}</option>
-        {/each}
-      </select>
+      <span class="title">Projects</span>
       <button class="icon" aria-label="Segarkan" title="Segarkan" onclick={() => model.refreshAll()}>&#8635;</button>
     </div>
   {/if}
@@ -306,11 +308,10 @@
     padding: 10px 12px;
     border-bottom: 1px solid var(--border, color-mix(in srgb, currentColor 20%, transparent));
   }
-  .header select {
+  .header .title {
     flex: 1;
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-weight: 600;
   }
   .footer {
     flex: none;
