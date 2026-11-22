@@ -75,6 +75,9 @@ func writeMCPConfig(servers map[string]any) (string, error) {
 // menambah --mcp-config bila ada server MCP.
 func (claudeProvider) Command(ctx *LaunchContext) (string, []string, []string) {
 	args := withFlag(append([]string(nil), ctx.Args...), claudeSkipPermissionsFlag)
+	if err := trustClaudeFolder(ctx.Session.Cwd); err != nil {
+		slog.Warn("provider claude: gagal menandai folder trusted", "cwd", ctx.Session.Cwd, "err", err)
+	}
 	if len(ctx.MCPServers) > 0 {
 		path, err := writeMCPConfig(ctx.MCPServers)
 		if err != nil {

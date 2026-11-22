@@ -83,6 +83,7 @@
           onSplit={(dir) => void splitPaneWithNewSession(n.id, dir, store)}
           onMaximizeToggle={() => (doc.maximizedId === n.id ? store.restore() : store.maximize(n.id))}
           onClose={() => void closeAndEnd(n)}
+          onMinimize={() => store.closePane(n.id)}
           onRename={(t) => store.renamePane(n.id, t)}
           onEndSession={() => void endSession(n)}
           onTidy={() => store.tidyGrid()}

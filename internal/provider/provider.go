@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"time"
 )
 
 // Identitas provider bawaan.
@@ -44,14 +45,24 @@ type Provider interface {
 	Available() (path string, err error)
 }
 
-// BracketedPaste mengembalikan "\x1b[200~" + text + "\x1b[201~" + "\r" (Enter sudah termasuk).
+// BracketedPaste mengembalikan "\x1b[200~" + text + "\x1b[201~" (tanpa Enter).
 func BracketedPaste(text string) []byte {
-	return []byte("\x1b[200~" + text + "\x1b[201~" + "\r")
+	return []byte("\x1b[200~" + text + "\x1b[201~")
 }
 
-// WriteInput menulis BracketedPaste(text) ke w dalam satu panggilan Write.
+// submitDelay adalah jeda antara akhir paste dan Enter. TUI agent (Claude Code)
+// memperlakukan "\r" yang datang satu chunk dengan akhir paste sebagai baris baru
+// di dalam paste, bukan submit; Enter harus tiba sebagai input terpisah.
+const submitDelay = 250 * time.Millisecond
+
+// WriteInput menulis bracketed paste, jeda singkat, lalu Enter sebagai Write terpisah
+// agar pesan otomatis terkirim.
 func WriteInput(w io.Writer, text string) error {
-	_, err := w.Write(BracketedPaste(text))
+	if _, err := w.Write(BracketedPaste(text)); err != nil {
+		return err
+	}
+	time.Sleep(submitDelay)
+	_, err := w.Write([]byte("\r"))
 	return err
 }
 

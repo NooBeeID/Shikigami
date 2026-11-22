@@ -18,13 +18,14 @@
     onSplit: (dir: 'h' | 'v') => void;
     onMaximizeToggle: () => void;
     onClose: () => void;
+    onMinimize: () => void;
     onRename: (title: string) => void;
     onEndSession: () => void;
     onTidy: () => void;
   }
   let {
     pane, index, focused, maximized, store = layout,
-    onSplit, onMaximizeToggle, onClose, onRename, onEndSession, onTidy,
+    onSplit, onMaximizeToggle, onClose, onMinimize, onRename, onEndSession, onTidy,
   }: Props = $props();
 
   let editing = $state(false);
@@ -140,6 +141,11 @@
   <button type="button" class="hbtn" aria-label="Bagi bawah" title="Bagi bawah" onclick={() => onSplit('v')}>
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1.5" y="2" width="11" height="10" rx="1"/><path d="M1.5 7h11"/></svg>
   </button>
+  {#if isTerminal}
+    <button type="button" class="hbtn" aria-label="Minimize" title="Minimize (sesi tetap jalan)" onclick={onMinimize}>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 11h8"/></svg>
+    </button>
+  {/if}
   <button
     type="button"
     class="hbtn"

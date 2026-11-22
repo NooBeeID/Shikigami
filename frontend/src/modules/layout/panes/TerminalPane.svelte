@@ -14,7 +14,9 @@
 </script>
 
 {#if pane.sessionId}
-  <TerminalTab sessionId={pane.sessionId} {visible} scrollback={1000} {onTitle} />
+  {#key pane.sessionId}
+    <TerminalTab sessionId={pane.sessionId} {visible} scrollback={1000} {onTitle} />
+  {/key}
 {:else}
   <div class="empty">Sesi tidak tersedia</div>
 {/if}

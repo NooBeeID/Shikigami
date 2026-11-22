@@ -24,7 +24,28 @@ const (
 var (
 	daemonStartupMu  sync.RWMutex
 	daemonStartupErr error
+	// daemonStartupDone ditutup setelah auto-start awal (init) selesai.
+	daemonStartupDone = make(chan struct{})
 )
+
+// waitDaemonStartup menunggu auto-start awal selesai (maks timeout). Mengembalikan
+// true bila sudah selesai. Dipakai Bridge agar ping pertama frontend tidak
+// berlomba dengan spawn daemon.
+func waitDaemonStartup(done <-chan struct{}, timeout time.Duration) bool {
+	select {
+	case <-done:
+		return true
+	default:
+	}
+	t := time.NewTimer(timeout)
+	defer t.Stop()
+	select {
+	case <-done:
+		return true
+	case <-t.C:
+		return false
+	}
+}
 
 // daemonPing menghubungi daemon dan memanggil method ping satu kali.
 func daemonPing(socketPath string) error {
@@ -162,6 +183,7 @@ func init() {
 			daemonStartupMu.Lock()
 			daemonStartupErr = err
 			daemonStartupMu.Unlock()
+			close(daemonStartupDone)
 		}()
 		err = EnsureDaemon(context.Background())
 	}()

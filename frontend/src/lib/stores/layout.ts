@@ -5,6 +5,7 @@ import type { DropZone, Leaf, LayoutDoc, NewLeaf, SplitPath } from '../../module
 export interface LayoutStore extends Readable<LayoutDoc> {
   openPane(leaf: NewLeaf, opts?: { dir?: 'h' | 'v' }): string;
   splitPane(paneId: string, dir: 'h' | 'v', newLeaf: NewLeaf | Leaf, side?: 'after' | 'before'): string;
+  openThreadAgent(leaf: NewLeaf): string;
   closePane(paneId: string): void;
   movePane(paneId: string, targetId: string, zone: DropZone): void;
   swapPanes(aId: string, bId: string): void;
@@ -38,6 +39,15 @@ export function createLayoutStore(initial?: LayoutDoc): LayoutStore {
       let id = '';
       update((d) => {
         const r = M.splitPane(d, paneId, dir, newLeaf, side);
+        id = r.id;
+        return r.doc;
+      });
+      return id;
+    },
+    openThreadAgent(leaf) {
+      let id = '';
+      update((d) => {
+        const r = M.openThreadAgent(d, leaf);
         id = r.id;
         return r.doc;
       });

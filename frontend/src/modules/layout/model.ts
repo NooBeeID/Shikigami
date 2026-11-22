@@ -14,6 +14,8 @@ export interface Leaf {
   workspaceId?: string; // tambahan: untuk pane file
   root?: string; // root eksplisit untuk pane file read-only (mis. direktori grimoire)
   readOnly?: boolean;
+  // Satu-satunya pane terminal untuk agent thread; membuka agent lain mengganti sesinya.
+  threadAgent?: boolean;
 }
 export interface Split {
   type: 'split';
@@ -33,6 +35,7 @@ export type DropZone = 'top' | 'bottom' | 'left' | 'right' | 'center';
 export type SplitPath = string;
 export interface NewLeaf {
   kind: PaneKind;
+  threadAgent?: boolean;
   sessionId?: string;
   projectId?: string;
   provider?: string;
@@ -133,6 +136,7 @@ function makeLeaf(nl: NewLeaf): Leaf {
     kind: nl.kind,
     title: nl.title ?? nl.provider ?? basename(nl.filePath) ?? 'Pane',
   };
+  if (nl.threadAgent) leaf.threadAgent = true;
   if (nl.sessionId !== undefined) leaf.sessionId = nl.sessionId;
   if (nl.projectId !== undefined) leaf.projectId = nl.projectId;
   if (nl.provider !== undefined) leaf.provider = nl.provider;
@@ -314,6 +318,28 @@ export function tidyGrid(doc: LayoutDoc): LayoutDoc {
   return out;
 }
 
+// Buka agent thread di satu pane khusus: bila pane itu sudah ada, ganti sesinya; bila belum, buat.
+export function openThreadAgent(doc: LayoutDoc, nl: NewLeaf): { doc: LayoutDoc; id: string } {
+  const sameSession = findLeafBy(doc, (l) => l.sessionId !== undefined && l.sessionId === nl.sessionId);
+  if (sameSession) return { doc: setFocus(doc, sameSession.id), id: sameSession.id };
+  const slot = findLeafBy(doc, (l) => !!l.threadAgent);
+  if (!slot) return openPane(doc, { ...nl, threadAgent: true });
+  const rec = (n: Node): Node =>
+    n.type === 'pane'
+      ? n.id === slot.id
+        ? {
+            ...n,
+            sessionId: nl.sessionId,
+            projectId: nl.projectId,
+            provider: nl.provider,
+            workspaceId: nl.workspaceId,
+            title: nl.title ?? n.title,
+          }
+        : n
+      : { ...n, a: rec(n.a), b: rec(n.b) };
+  return { doc: setFocus({ ...doc, root: doc.root ? rec(doc.root) : null }, slot.id), id: slot.id };
+}
+
 export function renamePane(doc: LayoutDoc, paneId: string, title: string): LayoutDoc {
   const t = (title ?? '').trim();
   if (!t || !findLeaf(doc, paneId)) return doc;
@@ -339,6 +365,7 @@ function hydrateNode(raw: unknown): Node | null {
       if (isStr(r[k])) leaf[k] = r[k] as string;
     }
     if (typeof r.readOnly === 'boolean') leaf.readOnly = r.readOnly;
+    if (typeof r.threadAgent === 'boolean') leaf.threadAgent = r.threadAgent;
     return leaf;
   }
   if (r.type === 'split') {

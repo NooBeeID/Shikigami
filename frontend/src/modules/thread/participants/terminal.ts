@@ -26,7 +26,7 @@ export function openParticipantTerminal(p: Participant, thread: Thread): void {
       }
       if (focusExisting(p.sessionId)) return;
       const providerName = get(providers).find((x) => x.id === s!.providerId)?.name ?? s.providerId;
-      layout.openPane({
+      layout.openThreadAgent({
         kind: 'terminal',
         sessionId: s.id,
         projectId: s.projectId,

@@ -119,7 +119,12 @@ func (b *Bridge) connect() (*ipc.Client, error) {
 	}
 	c, err := ipc.Dial(sock)
 	if err != nil {
-		return nil, fmt.Errorf("daemon tidak berjalan di %s", sock)
+		// Daemon mungkin masih dijalankan oleh auto-start (cold start): tunggu
+		// lalu coba lagi. Bila daemon mati belakangan, EnsureDaemon menyalakannya.
+		c, err = b.redialAfterStartup(sock)
+		if err != nil {
+			return nil, err
+		}
 	}
 	unsub, err := c.Subscribe("", b.relay)
 	if err != nil {
@@ -128,6 +133,22 @@ func (b *Bridge) connect() (*ipc.Client, error) {
 	}
 	b.client = c
 	b.unsub = unsub
+	return c, nil
+}
+
+// redialAfterStartup dipanggil saat Dial pertama gagal.
+func (b *Bridge) redialAfterStartup(sock string) (*ipc.Client, error) {
+	waitDaemonStartup(daemonStartupDone, 2*daemonWaitTimeout)
+	if c, err := ipc.Dial(sock); err == nil {
+		return c, nil
+	}
+	if err := EnsureDaemon(context.Background()); err != nil {
+		return nil, fmt.Errorf("daemon tidak berjalan di %s: %w", sock, err)
+	}
+	c, err := ipc.Dial(sock)
+	if err != nil {
+		return nil, fmt.Errorf("daemon tidak berjalan di %s", sock)
+	}
 	return c, nil
 }
 
