@@ -19,13 +19,13 @@ func init() {
 				}
 				return
 			}
-			runs.RegisterIPC(srv, reg, eng)
 			publish := func(sessionID string) {
 				srv.Publish("runs.changed", map[string]any{
 					"sessionId": sessionID,
 					"runs":      reg.List(map[string]bool{sessionID: true}),
 				})
 			}
+			runs.RegisterIPC(srv, reg, eng, publish)
 			eng.AddHookListener(func(sessionID, event string, payload map[string]any) {
 				if reg.Apply(sessionID, event, payload) {
 					publish(sessionID)
