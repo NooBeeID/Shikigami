@@ -30,17 +30,34 @@ func SessionIDsOfWorkspace(reg *Registry, eng sessionLookup, workspaceID string)
 	return set
 }
 
-// Reconcile mencocokkan run workspace dengan berkas Claude: run selesai dibuang,
-// run yang ditemukan ditandai Confirmed beserta Progress, run tak ditemukan
-// yang sesinya sudah tak dikenal dibuang. Mengembalikan ID sesi yang berubah.
-func Reconcile(reg *Registry, eng sessionLookup, workspaceID string) []string {
-	changed := map[string]bool{}
+// reconcileStep adalah hasil membaca berkas untuk satu run.
+type reconcileStep struct {
+	run   Run
+	d     Detail
+	known bool
+}
+
+type reconcilePlan []reconcileStep
+
+// scanReconcile membaca berkas Claude (I/O) tanpa mengubah registry.
+func scanReconcile(reg *Registry, eng sessionLookup, workspaceID string) reconcilePlan {
+	var plan reconcilePlan
 	for _, run := range reg.List(nil) {
 		s, known := eng.Lookup(run.SessionID)
 		if known && s.WorkspaceID != workspaceID {
 			continue
 		}
-		d := ReadDetail(reg.TranscriptPath(run.SessionID), run)
+		plan = append(plan, reconcileStep{run: run, d: ReadDetail(reg.TranscriptPath(run.SessionID), run), known: known})
+	}
+	return plan
+}
+
+// apply menerapkan hasil baca ke registry (cepat, hanya memori). Mengembalikan
+// ID sesi yang berubah, terurut.
+func (plan reconcilePlan) apply(reg *Registry) []string {
+	changed := map[string]bool{}
+	for _, st := range plan {
+		run, d := st.run, st.d
 		switch {
 		case d.Finished:
 			if reg.Remove(run.ID) {
@@ -57,7 +74,7 @@ func Reconcile(reg *Registry, eng sessionLookup, workspaceID string) []string {
 					changed[run.SessionID] = true
 				}
 			}
-		case !known:
+		case !st.known:
 			if reg.Remove(run.ID) {
 				changed[run.SessionID] = true
 			}
@@ -71,9 +88,17 @@ func Reconcile(reg *Registry, eng sessionLookup, workspaceID string) []string {
 	return out
 }
 
-// RegisterIPC mendaftarkan runs.list dan runs.detail. publish (boleh nil)
-// dipanggil per sesi yang berubah setelah rekonsiliasi.
-func RegisterIPC(srv *ipc.Server, reg *Registry, eng sessionLookup, publish func(sessionID string)) {
+// Reconcile mencocokkan run workspace dengan berkas Claude: run selesai dibuang,
+// run yang ditemukan ditandai Confirmed beserta Progress, run tak ditemukan
+// yang sesinya sudah tak dikenal dibuang. Mengembalikan ID sesi yang berubah.
+// Versi tanpa lock bersama; jalur produksi memakai Notifier.Reconcile.
+func Reconcile(reg *Registry, eng sessionLookup, workspaceID string) []string {
+	return scanReconcile(reg, eng, workspaceID).apply(reg)
+}
+
+// RegisterIPC mendaftarkan runs.list dan runs.detail. n (boleh nil) menjalankan
+// rekonsiliasi dengan publish terserialisasi bersama listener hook.
+func RegisterIPC(srv *ipc.Server, reg *Registry, eng sessionLookup, n *Notifier) {
 	workspaceParam := func(params json.RawMessage) (string, error) {
 		var p struct {
 			WorkspaceID string `json:"workspaceId"`
@@ -98,10 +123,10 @@ func RegisterIPC(srv *ipc.Server, reg *Registry, eng sessionLookup, publish func
 		if err != nil {
 			return nil, err
 		}
-		for _, sid := range Reconcile(reg, eng, ws) {
-			if publish != nil {
-				publish(sid)
-			}
+		if n != nil {
+			n.Reconcile(eng, ws)
+		} else {
+			Reconcile(reg, eng, ws)
 		}
 		return reg.List(SessionIDsOfWorkspace(reg, eng, ws)), nil
 	})

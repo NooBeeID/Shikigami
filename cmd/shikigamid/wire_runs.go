@@ -19,24 +19,15 @@ func init() {
 				}
 				return
 			}
-			publish := func(sessionID string) {
-				srv.Publish("runs.changed", map[string]any{
-					"sessionId": sessionID,
-					"runs":      reg.List(map[string]bool{sessionID: true}),
-				})
-			}
-			runs.RegisterIPC(srv, reg, eng, publish)
-			eng.AddHookListener(func(sessionID, event string, payload map[string]any) {
-				if reg.Apply(sessionID, event, payload) {
-					publish(sessionID)
-				}
+			// Satu Notifier (satu mutex) untuk listener hook, listener exit, dan
+			// runs.detail agar runs.changed tidak tiba terbalik urutan.
+			n := runs.NewNotifier(reg, func(sessionID string, list []runs.Run) {
+				srv.Publish("runs.changed", map[string]any{"sessionId": sessionID, "runs": list})
 			})
+			runs.RegisterIPC(srv, reg, eng, n)
+			eng.AddHookListener(n.Apply)
 			// Listener exit (bukan event status): tetap jalan walau sesi sudah Done lewat Stop.
-			eng.AddExitListener(func(sessionID string) {
-				if reg.Forget(sessionID) {
-					publish(sessionID)
-				}
-			})
+			eng.AddExitListener(n.Forget)
 		})
 	})
 }
