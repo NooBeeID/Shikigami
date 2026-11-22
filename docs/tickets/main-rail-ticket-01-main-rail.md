@@ -2,7 +2,7 @@
 id: main-rail-ticket-01-main-rail
 title: Rail menu utama dan panel kiri
 spec: docs/superpowers/specs/2026-11-22-08-main-rail-design.md
-status: ready
+status: implemented
 wave: 1
 depends_on: []
 ---

@@ -7,7 +7,7 @@
   import { ShellFrame, RightPanel } from './modules/shell';
   import './modules/shell/register';
   import Topbar from './modules/topbar/Topbar.svelte';
-  import AgentSidebar from './modules/sidebar-left/AgentSidebar.svelte';
+  import RailPanelHost from './modules/shell/RailPanelHost.svelte';
   import Palette from './modules/palette/Palette.svelte';
   import Toast from './modules/openfolder/Toast.svelte';
   import { SettingsModal } from './modules/settings';
@@ -37,7 +37,7 @@
 {:else}
   <ShellFrame>
     {#snippet topbar()}<Topbar />{/snippet}
-    {#snippet left()}<AgentSidebar />{/snippet}
+    {#snippet left()}<RailPanelHost />{/snippet}
     {#snippet center()}<LayoutArea />{/snippet}
     {#snippet right()}<RightPanel />{/snippet}
   </ShellFrame>

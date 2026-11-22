@@ -4,9 +4,19 @@ import { derived, writable, type Readable } from 'svelte/store';
 export interface RightTabSpec { id: string; title: string; component: Component<any>; order?: number }
 export interface TopbarItemSpec { id: string; component: Component<any>; align: 'left' | 'center' | 'right'; order?: number }
 
+export interface RailItemSpec {
+  id: string;
+  title: string;
+  icon: Component;
+  component: Component<any>;
+  order?: number;
+  visible?: Readable<boolean>;
+}
+
 export interface LayoutHeaderSpec { id: string; component: Component<any>; order?: number }
 
 const rightTabStore = writable<Record<string, RightTabSpec>>({});
+const railStore = writable<Record<string, RailItemSpec>>({});
 const topbarStore = writable<Record<string, TopbarItemSpec>>({});
 const layoutHeaderStore = writable<Record<string, LayoutHeaderSpec>>({});
 
@@ -39,4 +49,38 @@ export function registerLayoutHeader(spec: LayoutHeaderSpec): void {
 
 export function layoutHeaders(): Readable<LayoutHeaderSpec[]> {
   return derived(layoutHeaderStore, (m) => Object.values(m).sort(byOrder));
+}
+
+export function registerRailItem(spec: RailItemSpec): void {
+  railStore.update((m) => ({ ...m, [spec.id]: spec }));
+}
+
+export function railItems(): Readable<RailItemSpec[]> {
+  const sorted = derived(railStore, (m) => Object.values(m).sort(byOrder));
+  return derived(
+    sorted,
+    ($items, set) => {
+      if ($items.length === 0) {
+        set([]);
+        return;
+      }
+      const flags: boolean[] = $items.map(() => true);
+      let ready = false;
+      const emit = () => {
+        if (ready) set($items.filter((_, i) => flags[i]));
+      };
+      const unsubs = $items.map((item, i) =>
+        item.visible
+          ? item.visible.subscribe((v) => {
+              flags[i] = v;
+              emit();
+            })
+          : () => {},
+      );
+      ready = true;
+      emit();
+      return () => unsubs.forEach((u) => u());
+    },
+    [] as RailItemSpec[],
+  );
 }

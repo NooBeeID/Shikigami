@@ -1,12 +1,17 @@
 import { writable, type Writable } from 'svelte/store';
 
-export interface SidebarState { visible: boolean; width: number }
+export interface SidebarState { visible: boolean; width: number; activeRail?: string }
 export interface RightSidebarState extends SidebarState { activeTab: string }
 
 export const LEFT_MIN = 240, LEFT_MAX = 480, RIGHT_MIN = 220, RIGHT_MAX = 520;
 export const LEFT_DEFAULT = 300, RIGHT_DEFAULT = 280;
+export const DEFAULT_RAIL = 'agents';
 
-export const leftSidebar: Writable<SidebarState> = writable<SidebarState>({ visible: true, width: LEFT_DEFAULT });
+export const leftSidebar: Writable<SidebarState> = writable<SidebarState>({
+  visible: true,
+  width: LEFT_DEFAULT,
+  activeRail: DEFAULT_RAIL,
+});
 export const rightSidebar: Writable<RightSidebarState> = writable<RightSidebarState>({
   visible: true,
   width: RIGHT_DEFAULT,
@@ -34,4 +39,10 @@ export function setRightWidth(px: number): void {
 }
 export function setRightTab(id: string): void {
   rightSidebar.update((s) => ({ ...s, activeTab: id }));
+}
+export function setActiveRail(id: string): void {
+  leftSidebar.update((s) => ({ ...s, activeRail: id }));
+}
+export function resolveActiveRail(items: { id: string }[], id: string | undefined): string {
+  return id && items.some((i) => i.id === id) ? id : DEFAULT_RAIL;
 }

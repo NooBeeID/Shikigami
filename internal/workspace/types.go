@@ -45,9 +45,10 @@ type Group struct {
 
 // SidebarState adalah keadaan satu sidebar.
 type SidebarState struct {
-	Visible   bool   `json:"visible"`
-	Width     int    `json:"width"`
-	ActiveTab string `json:"activeTab,omitempty"` // hanya sidebar kanan
+	Visible    bool   `json:"visible"`
+	Width      int    `json:"width"`
+	ActiveTab  string `json:"activeTab,omitempty"`  // hanya sidebar kanan
+	ActiveRail string `json:"activeRail,omitempty"` // hanya sidebar kiri
 }
 
 // UIState adalah keadaan UI global yang dipersist.
@@ -64,7 +65,9 @@ type UIPatch struct {
 	ActiveWorkspaceID *string       `json:"activeWorkspaceId,omitempty"`
 }
 
-func defaultLeftSidebar() SidebarState { return SidebarState{Visible: true, Width: 260} }
+func defaultLeftSidebar() SidebarState {
+	return SidebarState{Visible: true, Width: 260, ActiveRail: "agents"}
+}
 func defaultRightSidebar() SidebarState {
 	return SidebarState{Visible: true, Width: 280, ActiveTab: "files"}
 }

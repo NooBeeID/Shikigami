@@ -28,6 +28,7 @@ export function applyUi(ui: unknown): void {
   leftSidebar.set({
     visible: typeof l.visible === 'boolean' ? l.visible : true,
     width: clamp(l.width, LEFT_MIN, LEFT_MAX, LEFT_DEFAULT),
+    activeRail: typeof l.activeRail === 'string' && l.activeRail ? l.activeRail : 'agents',
   });
   rightSidebar.set({
     visible: typeof r.visible === 'boolean' ? r.visible : true,
