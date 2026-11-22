@@ -1,0 +1,81 @@
+{
+  "ok": true,
+  "identity": "user",
+  "data": {
+    "has_more": true,
+    "nodes": [
+      {
+        "has_child": true,
+        "node_token": "wikcnFAKE000000000000000001",
+        "node_type": "origin",
+        "obj_token": "doxcnFAKE000000000000000001",
+        "obj_type": "docx",
+        "parent_node_token": "",
+        "space_id": "7000000000000000003",
+        "title": "Judul Contoh 1"
+      },
+      {
+        "has_child": true,
+        "node_token": "wikcnFAKE000000000000000002",
+        "node_type": "origin",
+        "obj_token": "doxcnFAKE000000000000000002",
+        "obj_type": "docx",
+        "parent_node_token": "",
+        "space_id": "7000000000000000003",
+        "title": "Judul Contoh 2"
+      },
+      {
+        "has_child": true,
+        "node_token": "wikcnFAKE000000000000000003",
+        "node_type": "origin",
+        "obj_token": "doxcnFAKE000000000000000003",
+        "obj_type": "docx",
+        "parent_node_token": "",
+        "space_id": "7000000000000000003",
+        "title": "Judul Contoh 3"
+      },
+      {
+        "has_child": true,
+        "node_token": "wikcnFAKE000000000000000004",
+        "node_type": "origin",
+        "obj_token": "doxcnFAKE000000000000000004",
+        "obj_type": "docx",
+        "parent_node_token": "",
+        "space_id": "7000000000000000003",
+        "title": "Judul Contoh 4"
+      },
+      {
+        "has_child": true,
+        "node_token": "wikcnFAKE000000000000000005",
+        "node_type": "origin",
+        "obj_token": "doxcnFAKE000000000000000005",
+        "obj_type": "docx",
+        "parent_node_token": "",
+        "space_id": "7000000000000000003",
+        "title": "Judul Contoh 5"
+      },
+      {
+        "has_child": true,
+        "node_token": "wikcnFAKE000000000000000006",
+        "node_type": "origin",
+        "obj_token": "doxcnFAKE000000000000000006",
+        "obj_type": "docx",
+        "parent_node_token": "",
+        "space_id": "7000000000000000003",
+        "title": "Judul Contoh 6"
+      }
+    ],
+    "page_token": "FAKEPAGETOKEN00000000000000000000000000000000000000000000000001"
+  },
+  "meta": {
+    "count": 6
+  },
+  "_notice": {
+    "update": {
+      "command": "lark-cli update",
+      "current": "1.0.97",
+      "latest": "1.0.100",
+      "message": "lark-cli 1.0.100 available, current 1.0.97, run: lark-cli update"
+    }
+  }
+}

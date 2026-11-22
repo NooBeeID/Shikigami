@@ -47,7 +47,12 @@ func lookPath(name string) (string, bool) {
 // RunCLI menjalankan CLI dengan timeout dan PATH login-shell. Stdout
 // dikembalikan apa adanya.
 func RunCLI(ctx context.Context, name string, args ...string) (string, error) {
-	ctx, cancel := context.WithTimeout(ctx, cliTimeout)
+	return RunCLITimeout(ctx, cliTimeout, name, args...)
+}
+
+// RunCLITimeout seperti RunCLI tetapi dengan batas waktu eksplisit.
+func RunCLITimeout(ctx context.Context, timeout time.Duration, name string, args ...string) (string, error) {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
 	bin, ok := lookPath(name)

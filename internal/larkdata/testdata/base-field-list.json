@@ -1,0 +1,836 @@
+{
+  "ok": true,
+  "identity": "user",
+  "data": {
+    "fields": [
+      {
+        "bidirectional": true,
+        "bidirectional_link_field_id": "fldFAKE039",
+        "id": "fldFAKE024",
+        "link_table": "tblFAKE000000001",
+        "name": "Kolom 24",
+        "type": "link"
+      },
+      {
+        "default_value": [
+          "Opsi 16"
+        ],
+        "id": "fldFAKE006",
+        "multiple": false,
+        "name": "Kolom 6",
+        "options": [
+          {
+            "hue": "Purple",
+            "lightness": "Standard",
+            "name": "Opsi 2"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Light",
+            "name": "Opsi 16"
+          },
+          {
+            "hue": "Turquoise",
+            "lightness": "Lighter",
+            "name": "Opsi 17"
+          },
+          {
+            "hue": "Red",
+            "lightness": "Dark",
+            "name": "Opsi 18"
+          }
+        ],
+        "type": "select"
+      },
+      {
+        "default_value": {
+          "$slot": "record_created_time"
+        },
+        "id": "fldFAKE016",
+        "name": "Kolom 16",
+        "style": {
+          "format": "dd/MM/yyyy"
+        },
+        "type": "datetime"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE019",
+        "name": "Kolom 19",
+        "style": {
+          "percentage": false,
+          "precision": 0,
+          "thousands_separator": true,
+          "type": "plain"
+        },
+        "type": "number"
+      },
+      {
+        "default_value": null,
+        "dynamic_options_source": {
+          "field_id": "fldtcpeTCf",
+          "table_id": "tblFAKE000000002"
+        },
+        "id": "fldFAKE034",
+        "multiple": false,
+        "name": "Kolom 34",
+        "options": [
+          {
+            "hue": "Gray",
+            "lightness": "Lighter",
+            "name": "Opsi 7"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 19"
+          },
+          {
+            "hue": "Carmine",
+            "lightness": "Light",
+            "name": "Opsi 20"
+          },
+          {
+            "hue": "Green",
+            "lightness": "Light",
+            "name": "Opsi 21"
+          },
+          {
+            "hue": "Orange",
+            "lightness": "Light",
+            "name": "Opsi 22"
+          }
+        ],
+        "type": "select"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE013",
+        "name": "Kolom 13",
+        "style": {
+          "type": "plain"
+        },
+        "type": "text"
+      },
+      {
+        "default_value": null,
+        "dynamic_options_source": {
+          "field_id": "fldr8inaZu",
+          "table_id": "tblFAKE000000003"
+        },
+        "id": "fldFAKE004",
+        "multiple": false,
+        "name": "Kolom 4",
+        "options": [
+          {
+            "hue": "Lime",
+            "lightness": "Lighter",
+            "name": "Opsi 23"
+          },
+          {
+            "hue": "Lime",
+            "lightness": "Lighter",
+            "name": "Opsi 24"
+          },
+          {
+            "hue": "Lime",
+            "lightness": "Lighter",
+            "name": "Opsi 25"
+          },
+          {
+            "hue": "Lime",
+            "lightness": "Lighter",
+            "name": "Opsi 26"
+          },
+          {
+            "hue": "Lime",
+            "lightness": "Lighter",
+            "name": "Opsi 27"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 1"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 28"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 29"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 9"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 30"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 31"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 11"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 32"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 33"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 34"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 35"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 36"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 37"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 38"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 39"
+          },
+          {
+            "hue": "Purple",
+            "lightness": "Lighter",
+            "name": "Opsi 40"
+          },
+          {
+            "hue": "Purple",
+            "lightness": "Lighter",
+            "name": "Opsi 12"
+          },
+          {
+            "hue": "Purple",
+            "lightness": "Lighter",
+            "name": "Opsi 41"
+          },
+          {
+            "hue": "Purple",
+            "lightness": "Lighter",
+            "name": "Opsi 14"
+          },
+          {
+            "hue": "Purple",
+            "lightness": "Lighter",
+            "name": "Opsi 42"
+          },
+          {
+            "hue": "Purple",
+            "lightness": "Lighter",
+            "name": "Opsi 15"
+          },
+          {
+            "hue": "Purple",
+            "lightness": "Lighter",
+            "name": "Opsi 43"
+          },
+          {
+            "hue": "Purple",
+            "lightness": "Lighter",
+            "name": "Opsi 44"
+          },
+          {
+            "hue": "Orange",
+            "lightness": "Lighter",
+            "name": "Opsi 45"
+          },
+          {
+            "hue": "Orange",
+            "lightness": "Lighter",
+            "name": "Opsi 46"
+          },
+          {
+            "hue": "Orange",
+            "lightness": "Lighter",
+            "name": "Opsi 47"
+          },
+          {
+            "hue": "Orange",
+            "lightness": "Lighter",
+            "name": "Opsi 48"
+          },
+          {
+            "hue": "Orange",
+            "lightness": "Lighter",
+            "name": "Opsi 49"
+          },
+          {
+            "hue": "Orange",
+            "lightness": "Lighter",
+            "name": "Opsi 50"
+          },
+          {
+            "hue": "Orange",
+            "lightness": "Lighter",
+            "name": "Opsi 51"
+          },
+          {
+            "hue": "Orange",
+            "lightness": "Lighter",
+            "name": "Opsi 52"
+          },
+          {
+            "hue": "Orange",
+            "lightness": "Lighter",
+            "name": "Opsi 53"
+          },
+          {
+            "hue": "Orange",
+            "lightness": "Lighter",
+            "name": "Opsi 54"
+          },
+          {
+            "hue": "Orange",
+            "lightness": "Lighter",
+            "name": "Opsi 55"
+          },
+          {
+            "hue": "Orange",
+            "lightness": "Lighter",
+            "name": "Opsi 56"
+          },
+          {
+            "hue": "Orange",
+            "lightness": "Lighter",
+            "name": "Opsi 57"
+          },
+          {
+            "hue": "Turquoise",
+            "lightness": "Lighter",
+            "name": "Opsi 58"
+          },
+          {
+            "hue": "Turquoise",
+            "lightness": "Lighter",
+            "name": "Opsi 59"
+          },
+          {
+            "hue": "Turquoise",
+            "lightness": "Lighter",
+            "name": "Opsi 60"
+          },
+          {
+            "hue": "Turquoise",
+            "lightness": "Lighter",
+            "name": "Opsi 61"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 62"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 63"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 64"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 65"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 66"
+          }
+        ],
+        "remaining_options_count": 32,
+        "truncated": true,
+        "truncated_options_count": 32,
+        "type": "select"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE012",
+        "name": "Kolom 12",
+        "style": {
+          "type": "plain"
+        },
+        "type": "text"
+      },
+      {
+        "bidirectional": false,
+        "id": "fldFAKE033",
+        "link_table": "tblFAKE000000001",
+        "name": "Kolom 33",
+        "type": "link"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE031",
+        "name": "Kolom 31",
+        "style": {
+          "type": "plain"
+        },
+        "type": "text"
+      },
+      {
+        "id": "fldFAKE007",
+        "name": "Kolom 7",
+        "style": {
+          "rules": [
+            {
+              "text": "HRP-",
+              "type": "text"
+            },
+            {
+              "length": 3,
+              "type": "incremental_number"
+            }
+          ]
+        },
+        "type": "auto_number"
+      },
+      {
+        "expression": "[Kolom 19]+[Kolom 28]",
+        "id": "fldFAKE027",
+        "name": "Kolom 27",
+        "type": "formula"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE035",
+        "name": "Kolom 35",
+        "style": {
+          "type": "url"
+        },
+        "type": "text"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE022",
+        "multiple": false,
+        "name": "Kolom 22",
+        "type": "user"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE011",
+        "multiple": true,
+        "name": "Kolom 11",
+        "options": [],
+        "type": "select"
+      },
+      {
+        "default_value": null,
+        "dynamic_options_source": {
+          "field_id": "fld2VJeY0Y",
+          "table_id": "tblFAKE000000004"
+        },
+        "id": "fldFAKE009",
+        "multiple": false,
+        "name": "Kolom 9",
+        "options": [
+          {
+            "hue": "Lime",
+            "lightness": "Lighter",
+            "name": "Opsi 3"
+          }
+        ],
+        "type": "select"
+      },
+      {
+        "default_value": null,
+        "description": "Deskripsi Contoh 1",
+        "id": "fldFAKE030",
+        "name": "Kolom 30",
+        "style": {
+          "type": "plain"
+        },
+        "type": "text"
+      },
+      {
+        "expression": "[Kolom 26]+[Kolom 25]",
+        "id": "fldFAKE005",
+        "name": "Kolom 5",
+        "type": "formula"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE032",
+        "name": "Kolom 32",
+        "style": {
+          "type": "plain"
+        },
+        "type": "text"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE010",
+        "multiple": false,
+        "name": "Kolom 10",
+        "options": [
+          {
+            "hue": "Red",
+            "lightness": "Light",
+            "name": "Opsi 67"
+          },
+          {
+            "hue": "Orange",
+            "lightness": "Light",
+            "name": "Opsi 68"
+          },
+          {
+            "hue": "Green",
+            "lightness": "Light",
+            "name": "Opsi 69"
+          },
+          {
+            "hue": "Wathet",
+            "lightness": "Light",
+            "name": "Opsi 70"
+          }
+        ],
+        "type": "select"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE014",
+        "name": "Kolom 14",
+        "style": {
+          "percentage": false,
+          "precision": 2,
+          "thousands_separator": false,
+          "type": "plain"
+        },
+        "type": "number"
+      },
+      {
+        "id": "fldFAKE020",
+        "name": "Kolom 20",
+        "type": "created_by"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE017",
+        "name": "Kolom 17",
+        "style": {
+          "percentage": true,
+          "precision": 1,
+          "thousands_separator": false,
+          "type": "plain"
+        },
+        "type": "number"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE018",
+        "multiple": false,
+        "name": "Kolom 18",
+        "options": [
+          {
+            "hue": "Turquoise",
+            "lightness": "Lighter",
+            "name": "Opsi 71"
+          },
+          {
+            "hue": "Yellow",
+            "lightness": "Lighter",
+            "name": "Opsi 72"
+          },
+          {
+            "hue": "Purple",
+            "lightness": "Lighter",
+            "name": "Opsi 4"
+          }
+        ],
+        "type": "select"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE001",
+        "name": "Kolom 1",
+        "style": {
+          "type": "plain"
+        },
+        "type": "text"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE025",
+        "name": "Kolom 25",
+        "style": {
+          "percentage": false,
+          "precision": 4,
+          "thousands_separator": false,
+          "type": "plain"
+        },
+        "type": "number"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE023",
+        "name": "Kolom 23",
+        "style": {
+          "type": "plain"
+        },
+        "type": "text"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE015",
+        "name": "Kolom 15",
+        "style": {
+          "format": "yyyy-MM-dd"
+        },
+        "type": "datetime"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE002",
+        "name": "Kolom 2",
+        "style": {
+          "percentage": false,
+          "precision": 2,
+          "thousands_separator": false,
+          "type": "plain"
+        },
+        "type": "number"
+      },
+      {
+        "default_value": null,
+        "description": "Deskripsi Contoh 2",
+        "id": "fldFAKE037",
+        "name": "Kolom 37",
+        "style": {
+          "type": "plain"
+        },
+        "type": "text"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE026",
+        "name": "Kolom 26",
+        "style": {
+          "percentage": false,
+          "precision": 4,
+          "thousands_separator": false,
+          "type": "plain"
+        },
+        "type": "number"
+      },
+      {
+        "default_value": null,
+        "dynamic_options_source": {
+          "field_id": "fldRTcd2Vs",
+          "table_id": "tblFAKE000000005"
+        },
+        "id": "fldFAKE029",
+        "multiple": false,
+        "name": "Kolom 29",
+        "options": [
+          {
+            "hue": "Lime",
+            "lightness": "Lighter",
+            "name": "Opsi 73"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 6"
+          },
+          {
+            "hue": "Purple",
+            "lightness": "Lighter",
+            "name": "Opsi 13"
+          },
+          {
+            "hue": "Orange",
+            "lightness": "Lighter",
+            "name": "Opsi 74"
+          },
+          {
+            "hue": "Turquoise",
+            "lightness": "Lighter",
+            "name": "Opsi 75"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 76"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Lighter",
+            "name": "Opsi 77"
+          },
+          {
+            "hue": "Wathet",
+            "lightness": "Lighter",
+            "name": "Opsi 78"
+          }
+        ],
+        "type": "select"
+      },
+      {
+        "id": "fldFAKE003",
+        "name": "Kolom 3",
+        "style": {
+          "type": "plain"
+        },
+        "type": "attachment"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE036",
+        "name": "Kolom 36",
+        "style": {
+          "type": "plain"
+        },
+        "type": "text"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE021",
+        "multiple": false,
+        "name": "Kolom 21",
+        "options": [
+          {
+            "hue": "Wathet",
+            "lightness": "Lighter",
+            "name": "Opsi 10"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Light",
+            "name": "Opsi 5"
+          },
+          {
+            "hue": "Yellow",
+            "lightness": "Light",
+            "name": "Opsi 79"
+          },
+          {
+            "hue": "Orange",
+            "lightness": "Light",
+            "name": "Opsi 80"
+          },
+          {
+            "hue": "Red",
+            "lightness": "Light",
+            "name": "Opsi 81"
+          }
+        ],
+        "type": "select"
+      },
+      {
+        "default_value": [
+          "Opsi 82"
+        ],
+        "id": "fldFAKE038",
+        "multiple": false,
+        "name": "Kolom 38",
+        "options": [
+          {
+            "hue": "Red",
+            "lightness": "Light",
+            "name": "Opsi 82"
+          },
+          {
+            "hue": "Purple",
+            "lightness": "Light",
+            "name": "Opsi 83"
+          },
+          {
+            "hue": "Blue",
+            "lightness": "Light",
+            "name": "Opsi 84"
+          },
+          {
+            "hue": "Yellow",
+            "lightness": "Light",
+            "name": "Opsi 8"
+          },
+          {
+            "hue": "Green",
+            "lightness": "Light",
+            "name": "Opsi 85"
+          },
+          {
+            "hue": "Red",
+            "lightness": "Standard",
+            "name": "Opsi 86"
+          },
+          {
+            "hue": "Gray",
+            "lightness": "Darker",
+            "name": "Opsi 87"
+          }
+        ],
+        "type": "select"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE008",
+        "name": "Kolom 8",
+        "style": {
+          "percentage": false,
+          "precision": 2,
+          "thousands_separator": false,
+          "type": "plain"
+        },
+        "type": "number"
+      },
+      {
+        "default_value": null,
+        "id": "fldFAKE028",
+        "name": "Kolom 28",
+        "style": {
+          "percentage": false,
+          "precision": 0,
+          "thousands_separator": true,
+          "type": "plain"
+        },
+        "type": "number"
+      }
+    ],
+    "total": 38
+  },
+  "_notice": {
+    "update": {
+      "command": "lark-cli update",
+      "current": "1.0.97",
+      "latest": "1.0.100",
+      "message": "lark-cli 1.0.100 available, current 1.0.97, run: lark-cli update"
+    }
+  }
+}

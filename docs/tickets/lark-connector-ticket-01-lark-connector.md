@@ -2,7 +2,7 @@
 id: lark-connector-ticket-01-lark-connector
 title: Connector Lark dan spike CLI
 spec: docs/superpowers/specs/2026-11-22-09-lark-connector-design.md
-status: ready
+status: implemented
 wave: 1
 depends_on: []
 ---

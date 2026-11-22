@@ -1,0 +1,25 @@
+{
+  "appId": "cli_fake000000000001",
+  "brand": "lark",
+  "defaultAs": "auto",
+  "identities": {
+    "bot": {
+      "status": "ready",
+      "available": true,
+      "message": "Bot identity: ready"
+    },
+    "user": {
+      "status": "ready",
+      "available": true,
+      "message": "User identity: ready",
+      "openId": "ou_FAKE0000000000000000000000000001",
+      "userName": "Pengguna Contoh 1",
+      "tokenStatus": "valid",
+      "scope": "base:record:read wiki:node:read docs:document:readonly sheets:spreadsheet:readonly",
+      "expiresAt": "2026-01-01T09:00:00+07:00",
+      "refreshExpiresAt": "2026-01-01T09:00:00+07:00",
+      "grantedAt": "2026-01-01T09:00:00+07:00"
+    }
+  },
+  "identity": "user"
+}

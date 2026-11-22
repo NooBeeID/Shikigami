@@ -1,0 +1,528 @@
+{
+  "ok": true,
+  "identity": "user",
+  "data": {
+    "approx_char_count": 4659,
+    "has_more": false,
+    "ranges": [
+      {
+        "actual_range": "A1:F12",
+        "cells": [
+          [
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "Teks Contoh 36"
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "Teks Contoh 37"
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "Teks Contoh 38"
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "Teks Contoh 39"
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "Teks Contoh 40"
+            }
+          ],
+          [
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "Teks Contoh 41"
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "Teks Contoh 42"
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "1"
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "11"
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "Teks Contoh 43"
+            }
+          ],
+          [
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            }
+          ],
+          [
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "Teks Contoh 44"
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "Teks Contoh 45"
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "Teks Contoh 46"
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            }
+          ],
+          [
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "Teks Contoh 47"
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "Teks Contoh 48"
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "1"
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            }
+          ],
+          [
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "Teks Contoh 49"
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "Teks Contoh 50"
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "1"
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "1"
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            }
+          ],
+          [
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "Teks Contoh 51"
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              },
+              "value": "11"
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            }
+          ],
+          [
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            }
+          ],
+          [
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            }
+          ],
+          [
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            }
+          ],
+          [
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            }
+          ],
+          [
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            },
+            {
+              "cell_styles": {
+                "font_size": 10,
+                "vertical_alignment": "middle"
+              }
+            }
+          ]
+        ],
+        "col_indices": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F"
+        ],
+        "range": "A1:F12",
+        "row_indices": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "truncated": false
+      }
+    ],
+    "returned_cell_count": 72,
+    "revision": 60,
+    "warning_message": "Peringatan contoh: periksa has_more dan actual_range sebelum membaca cells."
+  },
+  "_notice": {
+    "update": {
+      "command": "lark-cli update",
+      "current": "1.0.97",
+      "latest": "1.0.100",
+      "message": "lark-cli 1.0.100 available, current 1.0.97, run: lark-cli update"
+    }
+  }
+}

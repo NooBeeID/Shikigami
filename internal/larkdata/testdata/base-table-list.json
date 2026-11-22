@@ -1,0 +1,47 @@
+{
+  "ok": true,
+  "identity": "user",
+  "data": {
+    "tables": [
+      {
+        "id": "tblFAKE000000001",
+        "name": "Tabel Contoh 1",
+        "records_count": 318,
+        "rev": 2220
+      },
+      {
+        "id": "tblFAKE000000002",
+        "name": "Tabel Contoh 2",
+        "records_count": 5,
+        "rev": 23
+      },
+      {
+        "id": "tblFAKE000000004",
+        "name": "Tabel Contoh 3",
+        "records_count": 1,
+        "rev": 62
+      },
+      {
+        "id": "tblFAKE000000005",
+        "name": "Tabel Contoh 4",
+        "records_count": 6,
+        "rev": 50
+      },
+      {
+        "id": "tblFAKE000000003",
+        "name": "Tabel Contoh 5",
+        "records_count": 58,
+        "rev": 32
+      }
+    ],
+    "total": 5
+  },
+  "_notice": {
+    "update": {
+      "command": "lark-cli update",
+      "current": "1.0.97",
+      "latest": "1.0.100",
+      "message": "lark-cli 1.0.100 available, current 1.0.97, run: lark-cli update"
+    }
+  }
+}

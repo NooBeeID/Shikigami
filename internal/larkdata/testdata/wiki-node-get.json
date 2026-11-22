@@ -1,0 +1,29 @@
+{
+  "ok": true,
+  "identity": "user",
+  "data": {
+    "creator": "ou_FAKE0000000000000000000000000003",
+    "has_child": false,
+    "node_create_time": "1767225600",
+    "node_token": "wikcnFAKE000000000000000007",
+    "node_type": "origin",
+    "obj_create_time": "1767225600",
+    "obj_edit_time": "1767225600",
+    "obj_token": "doxcnFAKE000000000000000007",
+    "obj_type": "docx",
+    "origin_node_token": "wikcnFAKE000000000000000007",
+    "owner": "ou_FAKE0000000000000000000000000003",
+    "parent_node_token": "",
+    "space_id": "7000000000000000003",
+    "title": "Judul Contoh 7",
+    "updated_at": "2026-01-01T09:00:00Z"
+  },
+  "_notice": {
+    "update": {
+      "command": "lark-cli update",
+      "current": "1.0.97",
+      "latest": "1.0.100",
+      "message": "lark-cli 1.0.100 available, current 1.0.97, run: lark-cli update"
+    }
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "ok": true,
+  "identity": "user",
+  "data": {
+    "total": 10,
+    "views": [
+      {
+        "_meta": {
+          "filter": null,
+          "group": [],
+          "sort": [],
+          "visible_fields": "38 fields"
+        },
+        "id": "vewFAKE001",
+        "name": "Tampilan Contoh 1",
+        "type": "grid"
+      },
+      {
+        "_meta": {
+          "filter": "3 conditions",
+          "group": [],
+          "sort": [],
+          "visible_fields": "38 fields"
+        },
+        "id": "vewFAKE002",
+        "name": "Tampilan Contoh 2",
+        "type": "grid"
+      },
+      {
+        "_meta": {
+          "card_cover": null,
+          "filter": "1 condition",
+          "group": [
+            "fldYGrcxdH"
+          ],
+          "sort": [],
+          "visible_fields": "37 fields"
+        },
+        "id": "vewFAKE003",
+        "name": "Tampilan Contoh 3",
+        "type": "kanban"
+      },
+      {
+        "_meta": {
+          "card_cover": null,
+          "filter": "1 condition",
+          "group": [
+            "fldYGrcxdH"
+          ],
+          "sort": [],
+          "visible_fields": "37 fields"
+        },
+        "id": "vewFAKE004",
+        "name": "Tampilan Contoh 4",
+        "type": "kanban"
+      },
+      {
+        "_meta": {
+          "filter": null,
+          "group": [
+            "fldbTU0704"
+          ],
+          "sort": [],
+          "visible_fields": "38 fields"
+        },
+        "id": "vewFAKE005",
+        "name": "Tampilan Contoh 5",
+        "type": "grid"
+      },
+      {
+        "_meta": {
+          "filter": null,
+          "group": [
+            "fldRtErj1C",
+            "fldYGrcxdH",
+            "fldVnf8Dun"
+          ],
+          "sort": [],
+          "visible_fields": "38 fields"
+        },
+        "id": "vewFAKE006",
+        "name": "Tampilan Contoh 6",
+        "type": "grid"
+      },
+      {
+        "_meta": {
+          "filter": null,
+          "group": [
+            "fldozv76Ma",
+            "fldYGrcxdH"
+          ],
+          "sort": [],
+          "visible_fields": "38 fields"
+        },
+        "id": "vewFAKE007",
+        "name": "Tampilan Contoh 7",
+        "type": "grid"
+      },
+      {
+        "_meta": {
+          "filter": "1 condition",
+          "group": [
+            "fldVnf8Dun"
+          ],
+          "sort": [],
+          "visible_fields": "25 fields"
+        },
+        "id": "vewFAKE008",
+        "name": "Tampilan Contoh 8",
+        "type": "grid"
+      },
+      {
+        "_meta": {},
+        "id": "vewFAKE009",
+        "name": "Tampilan Contoh 9",
+        "type": "form"
+      },
+      {
+        "_meta": {},
+        "id": "vewFAKE010",
+        "name": "Tampilan Contoh 10",
+        "type": "not_support"
+      }
+    ]
+  },
+  "_notice": {
+    "update": {
+      "command": "lark-cli update",
+      "current": "1.0.97",
+      "latest": "1.0.100",
+      "message": "lark-cli 1.0.100 available, current 1.0.97, run: lark-cli update"
+    }
+  }
+}

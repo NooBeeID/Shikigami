@@ -1,0 +1,33 @@
+{
+  "ok": true,
+  "identity": "user",
+  "data": {
+    "create_time": "1767225600",
+    "modified_time": "1767225600",
+    "revision": 60,
+    "sheets": [
+      {
+        "chart_count": 0,
+        "column_count": 21,
+        "float_image_count": 0,
+        "index": 0,
+        "is_hidden": false,
+        "merged_cells_count": 0,
+        "pivot_table_count": 0,
+        "resource_type": "sheet",
+        "row_count": 200,
+        "sheet_id": "FAKE01",
+        "sheet_name": "Lembar Contoh 1"
+      }
+    ],
+    "token": "shtcnFAKE000000000000000001"
+  },
+  "_notice": {
+    "update": {
+      "command": "lark-cli update",
+      "current": "1.0.97",
+      "latest": "1.0.100",
+      "message": "lark-cli 1.0.100 available, current 1.0.97, run: lark-cli update"
+    }
+  }
+}

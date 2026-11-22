@@ -1,0 +1,20 @@
+{
+  "ok": false,
+  "identity": "user",
+  "error": {
+    "type": "api",
+    "subtype": "invalid_parameters",
+    "code": 131013,
+    "message": "token is invalid",
+    "hint": "The resource token is invalid. Do not retry the same token, switch identity, or reauthorize; check the URL/token and provide a valid wiki node_token, complete raw obj_token, or typed document URL.",
+    "log_id": "FAKELOGID0000000000000000000000001"
+  },
+  "_notice": {
+    "update": {
+      "command": "lark-cli update",
+      "current": "1.0.97",
+      "latest": "1.0.100",
+      "message": "lark-cli 1.0.100 available, current 1.0.97, run: lark-cli update"
+    }
+  }
+}

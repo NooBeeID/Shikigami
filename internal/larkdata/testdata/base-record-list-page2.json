@@ -1,0 +1,346 @@
+{
+  "ok": true,
+  "identity": "user",
+  "data": {
+    "data": [
+      [
+        "Teks Contoh 18",
+        54.88,
+        null,
+        [
+          "Opsi 12"
+        ],
+        "1",
+        [
+          "Opsi 2"
+        ],
+        "TKT-0004",
+        77.62,
+        [
+          "Opsi 3"
+        ],
+        null,
+        null,
+        "Teks Contoh 19",
+        "Teks Contoh 20",
+        30.3,
+        null,
+        null,
+        42.66,
+        [
+          "Opsi 4"
+        ],
+        null,
+        [
+          {
+            "id": "ou_FAKE0000000000000000000000000001",
+            "name": "Pengguna Contoh 1"
+          }
+        ],
+        [
+          "Opsi 10"
+        ],
+        [
+          {
+            "id": "ou_FAKE0000000000000000000000000002",
+            "name": "Pengguna Contoh 2"
+          }
+        ],
+        "Teks Contoh 21",
+        null,
+        null,
+        null,
+        "1",
+        null,
+        [
+          "Opsi 13"
+        ],
+        "Teks Contoh 22",
+        "[Tautan Contoh](https://example.larksuite.com/wiki/wikcnFAKE000000000000000000000000000000000000000000000000000000005)",
+        null,
+        null,
+        [
+          "Opsi 7"
+        ],
+        "[Tautan Contoh](https://example.larksuite.com/wiki/wikcnFAKE0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002)",
+        "Teks Contoh 23",
+        null,
+        [
+          "Opsi 8"
+        ]
+      ],
+      [
+        "Teks Contoh 24",
+        42.9,
+        null,
+        [
+          "Opsi 14"
+        ],
+        "1",
+        [
+          "Opsi 2"
+        ],
+        "TKT-0005",
+        79.73,
+        [
+          "Opsi 3"
+        ],
+        null,
+        null,
+        "Teks Contoh 25",
+        "Teks Contoh 26",
+        73.49,
+        null,
+        null,
+        18.71,
+        [
+          "Opsi 4"
+        ],
+        null,
+        [
+          {
+            "id": "ou_FAKE0000000000000000000000000001",
+            "name": "Pengguna Contoh 1"
+          }
+        ],
+        [
+          "Opsi 10"
+        ],
+        [
+          {
+            "id": "ou_FAKE0000000000000000000000000002",
+            "name": "Pengguna Contoh 2"
+          }
+        ],
+        "Teks Contoh 27",
+        null,
+        null,
+        null,
+        "1",
+        null,
+        [
+          "Opsi 13"
+        ],
+        "Teks Contoh 28",
+        "[Tautan Contoh](https://example.larksuite.com/wiki/wikcnFAKE000000000000000000000000000000000000000000000000000000006)",
+        null,
+        null,
+        [
+          "Opsi 7"
+        ],
+        "[Tautan Contoh](https://example.larksuite.com/wiki/wikcnFAKE0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002)",
+        "Teks Contoh 29",
+        null,
+        [
+          "Opsi 8"
+        ]
+      ],
+      [
+        "Teks Contoh 30",
+        79.45,
+        null,
+        [
+          "Opsi 15"
+        ],
+        "1",
+        [
+          "Opsi 2"
+        ],
+        "TKT-0006",
+        35.91,
+        [
+          "Opsi 3"
+        ],
+        null,
+        null,
+        "Teks Contoh 31",
+        "Teks Contoh 32",
+        71.39,
+        null,
+        null,
+        66.27,
+        [
+          "Opsi 4"
+        ],
+        null,
+        [
+          {
+            "id": "ou_FAKE0000000000000000000000000001",
+            "name": "Pengguna Contoh 1"
+          }
+        ],
+        [
+          "Opsi 10"
+        ],
+        [
+          {
+            "id": "ou_FAKE0000000000000000000000000001",
+            "name": "Pengguna Contoh 1"
+          }
+        ],
+        "Teks Contoh 33",
+        null,
+        null,
+        null,
+        "1",
+        null,
+        [
+          "Opsi 13"
+        ],
+        "Teks Contoh 34",
+        "[Tautan Contoh](https://example.larksuite.com/wiki/wikcnFAKE000000000000000000000000000000000000000000000000000000007)",
+        null,
+        null,
+        [
+          "Opsi 7"
+        ],
+        "[Tautan Contoh](https://example.larksuite.com/wiki/wikcnFAKE0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002)",
+        "Teks Contoh 35",
+        null,
+        [
+          "Opsi 8"
+        ]
+      ]
+    ],
+    "field_id_list": [
+      "fldFAKE001",
+      "fldFAKE002",
+      "fldFAKE003",
+      "fldFAKE004",
+      "fldFAKE005",
+      "fldFAKE006",
+      "fldFAKE007",
+      "fldFAKE008",
+      "fldFAKE009",
+      "fldFAKE010",
+      "fldFAKE011",
+      "fldFAKE012",
+      "fldFAKE013",
+      "fldFAKE014",
+      "fldFAKE015",
+      "fldFAKE016",
+      "fldFAKE017",
+      "fldFAKE018",
+      "fldFAKE019",
+      "fldFAKE020",
+      "fldFAKE021",
+      "fldFAKE022",
+      "fldFAKE023",
+      "fldFAKE024",
+      "fldFAKE025",
+      "fldFAKE026",
+      "fldFAKE027",
+      "fldFAKE028",
+      "fldFAKE029",
+      "fldFAKE030",
+      "fldFAKE031",
+      "fldFAKE032",
+      "fldFAKE033",
+      "fldFAKE034",
+      "fldFAKE035",
+      "fldFAKE036",
+      "fldFAKE037",
+      "fldFAKE038"
+    ],
+    "field_type_list": [
+      "text",
+      "number",
+      "attachment",
+      "select",
+      "formula",
+      "select",
+      "auto_number",
+      "number",
+      "select",
+      "select",
+      "select",
+      "text",
+      "text",
+      "number",
+      "datetime",
+      "datetime",
+      "number",
+      "select",
+      "number",
+      "created_by",
+      "select",
+      "user",
+      "text",
+      "link",
+      "number",
+      "number",
+      "formula",
+      "number",
+      "select",
+      "text",
+      "text",
+      "text",
+      "link",
+      "select",
+      "text",
+      "text",
+      "text",
+      "select"
+    ],
+    "fields": [
+      "Kolom 1",
+      "Kolom 2",
+      "Kolom 3",
+      "Kolom 4",
+      "Kolom 5",
+      "Kolom 6",
+      "Kolom 7",
+      "Kolom 8",
+      "Kolom 9",
+      "Kolom 10",
+      "Kolom 11",
+      "Kolom 12",
+      "Kolom 13",
+      "Kolom 14",
+      "Kolom 15",
+      "Kolom 16",
+      "Kolom 17",
+      "Kolom 18",
+      "Kolom 19",
+      "Kolom 20",
+      "Kolom 21",
+      "Kolom 22",
+      "Kolom 23",
+      "Kolom 24",
+      "Kolom 25",
+      "Kolom 26",
+      "Kolom 27",
+      "Kolom 28",
+      "Kolom 29",
+      "Kolom 30",
+      "Kolom 31",
+      "Kolom 32",
+      "Kolom 33",
+      "Kolom 34",
+      "Kolom 35",
+      "Kolom 36",
+      "Kolom 37",
+      "Kolom 38"
+    ],
+    "has_more": true,
+    "query_context": {
+      "field_scope": "all_fields",
+      "record_scope": "all_records"
+    },
+    "record_id_list": [
+      "recFAKE0000004",
+      "recFAKE0000005",
+      "recFAKE0000006"
+    ],
+    "rev": 2220,
+    "timezone": "Asia/Jakarta"
+  },
+  "_notice": {
+    "update": {
+      "command": "lark-cli update",
+      "current": "1.0.97",
+      "latest": "1.0.100",
+      "message": "lark-cli 1.0.100 available, current 1.0.97, run: lark-cli update"
+    }
+  }
+}
