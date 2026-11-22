@@ -34,7 +34,7 @@
 </div>
 
 <style>
-  .topbar-slot { min-width: 0; min-height: 0; overflow: hidden; }
+  .topbar-slot { position: relative; z-index: 30; min-width: 0; min-height: 0; overflow: visible; }
   .body {
     display: grid;
     grid-template-columns: var(--left-w) minmax(0, 1fr) var(--right-w);

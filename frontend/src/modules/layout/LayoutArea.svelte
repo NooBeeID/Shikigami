@@ -46,6 +46,12 @@
     };
   }
 
+  // Tutup pane = akhiri sesinya juga, supaya hilang dari sidebar.
+  async function closeAndEnd(leaf: Leaf) {
+    store.closePane(leaf.id);
+    if (leaf.kind === 'terminal' && leaf.sessionId) await endSession(leaf);
+  }
+
   async function endSession(leaf: Leaf) {
     try {
       await getPaneKind(leaf.kind)?.onEndSession?.(leaf);
@@ -76,7 +82,7 @@
           {store}
           onSplit={(dir) => void splitPaneWithNewSession(n.id, dir, store)}
           onMaximizeToggle={() => (doc.maximizedId === n.id ? store.restore() : store.maximize(n.id))}
-          onClose={() => store.closePane(n.id)}
+          onClose={() => void closeAndEnd(n)}
           onRename={(t) => store.renamePane(n.id, t)}
           onEndSession={() => void endSession(n)}
           onTidy={() => store.tidyGrid()}

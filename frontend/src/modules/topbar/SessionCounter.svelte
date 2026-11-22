@@ -6,7 +6,7 @@
   const mine = $derived(sessionsOfActive($sessions, $activeWorkspaceId));
   const counts = $derived(countByStatus(mine, $statusStore));
   const exited = $derived(mine.filter((s) => s.status === 'exited').length);
-  const n = $derived(counts.running);
+  const n = $derived(mine.length - exited);
   const tip = $derived(
     [
       `running ${counts.running}`,
@@ -19,7 +19,7 @@
 </script>
 
 <div class="counter" title={tip}>
-  <span class="dot" class:on={n > 0}></span>
+  <span class="dot" class:on={counts.running > 0}></span>
   <span>{n} sesi</span>
 </div>
 

@@ -38,5 +38,6 @@ export async function createSession(providerId: string): Promise<Session> {
 // FINAL(shell-layout)
 export async function killSession(id: string): Promise<void> {
   await call('session.kill', { id });
-  sessions.update((l) => l.map((s) => (s.id === id ? { ...s, status: 'exited' } : s)));
+  // daemon menghapus sesi saat kill, jadi buang juga dari daftar
+  sessions.update((l) => l.filter((s) => s.id !== id));
 }

@@ -4,6 +4,7 @@ import { layout, type LayoutStore } from '../../lib/stores/layout';
 import { sessions, createSession } from '../../lib/stores/sessions';
 import { activeWorkspace } from '../../lib/stores/workspaces';
 import type { Session } from '../../lib/stores/types';
+import { sessionTitle } from '../shell';
 import { findLeaf, type NewLeaf } from './model';
 
 // Mencegah Cmd+D beruntun membuat banyak sesi.
@@ -44,6 +45,7 @@ export async function splitPaneWithNewSession(
       sessionId: s.id,
       projectId: s.projectId,
       provider: s.providerId,
+      title: sessionTitle(s.id),
     };
     if (get(store).maximizedId) store.restore();
     if (findLeaf(get(store), paneId)) store.splitPane(paneId, dir, nl, 'after');

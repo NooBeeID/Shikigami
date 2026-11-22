@@ -14,8 +14,8 @@
   } from './terminal-client';
   import { currentTerminalFontSize, registerTerminalInstance } from './font-scale';
 
-  let { sessionId, scrollback = 2000, visible = true, fontSize }:
-    { sessionId: string; scrollback?: number; visible?: boolean; fontSize?: number } = $props();
+  let { sessionId, scrollback = 2000, visible = true, fontSize, onTitle }:
+    { sessionId: string; scrollback?: number; visible?: boolean; fontSize?: number; onTitle?: (t: string) => void } = $props();
 
   const MAX_QUEUE_BYTES = 8 * 1024 * 1024;
   let visibleNow = visible;
@@ -119,6 +119,9 @@
         emit('\r\n' + msg + '\r\n');
       }
     })();
+
+    // Program (mis. Claude Code setelah /rename) mengubah judul lewat OSC 0/2.
+    term.onTitleChange((t) => onTitle?.(t));
 
     term.onData((d) => {
       if (ended) return;
