@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -54,6 +55,7 @@ func init() {
 
 func installFileDrop(ctx context.Context, b *Bridge) {
 	runtime.OnFileDrop(ctx, func(x, y int, paths []string) {
+		fmt.Fprintf(os.Stderr, "[DEBUG-DROP] go callback x=%d y=%d paths=%q\n", x, y, paths) // TEMP: hapus setelah debug
 		if len(paths) == 0 {
 			return
 		}
