@@ -59,13 +59,13 @@
 </script>
 
 <div class="wrap" bind:this={bellEl}>
-  <button class="bell" aria-label="Notifikasi" aria-haspopup="true" aria-expanded={open} onclick={toggle}>
+  <button class="bell" aria-label={$unreadCount > 0 ? 'Notifikasi (ada yang belum dibaca)' : 'Notifikasi'} aria-haspopup="true" aria-expanded={open} onclick={toggle}>
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
       <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
     </svg>
     {#if $unreadCount > 0}
-      <span class="badge">{$unreadCount > 99 ? '99+' : $unreadCount}</span>
+      <span class="badge" aria-hidden="true"></span>
     {/if}
   </button>
 
@@ -102,8 +102,8 @@
   .wrap { position: relative; display: inline-flex; --wails-draggable: no-drag; }
   .bell { position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 4px 6px; background: transparent; border-color: transparent; --wails-draggable: no-drag; }
   .badge {
-    position: absolute; top: -4px; right: -4px; min-width: 16px; height: 16px; padding: 0 4px;
-    border-radius: 8px; background: var(--danger, #e5484d); color: #fff; font-size: 12px; line-height: 16px; text-align: center;
+    position: absolute; top: 2px; right: 3px; width: 9px; height: 9px;
+    border-radius: 50%; background: var(--danger, #e5484d);
   }
   .dropdown {
     position: absolute; top: calc(100% + 4px); right: 0; width: 320px; max-height: 60vh; overflow-y: auto; z-index: 1000;
