@@ -2,7 +2,7 @@
 id: git-connector-ticket-03-git-pipelines
 title: Daftar pipeline dan detail pipeline
 spec: docs/superpowers/specs/2026-11-22-10-git-connector-design.md
-status: ready
+status: implemented
 wave: 3
 depends_on: [git-connector-ticket-02-git-mrs]
 ---
