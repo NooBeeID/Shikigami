@@ -1,0 +1,7 @@
+gitlab.com
+  ✓ Logged in to gitlab.com as dev-alpha (/Users/dev/Library/Application Support/glab-cli/config.yml)
+  ✓ Git operations for gitlab.com configured to use https protocol.
+  ✓ API calls for gitlab.com are made over https protocol.
+  ✓ REST API Endpoint: https://gitlab.com/api/v4/
+  ✓ GraphQL Endpoint: https://gitlab.com/api/graphql/
+  ✓ Token found: **************************

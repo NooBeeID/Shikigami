@@ -1,0 +1,20 @@
+# Keluaran stderr NYATA (stdout kosong, exit 1), teranonimkan. Setiap blok: perintah, exit, stderr.
+$ glab mr list -R acme-group/tidak-ada-xyz -F json   (repo tidak ada ATAU tanpa akses)
+exit 1
+ ERROR  404 Not Found.
+
+$ glab mr view 99999 -R acme-group/acme-app -F json
+exit 1
+ ERROR  Failed to get merge request 99999: 404 Not Found.
+
+$ glab ci get -R acme-group/acme-app -p 99999999999 -F json
+exit 1  (stdout: "✘ No pipeline with the given ID: 99999999999")
+ ERROR  404 Not Found.
+
+$ glab mr list -R https://tidak-ada.example.invalid/a/b -F json   (host tak terjangkau)
+exit 1
+ ERROR  Get "https://tidak-ada.example.invalid/api/v4/projects/a%2Fb/merge_requests?page=1&per_page=30&state=opened": dial tcp: lookup tidak-ada.example.invalid: no such host.
+
+$ GLAB_CONFIG_DIR=<kosong> glab mr list -R acme-group/acme-app -F json   (token tidak ada; repo privat)
+exit 1
+ ERROR  404 Not Found.

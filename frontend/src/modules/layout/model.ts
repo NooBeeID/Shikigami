@@ -1,6 +1,6 @@
 // Model pohon pane: tipe dan fungsi murni (tanpa IPC, tanpa mutasi masukan).
 
-export type PaneKind = 'terminal' | 'file' | 'thread' | 'lark-board' | 'lark-doc'; // string terbuka lewat registerPaneKind
+export type PaneKind = 'terminal' | 'file' | 'thread' | 'lark-board' | 'lark-doc' | 'git-mr' | 'git-pipeline'; // string terbuka lewat registerPaneKind
 export interface Leaf {
   type: 'pane';
   id: string;
@@ -20,6 +20,8 @@ export interface Leaf {
   tableId?: string;
   viewId?: string;
   nodeToken?: string;
+  number?: number; // nomor MR/PR
+  pipelineId?: string;
 }
 export interface Split {
   type: 'split';
@@ -53,6 +55,8 @@ export interface NewLeaf {
   tableId?: string;
   viewId?: string;
   nodeToken?: string;
+  number?: number; // nomor MR/PR
+  pipelineId?: string;
 }
 
 export const emptyDoc = (): LayoutDoc => ({ version: 1, root: null });
@@ -157,6 +161,8 @@ function makeLeaf(nl: NewLeaf): Leaf {
   if (nl.tableId !== undefined) leaf.tableId = nl.tableId;
   if (nl.viewId !== undefined) leaf.viewId = nl.viewId;
   if (nl.nodeToken !== undefined) leaf.nodeToken = nl.nodeToken;
+  if (nl.number !== undefined) leaf.number = nl.number;
+  if (nl.pipelineId !== undefined) leaf.pipelineId = nl.pipelineId;
   return leaf;
 }
 
@@ -375,11 +381,12 @@ function hydrateNode(raw: unknown): Node | null {
       kind: r.kind as PaneKind,
       title: isStr(r.title) && r.title ? r.title : 'Pane',
     };
-    for (const k of ['sessionId', 'projectId', 'provider', 'filePath', 'workspaceId', 'root', 'threadId', 'sourceId', 'tableId', 'viewId', 'nodeToken'] as const) {
+    for (const k of ['sessionId', 'projectId', 'provider', 'filePath', 'workspaceId', 'root', 'threadId', 'sourceId', 'tableId', 'viewId', 'nodeToken', 'pipelineId'] as const) {
       if (isStr(r[k])) leaf[k] = r[k] as string;
     }
     if (typeof r.readOnly === 'boolean') leaf.readOnly = r.readOnly;
     if (typeof r.threadAgent === 'boolean') leaf.threadAgent = r.threadAgent;
+    if (typeof r.number === 'number' && Number.isFinite(r.number)) leaf.number = r.number;
     return leaf;
   }
   if (r.type === 'split') {

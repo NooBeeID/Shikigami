@@ -1,0 +1,67 @@
+[
+  {
+    "id": 3001,
+    "iid": 339,
+    "project_id": 1001,
+    "status": "success",
+    "source": "push",
+    "ref": "feature/contoh-1",
+    "sha": "16b2f4289dade3409ad6bcbaf44fd766f7889c26",
+    "name": "",
+    "web_url": "https://gitlab.com/acme-group/acme-app/-/pipelines/3001",
+    "updated_at": "2026-11-11T04:45:28.085Z",
+    "created_at": "2026-11-11T04:44:28.253Z"
+  },
+  {
+    "id": 3002,
+    "iid": 332,
+    "project_id": 1001,
+    "status": "failed",
+    "source": "push",
+    "ref": "feature/contoh-1",
+    "sha": "a544af123662c61ae0664b4d41457639d24ed7f1",
+    "name": "",
+    "web_url": "https://gitlab.com/acme-group/acme-app/-/pipelines/3002",
+    "updated_at": "2026-10-22T04:12:08.724Z",
+    "created_at": "2026-10-22T04:12:08.724Z"
+  },
+  {
+    "id": 3003,
+    "iid": 1,
+    "project_id": 1001,
+    "status": "running",
+    "source": "external",
+    "ref": "feature/contoh-2",
+    "sha": "6cd8d9c318182ea01857331f7cee7bc8b0740384",
+    "name": "",
+    "web_url": "https://gitlab.com/acme-group/acme-app/-/pipelines/3003",
+    "updated_at": "2026-11-13T19:46:46.561Z",
+    "created_at": "2026-11-13T19:46:46.322Z"
+  },
+  {
+    "id": 3004,
+    "iid": 327,
+    "project_id": 1001,
+    "status": "canceled",
+    "source": "push",
+    "ref": "feature/contoh-1",
+    "sha": "17d20ffda073bc843e57ebbea50406c289ced33a",
+    "name": "",
+    "web_url": "https://gitlab.com/acme-group/acme-app/-/pipelines/3004",
+    "updated_at": "2026-10-14T17:30:36.3Z",
+    "created_at": "2026-10-14T17:28:57.214Z"
+  },
+  {
+    "id": 3005,
+    "iid": 44,
+    "project_id": 1001,
+    "status": "manual",
+    "source": "push",
+    "ref": "feature/contoh-3",
+    "sha": "2cfb071471b3677fb3a58693c9872b8c4a16f9ba",
+    "name": "",
+    "web_url": "https://gitlab.com/acme-group/acme-app/-/pipelines/3005",
+    "updated_at": "2026-09-02T03:01:03.494Z",
+    "created_at": "2026-09-02T02:58:51.213Z"
+  }
+]

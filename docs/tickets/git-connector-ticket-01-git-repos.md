@@ -2,7 +2,7 @@
 id: git-connector-ticket-01-git-repos
 title: Connector Git dan deteksi repo
 spec: docs/superpowers/specs/2026-11-22-10-git-connector-design.md
-status: ready
+status: implemented
 wave: 1
 depends_on: []
 ---

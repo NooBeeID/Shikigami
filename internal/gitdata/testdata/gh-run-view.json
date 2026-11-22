@@ -1,0 +1,72 @@
+{
+  "databaseId": 3001,
+  "displayTitle": "Perbaiki validasi formulir",
+  "headBranch": "feature/contoh-1",
+  "headSha": "16b2f4289dade3409ad6bcbaf44fd766f7889c26",
+  "status": "completed",
+  "conclusion": "success",
+  "event": "pull_request",
+  "workflowName": "CI",
+  "createdAt": "2026-11-20T10:00:00Z",
+  "updatedAt": "2026-11-20T10:04:30Z",
+  "startedAt": "2026-11-20T10:00:05Z",
+  "url": "https://github.com/acme-org/acme-repo/actions/runs/3001",
+  "jobs": [
+    {
+      "databaseId": 4001,
+      "name": "build",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-20T10:00:10Z",
+      "completedAt": "2026-11-20T10:03:00Z",
+      "url": "https://github.com/acme-org/acme-repo/actions/runs/3001/job/4001",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run build",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2
+        }
+      ]
+    },
+    {
+      "databaseId": 4002,
+      "name": "test",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-20T10:03:05Z",
+      "completedAt": "2026-11-20T10:04:25Z",
+      "url": "https://github.com/acme-org/acme-repo/actions/runs/3001/job/4002",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1
+        },
+        {
+          "name": "Run tests",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 2
+        }
+      ]
+    },
+    {
+      "databaseId": 4003,
+      "name": "deploy",
+      "status": "in_progress",
+      "conclusion": "",
+      "startedAt": "2026-11-20T10:04:26Z",
+      "completedAt": "0001-01-01T00:00:00Z",
+      "url": "https://github.com/acme-org/acme-repo/actions/runs/3001/job/4003",
+      "steps": []
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+[
+  {
+    "databaseId": 3001,
+    "displayTitle": "Perbaiki validasi formulir",
+    "headBranch": "feature/contoh-1",
+    "headSha": "16b2f4289dade3409ad6bcbaf44fd766f7889c26",
+    "status": "completed",
+    "conclusion": "success",
+    "event": "pull_request",
+    "workflowName": "CI",
+    "createdAt": "2026-11-20T10:00:00Z",
+    "updatedAt": "2026-11-20T10:04:30Z",
+    "startedAt": "2026-11-20T10:00:05Z",
+    "url": "https://github.com/acme-org/acme-repo/actions/runs/3001"
+  },
+  {
+    "databaseId": 3002,
+    "displayTitle": "Tambah laporan ringkasan bulanan",
+    "headBranch": "feature/contoh-2",
+    "headSha": "6cd8d9c318182ea01857331f7cee7bc8b0740384",
+    "status": "in_progress",
+    "conclusion": "",
+    "event": "push",
+    "workflowName": "CI",
+    "createdAt": "2026-11-20T09:00:00Z",
+    "updatedAt": "2026-11-20T09:01:00Z",
+    "startedAt": "2026-11-20T09:00:05Z",
+    "url": "https://github.com/acme-org/acme-repo/actions/runs/3002"
+  },
+  {
+    "databaseId": 3003,
+    "displayTitle": "Perbarui konfigurasi lingkungan staging",
+    "headBranch": "main",
+    "headSha": "a544af123662c61ae0664b4d41457639d24ed7f1",
+    "status": "completed",
+    "conclusion": "failure",
+    "event": "push",
+    "workflowName": "CI",
+    "createdAt": "2026-11-19T08:00:00Z",
+    "updatedAt": "2026-11-19T08:05:00Z",
+    "startedAt": "2026-11-19T08:00:05Z",
+    "url": "https://github.com/acme-org/acme-repo/actions/runs/3003"
+  },
+  {
+    "databaseId": 3004,
+    "displayTitle": "Rilis terjadwal",
+    "headBranch": "main",
+    "headSha": "b1c2d3e4f5a60718293a4b5c6d7e8f9012345678",
+    "status": "completed",
+    "conclusion": "cancelled",
+    "event": "schedule",
+    "workflowName": "Rilis",
+    "createdAt": "2026-11-18T07:00:00Z",
+    "updatedAt": "2026-11-18T07:01:00Z",
+    "startedAt": "2026-11-18T07:00:05Z",
+    "url": "https://github.com/acme-org/acme-repo/actions/runs/3004"
+  },
+  {
+    "databaseId": 3005,
+    "displayTitle": "Menunggu persetujuan",
+    "headBranch": "main",
+    "headSha": "c1d2e3f4a5b60718293a4b5c6d7e8f9012345679",
+    "status": "queued",
+    "conclusion": "",
+    "event": "workflow_dispatch",
+    "workflowName": "Rilis",
+    "createdAt": "2026-11-17T06:00:00Z",
+    "updatedAt": "2026-11-17T06:00:00Z",
+    "startedAt": "2026-11-17T06:00:00Z",
+    "url": "https://github.com/acme-org/acme-repo/actions/runs/3005"
+  }
+]

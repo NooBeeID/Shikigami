@@ -1,0 +1,6 @@
+github.com
+  ✓ Logged in to github.com account dev-alpha (keyring)
+  - Active account: true
+  - Git operations protocol: https
+  - Token: ****
+  - Token scopes: 'gist', 'read:org', 'repo', 'workflow'

@@ -1,0 +1,57 @@
+{
+  "number": 42,
+  "title": "Perbaiki validasi formulir",
+  "body": "Memperbaiki validasi pada formulir pengajuan.",
+  "author": {
+    "id": "U_kgDOAAAAAA",
+    "is_bot": false,
+    "login": "dev-alpha",
+    "name": "Dev Alpha"
+  },
+  "headRefName": "feature/contoh-1",
+  "baseRefName": "main",
+  "state": "OPEN",
+  "isDraft": false,
+  "reviewDecision": "REVIEW_REQUIRED",
+  "mergeable": "MERGEABLE",
+  "mergeStateStatus": "CLEAN",
+  "statusCheckRollup": [
+    {
+      "__typename": "CheckRun",
+      "name": "build",
+      "status": "COMPLETED",
+      "conclusion": "SUCCESS",
+      "workflowName": "CI",
+      "detailsUrl": "https://github.com/acme-org/acme-repo/actions/runs/3001/job/4001",
+      "startedAt": "2026-11-20T10:00:00Z",
+      "completedAt": "2026-11-20T10:03:00Z"
+    }
+  ],
+  "updatedAt": "2026-11-20T10:05:00Z",
+  "url": "https://github.com/acme-org/acme-repo/pull/42",
+  "labels": [
+    {
+      "id": "LA_kwDOAAAAAA",
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    }
+  ],
+  "reviewRequests": [
+    {
+      "__typename": "User",
+      "login": "dev-bravo"
+    }
+  ],
+  "latestReviews": [
+    {
+      "author": {
+        "login": "dev-charlie"
+      },
+      "authorAssociation": "MEMBER",
+      "state": "APPROVED",
+      "submittedAt": "2026-11-20T10:04:00Z",
+      "body": ""
+    }
+  ]
+}
