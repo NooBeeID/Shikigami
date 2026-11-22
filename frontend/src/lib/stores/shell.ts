@@ -3,8 +3,8 @@ import { writable, type Writable } from 'svelte/store';
 export interface SidebarState { visible: boolean; width: number }
 export interface RightSidebarState extends SidebarState { activeTab: string }
 
-export const LEFT_MIN = 200, LEFT_MAX = 420, RIGHT_MIN = 220, RIGHT_MAX = 520;
-export const LEFT_DEFAULT = 260, RIGHT_DEFAULT = 280;
+export const LEFT_MIN = 240, LEFT_MAX = 480, RIGHT_MIN = 220, RIGHT_MAX = 520;
+export const LEFT_DEFAULT = 300, RIGHT_DEFAULT = 280;
 
 export const leftSidebar: Writable<SidebarState> = writable<SidebarState>({ visible: true, width: LEFT_DEFAULT });
 export const rightSidebar: Writable<RightSidebarState> = writable<RightSidebarState>({

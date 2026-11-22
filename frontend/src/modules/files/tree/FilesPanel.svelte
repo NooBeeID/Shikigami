@@ -153,7 +153,21 @@
             onclick={() => onRowClick(row)}
             onkeydown={() => {}}
           >
-            <span class="arrow">{isDir ? (row.expanded ? '▾' : '▸') : row.kind === 'symlink' ? '↗' : '·'}</span>
+            <span class="arrow">{isDir ? (row.expanded ? '▾' : '▸') : ''}</span>
+            <svg class="ico" class:dir={isDir} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              {#if isDir && row.expanded}
+                <path d="M3 8a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v1H3z" />
+                <path d="M3 11h19l-2 7a2 2 0 0 1-2 1.5H5a2 2 0 0 1-2-2z" />
+              {:else if isDir}
+                <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              {:else if row.kind === 'symlink'}
+                <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1" />
+                <path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />
+              {:else}
+                <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+                <path d="M14 3v5h5" />
+              {/if}
+            </svg>
             <span class="name">{row.name}</span>
             {#if isDir && row.expanded}
               <button
@@ -244,6 +258,13 @@
     flex: none;
     text-align: center;
     color: var(--fg-muted, inherit);
+  }
+  .ico {
+    flex: none;
+    color: var(--fg-muted, inherit);
+  }
+  .ico.dir {
+    color: var(--accent, #3b82f6);
   }
   .name {
     overflow: hidden;
