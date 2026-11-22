@@ -1,5 +1,8 @@
 import { onMenuEvent } from '../appmenu';
+import { get } from 'svelte/store';
 import { toggleLeft, toggleRight } from '../../lib/stores/shell';
+import { activeProjectId } from '../../lib/stores';
+import { createAndOpenSession, openFolder } from './helpers';
 
 const DEDUPE_MS = 250;
 
@@ -33,7 +36,28 @@ export function installShellShortcuts(): () => void {
   };
   window.addEventListener('keydown', onKey, true);
 
+  // ⌘T = sesi claude baru, ⇧⌘T = sesi shell baru (project aktif).
+  let newInflight = false;
+  const onNewSession = (e: KeyboardEvent) => {
+    if (!e.metaKey || e.code !== 'KeyT' || e.ctrlKey || e.altKey) return;
+    if (isBlockedTarget(e.target)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.repeat || newInflight) return;
+    const projectId = get(activeProjectId);
+    if (!projectId) {
+      openFolder();
+      return;
+    }
+    newInflight = true;
+    createAndOpenSession(e.shiftKey ? 'shell' : 'claude', projectId)
+      .catch((err) => console.error('[shell] gagal membuat sesi baru:', err))
+      .finally(() => { newInflight = false; });
+  };
+  window.addEventListener('keydown', onNewSession, true);
+
   return () => {
+    window.removeEventListener('keydown', onNewSession, true);
     offLeft();
     offRight();
     window.removeEventListener('keydown', onKey, true);

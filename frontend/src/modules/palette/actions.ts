@@ -11,7 +11,7 @@ export function registerBuiltinActions(): void {
     registerPaletteAction({
       id: `session.new.${providerId}`,
       title: `Sesi baru: ${providerId}`,
-      hint: providerId,
+      hint: providerId === 'claude' ? '⌘T' : providerId === 'shell' ? '⇧⌘T' : providerId,
       keywords: ['new', 'session', 'sesi', 'agent'],
       run: async () => {
         const projectId = get(activeProjectId);
