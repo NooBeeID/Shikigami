@@ -20,8 +20,9 @@ Status: sembilan tiket pertama (fase 0–3 di spec) sudah ter-merge dan build lu
 - **Status sesi**: berjalan / menunggu / selesai / idle, berbasis event hooks provider (bukan polling), dengan notifikasi di UI.
 - **Mention antar sesi**: dari user lewat UI (`@nama-sesi`, kirim dengan Cmd/Ctrl+Enter), dan dari agent lewat server MCP lokal (`list_sessions`, `send_message`, `read_output`). Pesan masuk antrean dan dikirim saat sesi target idle. Mode pengiriman dari agent: `auto`, `confirm_agent` (default), `user_only`.
 - **Monitor resource**: CPU dan memori total proses Shikigami tampil di bilah atas; klik untuk rincian per proses: daemon, app (termasuk WebKit), dan tiap sesi. Diukur tiap 5 detik, hanya saat jendela terlihat.
+- **Grimoire**: knowledge internal per project, dibangun dari isi project dan tampil sebagai buku dan chapter di item rail Grimoire (icon buku). Bila belum pernah dibangun, panel menampilkan tombol Generate Grimoire; bisa juga lewat `shikigamictl grimoire build`. Knowledge di-inject ke sesi dengan ukuran token terukur, di-refresh inkremental dengan penanda chapter yang usang (stale), dan bisa memakai LLM. Disimpan di data dir Shikigami, bukan di repo project.
 
-Belum ada: knowledge/Grimoire dan penataan project otomatis (fase 4 dan 5 di spec), Windows, syntax highlighting.
+Belum ada: penataan project otomatis (fase 5 di spec), Windows, syntax highlighting.
 
 ## Prasyarat
 
