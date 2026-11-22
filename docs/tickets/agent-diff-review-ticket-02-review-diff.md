@@ -2,7 +2,7 @@
 id: agent-diff-review-ticket-02-review-diff
 title: Review: diff unified per file
 spec: docs/superpowers/specs/2026-11-22-agent-diff-review-design.md
-status: ready
+status: implemented
 wave: 2
 depends_on: [agent-diff-review-ticket-01-review-capture]
 ---

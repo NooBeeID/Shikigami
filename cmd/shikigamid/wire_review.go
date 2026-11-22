@@ -119,6 +119,7 @@ func init() {
 				return
 			}
 			review.RegisterIPC(srv, store, reviewWireSupported(eng))
+			review.RegisterDiffIPC(srv, store, reviewWireSupported(eng))
 			log := d.Logger
 			if log == nil {
 				log = slog.Default()

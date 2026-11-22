@@ -37,6 +37,7 @@ func RegisterIPC(srv *ipc.Server, store *Store, supportedFn func(sessionID strin
 		if files == nil {
 			files = []FileEntry{}
 		}
+		FillDiffStats(store, id, files)
 		return FilesResult{Supported: true, Files: files}, nil
 	})
 }
