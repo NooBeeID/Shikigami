@@ -72,6 +72,12 @@ function handler(_topic: string, payload: unknown): void {
   store.update((m) => replaceSession(m, id, list));
 }
 
+// Muat terbaru yang gagal dan berjenis runs.detail memicu satu muat runs.list
+// sebagai cadangan; runs.list yang gagal tidak mengulang (tanpa loop).
+export function shouldFallbackToList(method: string, seq: number, current: number): boolean {
+  return method === 'runs.detail' && isLatestLoad(seq, current);
+}
+
 // Ganti isi store dengan hasil panggilan workspace `wid`, kecuali sesi yang
 // baru diubah event, dan abaikan balasan basi bila workspace sudah berganti.
 function apply(seq: number, wid: string, res: unknown, mark: Set<string>): void {
@@ -97,6 +103,10 @@ async function load(method: 'runs.list' | 'runs.detail'): Promise<void> {
     apply(seq, wid, await call<Run[]>(method, { workspaceId: wid }), mark);
   } catch (e) {
     console.warn(`${method} gagal:`, e);
+    // seq masih terbaru berarti belum ada stop() atau muat lain; cek workspace aktif.
+    if (shouldFallbackToList(method, seq, loadSeq) && get(activeWorkspaceId) === wid) {
+      void load('runs.list');
+    }
   }
 }
 
