@@ -11,6 +11,7 @@ export interface RailItemSpec {
   component: Component<any>;
   order?: number;
   visible?: Readable<boolean>;
+  badge?: Readable<number | boolean>; // titik tampil bila > 0 atau true
 }
 
 export interface LayoutHeaderSpec { id: string; component: Component<any>; order?: number }

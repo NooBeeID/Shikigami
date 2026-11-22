@@ -48,9 +48,11 @@ type StatusEvent struct {
 
 // SessionState adalah bentuk hasil status.get / elemen status.list.
 type SessionState struct {
-	SessionID string `json:"sessionId"`
-	Status    Status `json:"status"`
-	Since     int64  `json:"since"` // unix milidetik
+	SessionID  string `json:"sessionId"`
+	Status     Status `json:"status"`
+	Since      int64  `json:"since"` // unix milidetik
+	Reason     string `json:"reason,omitempty"`
+	ProviderID string `json:"providerId,omitempty"`
 }
 
 // LaunchInfo mencatat peluncuran sesi yang menunggu ikatan ke ID sesi asli (lihat T1).

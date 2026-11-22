@@ -2,7 +2,7 @@ import { derived, writable, type Readable } from 'svelte/store';
 import { call, onEvent } from '../../lib/ipc';
 
 export type Status = 'running' | 'waiting' | 'done' | 'idle';
-export interface SessionStatus { status: Status; since: number; }
+export interface SessionStatus { status: Status; since: number; reason?: string; providerId?: string; }
 
 const store = writable<Record<string, SessionStatus>>({});
 export const statusStore: Readable<Record<string, SessionStatus>> = { subscribe: store.subscribe };
@@ -16,13 +16,14 @@ const known: Status[] = ['running', 'waiting', 'done', 'idle'];
 const isStatus = (v: unknown): v is Status => known.includes(v as Status);
 
 function handler(_topic: string, payload: unknown): void {
-  const p = payload as { sessionId?: unknown; status?: unknown; source?: unknown; at?: unknown } | null;
+  const p = payload as { sessionId?: unknown; status?: unknown; source?: unknown; reason?: unknown; at?: unknown } | null;
   if (!p || typeof p.sessionId !== 'string' || !isStatus(p.status)) return;
   // Event exit ditampilkan sebagai done sampai shell menghapus sesi.
   const status: Status = p.source === 'exit' ? 'done' : p.status;
   const since = typeof p.at === 'number' ? p.at : Date.now();
+  const reason = p.source === 'exit' ? 'exit' : (typeof p.reason === 'string' && p.reason ? p.reason : undefined);
   const id = p.sessionId;
-  store.update((m) => ({ ...m, [id]: { status, since } }));
+  store.update((m) => ({ ...m, [id]: { status, since, reason, providerId: m[id]?.providerId } }));
 }
 
 let unsub: (() => void) | null = null;
@@ -35,7 +36,7 @@ export function startStatusSync(): () => void {
   if (unsub) return stop;
   // Berlangganan dahulu agar tidak ada event yang hilang, baru muat awal.
   unsub = onEvent('session.status', handler);
-  call<Array<{ sessionId: string; status: Status; since: number }>>('status.list')
+  call<Array<{ sessionId: string; status: Status; since: number; reason?: string; providerId?: string }>>('status.list')
     .then((list) => {
       if (!Array.isArray(list)) return;
       store.update((m) => {
@@ -44,8 +45,17 @@ export function startStatusSync(): () => void {
           if (!it || typeof it.sessionId !== 'string' || !isStatus(it.status)) continue;
           const cur = next[it.sessionId];
           // Pertahankan entri dari event yang lebih baru.
-          if (cur && cur.since >= it.since) continue;
-          next[it.sessionId] = { status: it.status, since: it.since };
+          const providerId = typeof it.providerId === 'string' && it.providerId ? it.providerId : undefined;
+          if (cur && cur.since >= it.since) {
+            if (!cur.providerId && providerId) next[it.sessionId] = { ...cur, providerId };
+            continue;
+          }
+          next[it.sessionId] = {
+            status: it.status,
+            since: it.since,
+            reason: typeof it.reason === 'string' && it.reason ? it.reason : undefined,
+            providerId,
+          };
         }
         return next;
       });

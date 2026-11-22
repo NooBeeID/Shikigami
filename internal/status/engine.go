@@ -33,6 +33,7 @@ type sessionState struct {
 	token      string // launch token terikat; "" bila tidak terikat
 	status     Status
 	since      time.Time
+	reason     string      // alasan transisi terakhir; "" bila belum pernah bertransisi
 	hookSeen   bool        // sudah ada hook pertama
 	submits    int         // jumlah event UserPromptSubmit yang pernah diterima
 	timer      *time.Timer // nil sampai output pertama
@@ -233,6 +234,7 @@ func (e *Engine) Set(sessionID string, st Status, source, reason string) bool {
 	now := time.Now()
 	state.status = st
 	state.since = now
+	state.reason = reason
 	if st == StatusDone {
 		stopTimerLocked(state)
 	}
@@ -421,7 +423,7 @@ func (e *Engine) Get(sessionID string) (SessionState, bool) {
 	if st == nil {
 		return SessionState{}, false
 	}
-	return SessionState{SessionID: st.id, Status: st.status, Since: st.since.UnixMilli()}, true
+	return SessionState{SessionID: st.id, Status: st.status, Since: st.since.UnixMilli(), Reason: st.reason, ProviderID: st.providerID}, true
 }
 
 func (e *Engine) List() []SessionState {
@@ -439,7 +441,7 @@ func (e *Engine) List() []SessionState {
 	}
 	rows := make([]row, 0, len(e.states))
 	for _, st := range e.states {
-		rows = append(rows, row{SessionState{SessionID: st.id, Status: st.status, Since: st.since.UnixMilli()}, st.since})
+		rows = append(rows, row{SessionState{SessionID: st.id, Status: st.status, Since: st.since.UnixMilli(), Reason: st.reason, ProviderID: st.providerID}, st.since})
 	}
 	e.mu.Unlock()
 	sort.Slice(rows, func(i, j int) bool {
