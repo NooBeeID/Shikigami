@@ -1,0 +1,73 @@
+{
+ "session_id": "5f1b44bf-1504-43a6-895e-8327fa09ce9a",
+ "transcript_path": "/Users/USER/.claude/projects/-private-tmp-claude-501--Users-ascendiz-Documents-Projects-noobeeid-research-ai-terminal-e5d0a41d-2a5a-4696-87ab-5421d0b85090-scratchpad-spike-cwd/5f1b44bf-1504-43a6-895e-8327fa09ce9a.jsonl",
+ "cwd": "/private/tmp/claude-501/-Users-ascendiz-Documents-Projects-noobeeid-research-ai-terminal/e5d0a41d-2a5a-4696-87ab-5421d0b85090/scratchpad/spike/cwd",
+ "prompt_id": "b07e26a7-7317-46fd-954b-ff9365449022",
+ "permission_mode": "bypassPermissions",
+ "effort": {
+  "level": "medium"
+ },
+ "hook_event_name": "PostToolUse",
+ "tool_name": "Agent",
+ "tool_input": {
+  "description": "Spike probe agent",
+  "prompt": "Reply with the word hi",
+  "run_in_background": false
+ },
+ "tool_response": {
+  "status": "completed",
+  "prompt": "Reply with the word hi",
+  "agentId": "ace33d88e5cb23509",
+  "agentType": "general-purpose",
+  "harnessNoteCount": 0,
+  "harnessTailCount": 0,
+  "harnessSectionHash": "13d7d79bc2b4cc6c",
+  "content": [
+   {
+    "type": "text",
+    "text": "hi"
+   }
+  ],
+  "resolvedModel": "claude-sonnet-5-5",
+  "totalDurationMs": 1534,
+  "totalTokens": 22867,
+  "totalToolUseCount": 0,
+  "usage": {
+   "output_tokens_details": {
+    "thinking_tokens": 0
+   },
+   "input_tokens": 2,
+   "cache_creation_input_tokens": 22861,
+   "cache_read_input_tokens": 0,
+   "output_tokens": 4,
+   "server_tool_use": {
+    "web_search_requests": 0,
+    "web_fetch_requests": 0
+   },
+   "service_tier": "standard",
+   "cache_creation": {
+    "ephemeral_1h_input_tokens": 0,
+    "ephemeral_5m_input_tokens": 22861
+   },
+   "inference_geo": "global",
+   "iterations": [
+    {
+     "input_tokens": 2,
+     "output_tokens": 4,
+     "cache_read_input_tokens": 0,
+     "cache_creation_input_tokens": 22861,
+     "cache_creation": {
+      "ephemeral_5m_input_tokens": 22861,
+      "ephemeral_1h_input_tokens": 0
+     },
+     "type": "message"
+    }
+   ],
+   "speed": "standard",
+   "fallback_credit": null
+  },
+  "canContinueAgent": true
+ },
+ "tool_use_id": "toolu_01XVrd27J6vbU5djmFACYvvQ",
+ "duration_ms": 1534
+}

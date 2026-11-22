@@ -1,0 +1,12 @@
+{
+ "agentType": "general-purpose",
+ "isBuiltIn": true,
+ "description": "Spike probe agent",
+ "toolUseId": "toolu_01XVrd27J6vbU5djmFACYvvQ",
+ "spawnDepth": 1,
+ "requestShape": "foreground",
+ "requestNonInteractive": true,
+ "model": "claude-sonnet-5-5",
+ "pickedEffortModel": "claude-sonnet-5-5",
+ "finished": true
+}
