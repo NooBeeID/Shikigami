@@ -3,15 +3,16 @@
 #
 # Pemakaian: scripts/make-icon.sh [sumber.png] [keluaran.icns]
 #
-# CATATAN: ikon bawaan ini SEMENTARA. Untuk menggantinya cukup menimpa
-# build/app-resources/icon-source.png (1024x1024) lalu jalankan ulang 'make app'.
-# 'make clean' menghapus build/, sehingga sumber bawaan dibuat ulang otomatis.
-# Untuk ikon permanen nanti, ubah skrip ini agar menyalin dari berkas yang
-# di-commit di luar build/.
+# Sumber ikon: assets/icon/shikigami.svg (di-commit). Skrip merendernya ke
+# build/app-resources/icon-source.png (1024x1024, latar transparan) setiap kali
+# PNG itu belum ada, ukurannya salah, atau SVG-nya lebih baru. 'make clean'
+# menghapus build/, sehingga PNG dibuat ulang otomatis dari SVG.
+# Untuk mengganti ikon, ubah assets/icon/shikigami.svg lalu jalankan 'make app'.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+ICON_SVG="assets/icon/shikigami.svg"
 DEFAULT_SRC="build/app-resources/icon-source.png"
 SRC="${1:-$DEFAULT_SRC}"
 OUT="${2:-build/app-resources/shikigami.icns}"
@@ -47,13 +48,8 @@ generate_fallback() {
 generate_default_source() {
   local svg="build/app-resources/icon-source.svg" tmp ok=0
   mkdir -p build/app-resources
-  cat > "$svg" <<'SVG'
-<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
-  <rect x="64" y="64" width="896" height="896" rx="200" fill="#1c1c24"/>
-  <circle cx="512" cy="512" r="400" fill="none" stroke="#7c5cff" stroke-opacity="0.25" stroke-width="8"/>
-  <text x="512" y="720" font-size="600" font-family="Helvetica" font-weight="700" fill="#7c5cff" text-anchor="middle">S</text>
-</svg>
-SVG
+  [ -f "$ICON_SVG" ] || die "sumber ikon tidak ditemukan: $ICON_SVG"
+  cp "$ICON_SVG" "$svg"
   # Render via Swift/AppKit agar latar transparan (qlmanage memberi latar putih opak).
   if command -v swift >/dev/null 2>&1; then
     tmp="$(mktemp -d)"
@@ -67,11 +63,11 @@ SVG
   if [ "$ok" -ne 1 ]; then
     generate_fallback
   fi
-  echo "ikon sementara dibuat: build/app-resources/icon-source.png"
+  echo "sumber ikon dibuat dari $ICON_SVG: build/app-resources/icon-source.png"
 }
 
 if [ "$SRC" = "$DEFAULT_SRC" ]; then
-  if [ ! -f "$SRC" ] || ! size_ok "$SRC"; then
+  if [ ! -f "$SRC" ] || ! size_ok "$SRC" || [ "$ICON_SVG" -nt "$SRC" ]; then
     generate_default_source
   fi
 fi
