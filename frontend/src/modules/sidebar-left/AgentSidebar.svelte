@@ -3,8 +3,9 @@
   import type { Session } from '../../lib/stores';
   import SessionGroups from './SessionGroups.svelte';
   import NewSessionMenu from './NewSessionMenu.svelte';
-  import { sessionListWrapper } from './registry';
+  import { sessionListWrapper, sidebarSections } from './registry';
 
+  const sections = sidebarSections();
   let err = $state('');
   const onerror = (m: string) => (err = m);
 </script>
@@ -16,6 +17,10 @@
 <aside class="side">
   <div class="label">AGENT</div>
   <WorkspaceHeader {onerror} />
+  {#each $sections as s (s.id)}
+    {@const S = s.component}
+    <S {onerror} />
+  {/each}
   {#if $sessionListWrapper}
     {@const W = $sessionListWrapper}
     <W.component {onerror} list={listSnippet} />

@@ -1,6 +1,6 @@
 // Model pohon pane: tipe dan fungsi murni (tanpa IPC, tanpa mutasi masukan).
 
-export type PaneKind = 'terminal' | 'file'; // string terbuka lewat registerPaneKind
+export type PaneKind = 'terminal' | 'file' | 'thread'; // string terbuka lewat registerPaneKind
 export interface Leaf {
   type: 'pane';
   id: string;
@@ -9,6 +9,7 @@ export interface Leaf {
   projectId?: string;
   provider?: string;
   filePath?: string;
+  threadId?: string;
   title: string;
   workspaceId?: string; // tambahan: untuk pane file
   root?: string; // root eksplisit untuk pane file read-only (mis. direktori grimoire)
@@ -36,6 +37,7 @@ export interface NewLeaf {
   projectId?: string;
   provider?: string;
   filePath?: string;
+  threadId?: string;
   workspaceId?: string;
   root?: string;
   readOnly?: boolean;
@@ -135,6 +137,7 @@ function makeLeaf(nl: NewLeaf): Leaf {
   if (nl.projectId !== undefined) leaf.projectId = nl.projectId;
   if (nl.provider !== undefined) leaf.provider = nl.provider;
   if (nl.filePath !== undefined) leaf.filePath = nl.filePath;
+  if (nl.threadId !== undefined) leaf.threadId = nl.threadId;
   if (nl.workspaceId !== undefined) leaf.workspaceId = nl.workspaceId;
   if (nl.root !== undefined) leaf.root = nl.root;
   if (nl.readOnly !== undefined) leaf.readOnly = nl.readOnly;
@@ -199,6 +202,7 @@ export function openPane(
   const existing = findLeafBy(doc, (l) => {
     if (nl.sessionId !== undefined && l.sessionId === nl.sessionId) return true;
     if (nl.filePath !== undefined && l.filePath === nl.filePath && l.projectId === nl.projectId) return true;
+    if (nl.threadId !== undefined && l.threadId === nl.threadId) return true;
     return false;
   });
   if (existing) return { doc: setFocus(doc, existing.id), id: existing.id };
@@ -331,7 +335,7 @@ function hydrateNode(raw: unknown): Node | null {
       kind: r.kind as PaneKind,
       title: isStr(r.title) && r.title ? r.title : 'Pane',
     };
-    for (const k of ['sessionId', 'projectId', 'provider', 'filePath', 'workspaceId', 'root'] as const) {
+    for (const k of ['sessionId', 'projectId', 'provider', 'filePath', 'workspaceId', 'root', 'threadId'] as const) {
       if (isStr(r[k])) leaf[k] = r[k] as string;
     }
     if (typeof r.readOnly === 'boolean') leaf.readOnly = r.readOnly;

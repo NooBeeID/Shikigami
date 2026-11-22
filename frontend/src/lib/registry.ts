@@ -3,7 +3,7 @@ import { derived, writable, type Readable } from 'svelte/store';
 
 export type PanelArea = 'sidebar' | 'main-tab' | 'statusbar';
 export interface PanelSpec { id: string; area: PanelArea; component: Component<any>; order?: number; }
-export interface TabTypeSpec { type: 'session' | 'file'; component: Component<any>; }
+export interface TabTypeSpec { type: 'session' | 'file' | 'thread'; component: Component<any>; }
 
 const panelStore = writable<Record<string, PanelSpec>>({});
 const tabTypeStore = writable<Record<string, TabTypeSpec>>({});

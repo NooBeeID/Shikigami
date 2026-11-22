@@ -30,3 +30,8 @@ export function registerSessionMenuItem(spec: SessionMenuItemSpec): void {
 export function sessionMenuItems(): Readable<SessionMenuItemSpec[]> {
   return derived(menuItemStore, (m) => Object.values(m).sort(byOrder));
 }
+
+export interface SidebarSectionSpec { id: string; component: Component<any>; order?: number }
+const sectionStore = writable<Record<string, SidebarSectionSpec>>({});
+export function registerSidebarSection(spec: SidebarSectionSpec): void { sectionStore.update((m) => ({ ...m, [spec.id]: spec })); }
+export function sidebarSections(): Readable<SidebarSectionSpec[]> { return derived(sectionStore, (m) => Object.values(m).sort(byOrder)); }
