@@ -25,7 +25,9 @@ const (
 	HookSessionStart     = "SessionStart"
 	HookNotification     = "Notification"
 	HookStop             = "Stop"
+	HookSubagentStart    = "SubagentStart"
 	HookSubagentStop     = "SubagentStop"
+	HookPreToolUse       = "PreToolUse"
 	HookPostToolUse      = "PostToolUse"
 )
 

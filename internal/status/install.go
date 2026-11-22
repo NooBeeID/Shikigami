@@ -18,8 +18,18 @@ import (
 
 var installOnce sync.Once
 
-// hookEvents adalah event hook Claude yang dipasang (tepat 5).
-var hookEvents = []string{HookUserPromptSubmit, HookNotification, HookStop, HookSessionStart, HookPostToolUse}
+// hookEvents adalah event hook Claude yang dipasang (8): lima event status lama
+// ditambah PreToolUse, SubagentStart, dan SubagentStop untuk registry runs.
+// ClassifyEvent hanya mengenal lima event lama; tiga yang baru tidak mengubah status.
+var hookEvents = []string{
+	HookUserPromptSubmit, HookNotification, HookStop, HookSessionStart, HookPostToolUse,
+	HookPreToolUse, HookSubagentStart, HookSubagentStop,
+}
+
+// preToolUseMatcher membatasi PreToolUse ke tool Workflow dan Agent (matcher Claude
+// adalah regex atas nama tool), sehingga proses shikigamictl tidak dijalankan pada
+// setiap pemanggilan tool.
+const preToolUseMatcher = "Workflow|Agent"
 
 // newToken membuat launch token acak (16 hex).
 func newToken() (string, error) {
@@ -60,6 +70,8 @@ func hooksFilePath(dataDir, token string) string {
 }
 
 // writeHooksFile menulis berkas hooks per sesi untuk Claude dan mengembalikan path-nya.
+// Semua event di hookEvents dipasang tanpa matcher, kecuali PreToolUse yang memakai
+// preToolUseMatcher.
 //
 // Verifikasi skema (2026-11-22): `claude --help` pada mesin ini mengonfirmasi
 // flag `--settings <file-or-json>` ("Settings file or JSON string to load more
@@ -72,11 +84,13 @@ func hooksFilePath(dataDir, token string) string {
 func writeHooksFile(dataDir, token, ctl string) (string, error) {
 	hooks := map[string]any{}
 	for _, ev := range hookEvents {
-		hooks[ev] = []any{
-			map[string]any{"hooks": []any{
-				map[string]any{"type": "command", "command": hookCommand(ctl, token, ev)},
-			}},
+		entry := map[string]any{"hooks": []any{
+			map[string]any{"type": "command", "command": hookCommand(ctl, token, ev)},
+		}}
+		if ev == HookPreToolUse {
+			entry["matcher"] = preToolUseMatcher
 		}
+		hooks[ev] = []any{entry}
 	}
 	data, err := json.MarshalIndent(map[string]any{"hooks": hooks}, "", "  ")
 	if err != nil {
