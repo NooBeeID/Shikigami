@@ -2,7 +2,7 @@
 id: grimoire-ticket-04-grimoire-llm
 title: Grimoire: ringkasan LLM opt-in
 spec: docs/superpowers/specs/2026-11-22-grimoire-design.md
-status: ready
+status: implemented
 wave: 4
 depends_on: [grimoire-ticket-03-grimoire-refresh]
 ---

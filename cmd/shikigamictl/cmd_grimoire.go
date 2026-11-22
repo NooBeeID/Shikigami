@@ -15,7 +15,7 @@ import (
 
 const grimoireUsage = `penggunaan:
   shikigamictl grimoire build  [--project <id>] [--full]   bangun (inkremental; --full tulis ulang semua) grimoire project
-  shikigamictl grimoire status [--project <id>]   tampilkan status grimoire project
+  shikigamictl grimoire status [--project <id>] [--dry-run]   tampilkan status grimoire project (--dry-run: estimasi modul dan token tanpa memanggil LLM)
 
 Tanpa --project, dipakai satu-satunya project bila hanya ada satu; bila lebih dari
 satu, daftar id project ditampilkan.`
@@ -86,7 +86,11 @@ func runGrimoire(ctx context.Context, c *ipc.Client, args []string) error {
 	fs.SetOutput(io.Discard)
 	project := fs.String("project", "", "id project")
 	full := fs.Bool("full", false, "tulis ulang semua modul (hanya untuk build)")
+	dryRun := fs.Bool("dry-run", false, "estimasi build tanpa memanggil LLM (hanya untuk status)")
 	if err := fs.Parse(args[1:]); err != nil || fs.NArg() > 0 {
+		return errors.New(grimoireUsage)
+	}
+	if *dryRun && sub != "status" {
 		return errors.New(grimoireUsage)
 	}
 	id := *project
@@ -99,6 +103,22 @@ func runGrimoire(ctx context.Context, c *ipc.Client, args []string) error {
 	params := map[string]any{"projectId": id}
 	if sub == "build" && *full {
 		params["full"] = true
+	}
+	if sub == "status" && *dryRun {
+		var out map[string]any
+		if err := c.Call("grimoire.estimate", params, &out); err != nil {
+			return grimoireError(err)
+		}
+		if err := printJSON(out); err != nil {
+			return err
+		}
+		modules, _ := out["modules"].(float64)
+		estTokens, _ := out["estTokens"].(float64)
+		fmt.Fprintf(os.Stderr, "estimasi: %d modul, ~%d token\n", int(modules), int(estTokens))
+		if over, _ := out["overLimit"].(float64); over > 0 {
+			fmt.Fprintf(os.Stderr, "di atas batas maxModules: %d modul tidak dihitung\n", int(over))
+		}
+		return nil
 	}
 	if sub == "status" {
 		var out map[string]any
@@ -115,6 +135,23 @@ func runGrimoire(ctx context.Context, c *ipc.Client, args []string) error {
 		}
 		fmt.Fprintf(os.Stderr, "index: %d byte, ~%d token, %d halaman, laws: %d byte, stale: %d, building: %s\n",
 			num("indexBytes"), num("estTokens"), num("pages"), num("lawsBytes"), num("staleCount"), building)
+		if on, _ := out["llmEnabled"].(bool); on {
+			fmt.Fprintln(os.Stderr, "llm: aktif")
+		} else {
+			fmt.Fprintln(os.Stderr, "llm: mati")
+		}
+		if cost, ok := out["lastBuildCost"].(map[string]any); ok && cost != nil {
+			cn := func(k string) int { f, _ := cost[k].(float64); return int(f) }
+			line := fmt.Sprintf("build terakhir: %d modul, ~%d token, %d ms, gagal %d",
+				cn("modules"), cn("estTokens"), cn("durationMs"), cn("failed"))
+			if sk := cn("skipped"); sk > 0 {
+				line += fmt.Sprintf(", dilewati %d", sk)
+			}
+			fmt.Fprintln(os.Stderr, line)
+			if note, _ := cost["note"].(string); note != "" {
+				fmt.Fprintf(os.Stderr, "catatan: %s\n", note)
+			}
+		}
 		return nil
 	}
 	return grimoireError(callAndPrint(c, "grimoire."+sub, params))

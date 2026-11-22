@@ -46,17 +46,18 @@ type service struct {
 }
 
 type statusResult struct {
-	Exists        bool   `json:"exists"`
-	Books         int    `json:"books"`
-	Pages         int    `json:"pages"`
-	StaleCount    int    `json:"staleCount"`
-	Building      bool   `json:"building"`
-	IndexBytes    int    `json:"indexBytes"`
-	EstTokens     int    `json:"estTokens"`
-	LawsBytes     int    `json:"lawsBytes"`
-	LLMEnabled    bool   `json:"llmEnabled"`
-	LastBuildCost int    `json:"lastBuildCost"`
-	Dir           string `json:"dir"`
+	Exists        bool         `json:"exists"`
+	Books         int          `json:"books"`
+	Pages         int          `json:"pages"`
+	StaleCount    int          `json:"staleCount"`
+	Building      bool         `json:"building"`
+	IndexBytes    int          `json:"indexBytes"`
+	EstTokens     int          `json:"estTokens"`
+	LawsBytes     int          `json:"lawsBytes"`
+	LLMEnabled    bool         `json:"llmEnabled"`
+	LastBuildCost *BuildCost   `json:"lastBuildCost"`
+	LLMProgress   *LLMProgress `json:"llmProgress"`
+	Dir           string       `json:"dir"`
 }
 
 type buildResult struct {
@@ -201,6 +202,17 @@ func (s *service) status(id string) statusResult {
 	}
 	res := statusResult{Dir: dir, Building: s.building(id) || RefreshBuilding(id), Exists: s.d.Store.Exists(id)}
 	res.StaleCount = RefreshStaleCount(id)
+	if set, err := LoadSettings(id); err != nil {
+		if s.d.Logger != nil {
+			s.d.Logger.Warn("baca settings grimoire gagal", "project", id, "err", err)
+		}
+	} else {
+		res.LLMEnabled = set.LLM
+	}
+	if c, err := LoadBuildCost(id); err == nil {
+		res.LastBuildCost = c
+	}
+	res.LLMProgress = ProgressFor(id)
 	if !res.Exists {
 		return res
 	}

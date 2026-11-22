@@ -278,6 +278,9 @@ func (b *Builder) BuildIncremental(ctx context.Context, projectID string, opts I
 	if err := b.store.ValidateProject(projectID); err != nil {
 		return Result{}, err
 	}
+	if opts.Summarizer == nil {
+		opts.Summarizer = SummarizerFor(projectID, opts.ProjectPath)
+	}
 	root, err := incrementalRoot(opts.ProjectPath)
 	if err != nil {
 		return Result{}, err

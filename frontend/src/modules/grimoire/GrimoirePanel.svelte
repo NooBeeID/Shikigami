@@ -7,6 +7,7 @@
   import { lawsViewOpen } from './laws/lawsStore';
   import StaleSlot from './stale/StaleSlot.svelte';
   import StaleBadge from './stale/StaleBadge.svelte';
+  import LlmSettings from './llm/LlmSettings.svelte';
 
   let s = $state<GrimoireState>({ projectId: null, exists: false, building: false, books: [], error: null });
   let expanded = $state<Record<string, boolean>>({});
@@ -101,7 +102,7 @@
   {#if errText}
     <div class="msg err" role="alert" title={errText}>{errText}</div>
   {/if}
-  <!-- slot: llm (tiket 4) -->
+  <LlmSettings projectId={s.projectId} exists={s.exists} />
 </section>
 
 <style>
