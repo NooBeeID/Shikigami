@@ -199,7 +199,12 @@ func (q *Queue) pump(to string) {
 	msg := e.msg
 	q.mu.Unlock()
 
+	// Hitungan submit sebelum menulis; dipakai membuktikan Enter benar-benar diterima.
+	submitsBefore, confirmable := status.PromptSubmits(to)
 	err := q.deliver(msg)
+	if err == nil && confirmable {
+		go q.confirmEnter(to, submitsBefore)
+	}
 
 	q.mu.Lock()
 	e.sending = false

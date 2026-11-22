@@ -69,6 +69,16 @@ func stopTimerLocked(state *sessionState) {
 	}
 }
 
+// PromptSubmits mengembalikan jumlah prompt yang sudah di-submit sesi (lihat
+// Engine.PromptSubmits). reliable=false bila engine belum ada atau sesi tanpa hooks aktif.
+func PromptSubmits(sessionID string) (n int, reliable bool) {
+	e := Default()
+	if e == nil {
+		return 0, false
+	}
+	return e.PromptSubmits(sessionID)
+}
+
 // IsIdle true untuk idle|done|waiting; false untuk running dan sesi tak dikenal.
 func IsIdle(sessionID string) bool {
 	e := Default()

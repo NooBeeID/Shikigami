@@ -34,6 +34,7 @@ type sessionState struct {
 	status     Status
 	since      time.Time
 	hookSeen   bool        // sudah ada hook pertama
+	submits    int         // jumlah event UserPromptSubmit yang pernah diterima
 	timer      *time.Timer // nil sampai output pertama
 }
 
@@ -354,6 +355,9 @@ func (e *Engine) Apply(idOrToken, event string, payload map[string]any) error {
 	e.mu.Lock()
 	if state := e.states[id]; state != nil {
 		state.hookSeen = true
+		if event == HookUserPromptSubmit {
+			state.submits++
+		}
 		if hookCapable(state) {
 			stopTimerLocked(state)
 		}
@@ -392,6 +396,22 @@ func (e *Engine) handleExit(id string) {
 		}()
 	}
 	e.Forget(id)
+}
+
+// PromptSubmits mengembalikan berapa kali sesi men-submit prompt (event hook
+// UserPromptSubmit). reliable=false bila sesi tidak punya hooks aktif (tidak
+// terikat launch token atau provider tanpa hooks): hitungan 0 di sana tidak
+// berarti prompt belum ter-submit, jadi pemanggil tidak boleh memakainya sebagai bukti.
+// SessionStart juga membuat status "running", sehingga status saja tidak cukup
+// untuk memastikan sebuah prompt benar-benar terkirim.
+func (e *Engine) PromptSubmits(sessionID string) (n int, reliable bool) {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	st := e.bindLocked(sessionID)
+	if st == nil {
+		return 0, false
+	}
+	return st.submits, hookCapable(st)
 }
 
 func (e *Engine) Get(sessionID string) (SessionState, bool) {
