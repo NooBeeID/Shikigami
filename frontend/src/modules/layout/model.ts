@@ -395,6 +395,75 @@ export function movePane(doc: LayoutDoc, paneId: string, targetId: string, zone:
   return normalize({ ...res.doc, focusId: leaf.id });
 }
 
+// activeTabId setelah tab `tabId` dicabut dari `tabs` (daftar SEBELUM pencabutan).
+function activeAfterRemoval(tabs: Tab[], activeTabId: string, tabId: string): string {
+  if (activeTabId !== tabId) return activeTabId;
+  const idx = tabs.findIndex((t) => t.id === tabId);
+  const rest = tabs.filter((t) => t.id !== tabId);
+  return (rest[idx] ?? rest[idx - 1]).id;
+}
+
+// Index sisip: floor, NaN/undefined = akhir, di-clamp ke 0..len.
+function clampIndex(index: number | undefined, len: number): number {
+  if (index === undefined || Number.isNaN(index)) return len;
+  return Math.min(Math.max(Math.floor(index), 0), len);
+}
+
+export function moveTab(
+  doc: LayoutDoc,
+  fromPaneId: string,
+  tabId: string,
+  targetPaneId: string,
+  zone: DropZone,
+  index?: number,
+): LayoutDoc {
+  const src = findLeaf(doc, fromPaneId);
+  const tab = src?.tabs.find((t) => t.id === tabId);
+  const tgt = findLeaf(doc, targetPaneId);
+  if (!src || !tab || !tgt) return doc;
+
+  // Cabut tab dari pane asal (pane kosong dihapus lewat closePane).
+  const detach = (d: LayoutDoc): LayoutDoc =>
+    src.tabs.length === 1
+      ? closePane(d, fromPaneId)
+      : mapLeaf(d, fromPaneId, (l) => ({
+          ...l,
+          tabs: l.tabs.filter((t) => t.id !== tabId),
+          activeTabId: activeAfterRemoval(l.tabs, l.activeTabId, tabId),
+        }));
+
+  if (zone === 'center') {
+    if (fromPaneId === targetPaneId) {
+      const from = src.tabs.findIndex((t) => t.id === tabId);
+      const raw = clampIndex(index, src.tabs.length);
+      const ins = raw > from ? raw - 1 : raw;
+      const rest = src.tabs.filter((t) => t.id !== tabId);
+      const next = [...rest.slice(0, ins), tab, ...rest.slice(ins)];
+      const d = mapLeaf(doc, fromPaneId, (l) => ({ ...l, tabs: next, activeTabId: tab.id }));
+      return normalize({ ...d, focusId: fromPaneId });
+    }
+    const ins = clampIndex(index, tgt.tabs.length);
+    const d = mapLeaf(detach(doc), targetPaneId, (l) => ({
+      ...l,
+      tabs: [...l.tabs.slice(0, ins), tab, ...l.tabs.slice(ins)],
+      activeTabId: tab.id,
+    }));
+    return normalize({ ...d, focusId: targetPaneId });
+  }
+
+  if (zone === 'top' || zone === 'bottom' || zone === 'left' || zone === 'right') {
+    if (fromPaneId === targetPaneId && src.tabs.length <= 1) return doc;
+    const d = detach(doc.maximizedId ? restore(doc) : doc);
+    const fresh: Leaf = { type: 'pane', id: newPaneId(), tabs: [tab], activeTabId: tab.id };
+    const dir: 'h' | 'v' = zone === 'top' || zone === 'bottom' ? 'v' : 'h';
+    const side: 'after' | 'before' = zone === 'top' || zone === 'left' ? 'before' : 'after';
+    const res = splitPane(d, targetPaneId, dir, fresh, side);
+    return normalize({ ...res.doc, focusId: fresh.id });
+  }
+
+  return doc;
+}
+
 export function resize(doc: LayoutDoc, path: SplitPath, ratio: number): LayoutDoc {
   const n = getAt(doc, path);
   if (!n || n.type !== 'split') return doc;

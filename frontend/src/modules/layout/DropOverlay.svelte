@@ -1,8 +1,25 @@
 <script lang="ts">
   import { dragState } from './dnd';
 
+  const marker = $derived.by(() => {
+    const s = $dragState;
+    if (!s || s.kind !== 'tab' || s.index === null || !s.rect || !s.targetId) return null;
+    let x = s.rect.x;
+    try {
+      const strip = document.querySelector(`[data-pane-id="${CSS.escape(s.targetId)}"] [data-tab-strip]`);
+      const tabs = strip ? strip.querySelectorAll<HTMLElement>('[data-tab-id]') : [];
+      if (tabs.length > 0) {
+        x = s.index < tabs.length
+          ? tabs[s.index].getBoundingClientRect().left
+          : tabs[tabs.length - 1].getBoundingClientRect().right;
+      }
+    } catch { /* jatuh ke rect */ }
+    return { x, y: s.rect.y, h: s.rect.h };
+  });
+
   const box = $derived.by(() => {
     const s = $dragState;
+    if (marker) return null;
     if (!s || !s.rect || !s.zone) return null;
     const { x, y, w, h } = s.rect;
     switch (s.zone) {
@@ -15,7 +32,12 @@
   });
 </script>
 
-{#if box}
+{#if marker}
+  <div
+    class="drop-marker"
+    style="left:{marker.x - 1}px;top:{marker.y}px;height:{marker.h}px"
+  ></div>
+{:else if box}
   <div
     class="drop-zone"
     style="left:{box.x}px;top:{box.y}px;width:{box.w}px;height:{box.h}px"
@@ -33,7 +55,15 @@
     border-radius: 4px;
     transition: left 80ms, top 80ms, width 80ms, height 80ms;
   }
+  .drop-marker {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    width: 2px;
+    background: var(--accent, #4f8cff);
+    transition: left 80ms;
+  }
   @media (prefers-reduced-motion: reduce) {
-    .drop-zone { transition: none; }
+    .drop-zone, .drop-marker { transition: none; }
   }
 </style>

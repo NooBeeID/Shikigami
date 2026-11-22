@@ -9,6 +9,7 @@ export interface LayoutStore extends Readable<LayoutDoc> {
   openThreadAgent(leaf: NewLeaf): string;
   closePane(paneId: string): void;
   movePane(paneId: string, targetId: string, zone: DropZone): void;
+  moveTab(fromPaneId: string, tabId: string, targetPaneId: string, zone: DropZone, index?: number): void;
   swapPanes(aId: string, bId: string): void;
   resize(path: SplitPath, ratio: number): void;
   maximize(paneId: string): void;
@@ -60,6 +61,7 @@ export function createLayoutStore(initial?: LayoutDoc): LayoutStore {
     },
     closePane: (id) => update((d) => M.closePane(d, id)),
     movePane: (id, target, zone) => update((d) => M.movePane(d, id, target, zone)),
+    moveTab: (from, tabId, target, zone, index) => update((d) => M.moveTab(d, from, tabId, target, zone, index)),
     swapPanes: (a, b) => update((d) => M.swapPanes(d, a, b)),
     resize: (path, ratio) => update((d) => M.resize(d, path, ratio)),
     maximize: (id) => update((d) => M.maximize(d, id)),

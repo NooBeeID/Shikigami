@@ -3,7 +3,8 @@
   import { activeTab, type Leaf, type Tab } from './model';
   import { layout, type LayoutStore } from '../../lib/stores/layout';
   import { getPaneKind } from './registry';
-  import { startPaneDrag } from './dnd';
+  import { startPaneDrag, startTabDrag } from './dnd';
+  import TabContextMenu from './TabContextMenu.svelte';
   import PaneMenu from './PaneMenu.svelte';
   import StatusBadge from '../status/StatusBadge.svelte';
   import { activeWorkspace } from '../../lib/stores/workspaces';
@@ -36,6 +37,11 @@
   let inputEl: HTMLInputElement | undefined = $state();
   let tabsEl: HTMLElement | undefined = $state();
   let committed = false;
+  let ctxMenu = $state<{ tabId: string; x: number; y: number } | null>(null);
+  const ctxTab = $derived(ctxMenu ? pane.tabs.find((x) => x.id === ctxMenu!.tabId) : undefined);
+  $effect(() => {
+    if (ctxMenu && !ctxTab) ctxMenu = null;
+  });
 
   const active = $derived(activeTab(pane));
   const spec = $derived(getPaneKind(active.kind));
@@ -168,6 +174,19 @@
     });
   });
 
+  function onTabDown(e: PointerEvent, t: Tab) {
+    if (e.button !== 0 || editing) return;
+    if ((e.target as HTMLElement).closest('button, input')) return;
+    e.stopPropagation();
+    startTabDrag(e, pane.id, t.id, t.title, store);
+  }
+
+  function onTabContext(e: MouseEvent, t: Tab) {
+    e.preventDefault();
+    e.stopPropagation();
+    ctxMenu = { tabId: t.id, x: e.clientX, y: e.clientY };
+  }
+
   function onHeaderDown(e: PointerEvent) {
     if (e.button !== 0 || editing) return;
     if ((e.target as HTMLElement).closest('button, input, .pane-menu, [role=tab]')) return;
@@ -197,6 +216,7 @@
     class="tabs"
     class:single={pane.tabs.length === 1}
     role="tablist"
+    data-tab-strip
     tabindex="-1"
     aria-label="Tab pane {index}"
     bind:this={tabsEl}
@@ -212,6 +232,8 @@
         tabindex={t.id === active.id ? 0 : -1}
         data-tab-id={t.id}
         title={t.title}
+        onpointerdown={(e) => onTabDown(e, t)}
+        oncontextmenu={(e) => onTabContext(e, t)}
         onclick={() => selectTab(t)}
         onkeydown={(e) => { if (e.target === e.currentTarget && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); selectTab(t); } }}
       >
@@ -290,6 +312,17 @@
       {onTidy}
       onClosePane={closeWholePane}
       onDismiss={() => (menuOpen = false)}
+    />
+  {/if}
+  {#if ctxMenu && ctxTab}
+    <TabContextMenu
+      paneId={pane.id}
+      tabId={ctxTab.id}
+      x={ctxMenu.x}
+      y={ctxMenu.y}
+      onClose={() => (ctxMenu = null)}
+      onCloseTab={() => closeTabAction(ctxTab)}
+      onMinimizeTab={isTermTab(ctxTab) ? () => minimizeTab(ctxTab) : undefined}
     />
   {/if}
 </div>

@@ -2,7 +2,7 @@
 id: multi-tab-pane-ticket-02-tab-dnd
 title: Drag tab, reorder, split, dan menu konteks tab
 spec: docs/superpowers/specs/2026-11-22-multi-tab-pane-design.md
-status: ready
+status: implemented
 wave: 2
 depends_on: [multi-tab-pane-ticket-01-tab-container]
 ---

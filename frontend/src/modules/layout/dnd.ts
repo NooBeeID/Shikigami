@@ -1,12 +1,16 @@
-import { writable, type Readable } from 'svelte/store';
+import { get, writable, type Readable } from 'svelte/store';
+import { findLeaf } from './model';
 import type { DropZone } from './model';
 import { layout, type LayoutStore } from '../../lib/stores/layout';
 
 export interface DragState {
+  kind: 'pane' | 'tab';
   paneId: string;
+  tabId?: string;
   title: string;
   targetId: string | null;
   zone: DropZone | null;
+  index: number | null;
   rect: { x: number; y: number; w: number; h: number } | null;
 }
 
@@ -34,7 +38,14 @@ export function zoneAt(rect: { x: number; y: number; w: number; h: number }, x: 
   return best[0];
 }
 
-export function startPaneDrag(e: PointerEvent, paneId: string, title: string, store: LayoutStore = layout): void {
+interface DragSpec {
+  base: Pick<DragState, 'kind' | 'paneId' | 'tabId' | 'title'>;
+  resolve(x: number, y: number): Pick<DragState, 'targetId' | 'zone' | 'index' | 'rect'>;
+  commit(target: DragState): void;
+}
+
+function runDrag(e: PointerEvent, spec: DragSpec): void {
+  const title = spec.base.title;
   if (e.button !== 0 || active) return;
   active = true;
 
@@ -50,7 +61,7 @@ export function startPaneDrag(e: PointerEvent, paneId: string, title: string, st
   let done = false;
 
   function setCur(next: DragState) {
-    if (cur && cur.targetId === next.targetId && cur.zone === next.zone &&
+    if (cur && cur.targetId === next.targetId && cur.zone === next.zone && cur.index === next.index &&
         cur.rect?.x === next.rect?.x && cur.rect?.y === next.rect?.y &&
         cur.rect?.w === next.rect?.w && cur.rect?.h === next.rect?.h) return;
     cur = next;
@@ -71,7 +82,7 @@ export function startPaneDrag(e: PointerEvent, paneId: string, title: string, st
     ghost = g;
     document.body.classList.add('pane-dragging');
     document.body.style.userSelect = 'none';
-    cur = { paneId, title, targetId: null, zone: null, rect: null };
+    cur = { ...spec.base, targetId: null, zone: null, index: null, rect: null };
     state.set(cur);
   }
 
@@ -84,15 +95,8 @@ export function startPaneDrag(e: PointerEvent, paneId: string, title: string, st
       ghost.style.left = `${ev.clientX + 12}px`;
       ghost.style.top = `${ev.clientY + 12}px`;
     }
-    const el = document.elementFromPoint(ev.clientX, ev.clientY);
-    const t = el?.closest('[data-pane-id]') as HTMLElement | null;
-    if (t && t.dataset.paneId && t.dataset.paneId !== paneId) {
-      const r = t.getBoundingClientRect();
-      const rect = { x: r.left, y: r.top, w: r.width, h: r.height };
-      setCur({ paneId, title, targetId: t.dataset.paneId, zone: zoneAt(rect, ev.clientX, ev.clientY), rect });
-    } else {
-      setCur({ paneId, title, targetId: null, zone: null, rect: null });
-    }
+    const r = spec.resolve(ev.clientX, ev.clientY);
+    setCur({ ...spec.base, ...r });
   }
 
   function swallowClick() {
@@ -110,7 +114,7 @@ export function startPaneDrag(e: PointerEvent, paneId: string, title: string, st
     const target = cur;
     cleanup();
     if (wasStarted) {
-      if (target && target.targetId && target.zone) store.movePane(paneId, target.targetId, target.zone);
+      if (target && target.targetId && target.zone) spec.commit(target);
       swallowClick();
     }
   }
@@ -152,5 +156,71 @@ export function startPaneDrag(e: PointerEvent, paneId: string, title: string, st
   source?.addEventListener('lostpointercapture', () => {
     // pointerup dikirim sebelum lostpointercapture; bila drag masih berjalan, berarti dibatalkan
     if (!done) onCancel();
+  });
+}
+
+export function startPaneDrag(e: PointerEvent, paneId: string, title: string, store: LayoutStore = layout): void {
+  runDrag(e, {
+    base: { kind: 'pane', paneId, title },
+    resolve(x, y) {
+      const el = document.elementFromPoint(x, y);
+      const t = el?.closest('[data-pane-id]') as HTMLElement | null;
+      if (t && t.dataset.paneId && t.dataset.paneId !== paneId) {
+        const r = t.getBoundingClientRect();
+        const rect = { x: r.left, y: r.top, w: r.width, h: r.height };
+        return { targetId: t.dataset.paneId, zone: zoneAt(rect, x, y), index: null, rect };
+      }
+      return { targetId: null, zone: null, index: null, rect: null };
+    },
+    commit: (t) => store.movePane(paneId, t.targetId!, t.zone!),
+  });
+}
+
+function tabInsertIndex(strip: HTMLElement, x: number): number {
+  const tabs = strip.querySelectorAll<HTMLElement>('[data-tab-id]');
+  for (let i = 0; i < tabs.length; i++) {
+    const r = tabs[i].getBoundingClientRect();
+    if (x < r.left + r.width / 2) return i;
+  }
+  return tabs.length;
+}
+
+export function startTabDrag(e: PointerEvent, paneId: string, tabId: string, title: string, store: LayoutStore = layout): void {
+  const sourceTabCount = () => findLeaf(get(store), paneId)?.tabs.length ?? 0;
+  const none = { targetId: null, zone: null, index: null, rect: null };
+  runDrag(e, {
+    base: { kind: 'tab', paneId, tabId, title },
+    resolve(x, y) {
+      const el = document.elementFromPoint(x, y);
+      const strip = el?.closest('[data-tab-strip]') as HTMLElement | null;
+      if (strip) {
+        const pane = strip.closest('[data-pane-id]') as HTMLElement | null;
+        if (!pane?.dataset.paneId) return none;
+        const r = strip.getBoundingClientRect();
+        return {
+          targetId: pane.dataset.paneId,
+          zone: 'center' as DropZone,
+          index: tabInsertIndex(strip, x),
+          rect: { x: r.left, y: r.top, w: r.width, h: r.height },
+        };
+      }
+      const pane = el?.closest('[data-pane-id]') as HTMLElement | null;
+      if (pane?.dataset.paneId) {
+        const r = pane.getBoundingClientRect();
+        const rect = { x: r.left, y: r.top, w: r.width, h: r.height };
+        const zone = zoneAt(rect, x, y);
+        if (pane.dataset.paneId === paneId && (zone === 'center' || sourceTabCount() <= 1)) return none;
+        return { targetId: pane.dataset.paneId, zone, index: null, rect };
+      }
+      return none;
+    },
+    commit(t) {
+      if (!t.targetId || !t.zone) return;
+      if (t.targetId === paneId) {
+        if (t.zone === 'center' && t.index === null) return;
+        if (t.zone !== 'center' && sourceTabCount() <= 1) return;
+      }
+      store.moveTab(paneId, tabId, t.targetId, t.zone, t.index ?? undefined);
+    },
   });
 }

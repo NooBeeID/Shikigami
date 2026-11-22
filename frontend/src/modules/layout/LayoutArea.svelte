@@ -38,16 +38,29 @@
   }
 
   function hostSlot(node: HTMLElement, p: { tab: Tab; paneId: string; visible: boolean }) {
+    let raf = 0;
+    function refit() {
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        raf = requestAnimationFrame(() => {
+          raf = 0;
+          window.dispatchEvent(new Event('resize'));
+        });
+      });
+    }
     ensureHost(p.tab, p.paneId, p.visible);
     attachHost(p.tab.id, node);
+    refit();
     let id = p.tab.id;
     return {
       update(np: { tab: Tab; paneId: string; visible: boolean }) {
         id = np.tab.id;
         ensureHost(np.tab, np.paneId, np.visible);
         attachHost(np.tab.id, node);
+        refit();
       },
       destroy() {
+        if (raf) cancelAnimationFrame(raf);
         const h = getHost(id);
         if (h && h.parentElement === node) detachHost(id);
       },
