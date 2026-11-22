@@ -3,7 +3,7 @@ import { call, onEvent } from '../../lib/ipc';
 import { layout } from '../../lib/stores/layout';
 import { sessions } from '../../lib/stores/sessions';
 import type { Session } from '../../lib/stores/types';
-import { findLeaf, type LayoutDoc } from '../layout/model';
+import { activeTab, findLeaf, type LayoutDoc } from '../layout/model';
 import type { ReviewFile, ReviewFilesResult, ReviewStatus } from './types';
 
 const EMPTY: ReviewFilesResult = { supported: true, files: [] };
@@ -63,7 +63,8 @@ function reviewSetCount(sessionId: string, n: number) {
 function reviewActiveFromLayout(doc: LayoutDoc): string | null | undefined {
   if (doc.root === null) return null;
   const leaf = doc.focusId ? findLeaf(doc, doc.focusId) : null;
-  if (leaf && leaf.kind === 'terminal' && leaf.sessionId) return leaf.sessionId;
+  const tab = leaf ? activeTab(leaf) : null;
+  if (tab && tab.kind === 'terminal' && tab.sessionId) return tab.sessionId;
   return undefined;
 }
 
