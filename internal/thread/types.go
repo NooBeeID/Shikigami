@@ -78,6 +78,9 @@ type ThreadMessage struct {
 	Text     string    `json:"text"`
 	TS       time.Time `json:"ts"`
 	Kind     string    `json:"kind"`
+	// Field di bawah ditambah epic thread-ticket-03 (kartu aktivitas).
+	Count int      `json:"count,omitempty"` // hanya kind=activity: jumlah aksi yang digabung
+	Items []string `json:"items,omitempty"` // hanya kind=activity: ringkasan per aksi (maks 50 terbaru), tanpa awalan nama
 }
 
 type CreateParams struct {

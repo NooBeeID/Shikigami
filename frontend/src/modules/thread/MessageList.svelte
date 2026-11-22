@@ -1,6 +1,8 @@
 <script lang="ts">
   import { tick } from 'svelte';
   import MessageItem from './MessageItem.svelte';
+  import { ActivityFlowItem, groupActivity } from './activity';
+  import { participantName } from './thread-store';
   import type { Thread, ThreadMessage } from './types';
 
   let { thread, messages }: { thread: Thread; messages: ThreadMessage[] } = $props();
@@ -9,6 +11,12 @@
   let stick = $state(true);
   let unseen = $state(false);
   let lastCount = 0;
+
+  const flow = $derived(groupActivity(messages, (id) => participantName(thread, id)));
+  const marker = $derived.by(() => {
+    const lastItem = flow[flow.length - 1];
+    return flow.length + (lastItem && lastItem.type === 'activity' ? lastItem.count : 0);
+  });
 
   function onscroll() {
     if (!el) return;
@@ -24,7 +32,7 @@
   }
 
   $effect(() => {
-    const n = messages.length;
+    const n = marker;
     const grew = n > lastCount;
     const first = lastCount === 0;
     lastCount = n;
@@ -40,8 +48,12 @@
 </script>
 
 <div class="list" bind:this={el} {onscroll}>
-  {#each messages as m (m.id)}
-    <MessageItem {thread} message={m} />
+  {#each flow as item (item.key)}
+    {#if item.type === 'activity'}
+      <ActivityFlowItem {thread} group={item} />
+    {:else}
+      <MessageItem {thread} message={item.message} />
+    {/if}
   {:else}
     <div class="empty">Belum ada pesan</div>
   {/each}

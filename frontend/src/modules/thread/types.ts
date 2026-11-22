@@ -9,6 +9,9 @@ export interface Thread {
 }
 export interface ThreadMessage {
   id: string; threadId: string; from: string; to: string; text: string; ts: string; kind: ThreadKind;
+  // Ditambah epic thread-ticket-03.
+  count?: number;   // hanya kind 'activity'
+  items?: string[]; // hanya kind 'activity'
 }
 export const THREAD_METHODS = {
   create: 'thread.create', list: 'thread.list', get: 'thread.get',

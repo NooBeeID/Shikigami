@@ -217,5 +217,14 @@ func wireThread(srv *ipc.Server, d *Deps) {
 	}); err != nil {
 		d.Logger.Warn("thread: gagal memasang tool agent", "err", err)
 	}
+	if v, ok := d.Lookup("status.engine"); ok {
+		if eng, ok2 := v.(*status.Engine); ok2 && eng != nil {
+			thread.InstallActivity(m, eng)
+		} else {
+			d.Logger.Warn("thread: status.engine bertipe tak terduga, kartu aktivitas dinonaktifkan")
+		}
+	} else {
+		d.Logger.Warn("thread: status.engine tidak tersedia, kartu aktivitas dinonaktifkan")
+	}
 	m.FireStart()
 }
