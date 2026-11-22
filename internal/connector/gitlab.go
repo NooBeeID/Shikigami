@@ -83,7 +83,7 @@ func (gitlabConnector) Name() string { return "GitLab" }
 // Status membaca `glab auth status` dan memetakannya ke State.
 // Tidak menyimpan cache dan tidak memuat output mentah CLI.
 func (gitlabConnector) Status(ctx context.Context) (Status, error) {
-	out, err := RunCLI(ctx, "glab", "auth", "status")
+	out, err := RunCLICombined(ctx, "glab", "auth", "status")
 	text := out
 	if err != nil {
 		if IsCLIMissing(err) {

@@ -24,7 +24,7 @@ func (githubConnector) Name() string { return "GitHub" }
 // Status membaca `gh auth status` dan memetakannya ke State.
 // Tidak menyimpan cache dan tidak memuat output mentah CLI.
 func (githubConnector) Status(ctx context.Context) (Status, error) {
-	out, err := RunCLI(ctx, "gh", "auth", "status")
+	out, err := RunCLICombined(ctx, "gh", "auth", "status")
 	text := out
 	if err != nil {
 		if IsCLIMissing(err) {

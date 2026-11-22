@@ -52,6 +52,16 @@ func RunCLI(ctx context.Context, name string, args ...string) (string, error) {
 
 // RunCLITimeout seperti RunCLI tetapi dengan batas waktu eksplisit.
 func RunCLITimeout(ctx context.Context, timeout time.Duration, name string, args ...string) (string, error) {
+	return runCLI(ctx, timeout, false, name, args...)
+}
+
+// RunCLICombined seperti RunCLI tetapi menggabungkan stdout dan stderr pada
+// sukses. Dipakai untuk CLI yang menulis status ke stderr (glab auth status).
+func RunCLICombined(ctx context.Context, name string, args ...string) (string, error) {
+	return runCLI(ctx, cliTimeout, true, name, args...)
+}
+
+func runCLI(ctx context.Context, timeout time.Duration, combine bool, name string, args ...string) (string, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
@@ -66,6 +76,9 @@ func RunCLITimeout(ctx context.Context, timeout time.Duration, name string, args
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	if err == nil {
+		if combine {
+			return stdout.String() + stderr.String(), nil
+		}
 		return stdout.String(), nil
 	}
 	if errors.Is(err, exec.ErrNotFound) || errors.Is(err, os.ErrNotExist) {
