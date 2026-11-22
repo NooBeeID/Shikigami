@@ -98,7 +98,7 @@ func identityOf(kind Kind, toolInput map[string]any) string {
 	}
 	if t, ok := args["ticket"].(string); ok && t != "" {
 		t = t[strings.LastIndex(t, "/")+1:]
-		return strings.TrimSuffix(t, ".md")
+		return truncate(strings.TrimSuffix(t, ".md"), 40)
 	}
 	keys := make([]string, 0, len(args))
 	for k := range args {
@@ -283,7 +283,9 @@ func (r *Registry) List(sessionIDs map[string]bool) []Run {
 		if sessionIDs != nil && !sessionIDs[run.SessionID] {
 			continue
 		}
-		out = append(out, *run)
+		c := *run
+		c.Progress = copyProgress(run.Progress)
+		out = append(out, c)
 	}
 	sort.Slice(out, func(i, j int) bool {
 		if out[i].StartedAt != out[j].StartedAt {
@@ -335,7 +337,7 @@ func (r *Registry) MarkConfirmed(id string, p *Progress) {
 	defer r.mu.Unlock()
 	if run, ok := r.runs[id]; ok {
 		run.Confirmed = true
-		run.Progress = p
+		run.Progress = copyProgress(p)
 	}
 }
 
@@ -345,4 +347,16 @@ func jsonString(v any) string {
 		return ""
 	}
 	return string(b)
+}
+
+// copyProgress menyalin Progress beserta Agents agar tidak berbagi state.
+func copyProgress(p *Progress) *Progress {
+	if p == nil {
+		return nil
+	}
+	c := *p
+	if p.Agents != nil {
+		c.Agents = append([]AgentLine(nil), p.Agents...)
+	}
+	return &c
 }

@@ -242,3 +242,30 @@ func TestRemoveAndMarkConfirmed(t *testing.T) {
 		t.Fatal("remove")
 	}
 }
+
+func TestIdentityLongTicketTruncates(t *testing.T) {
+	got := identityOf(KindWorkflow, map[string]any{"args": map[string]any{"ticket": strings.Repeat("x", 200)}})
+	if utf8.RuneCountInString(got) > 40 || !strings.HasSuffix(got, "…") {
+		t.Fatalf("got %q", got)
+	}
+}
+
+func TestProgressNotAliased(t *testing.T) {
+	r := NewRegistry()
+	apply(r, "s1", fixture(t, "pretooluse_workflow.json"))
+	id := r.List(nil)[0].ID
+	in := &Progress{PhaseTitle: "a", Done: 1, Total: 2, Agents: []AgentLine{{Label: "x"}}}
+	r.MarkConfirmed(id, in)
+	in.Done = 99
+	in.Agents[0].Label = "diubah"
+	l := r.List(nil)
+	if l[0].Progress.Done != 1 || l[0].Progress.Agents[0].Label != "x" {
+		t.Fatalf("state terpengaruh caller: %+v", l[0].Progress)
+	}
+	l[0].Progress.Done = 77
+	l[0].Progress.Agents[0].Label = "diubah2"
+	again := r.List(nil)[0].Progress
+	if again.Done != 1 || again.Agents[0].Label != "x" {
+		t.Fatalf("state terpengaruh hasil List: %+v", again)
+	}
+}
