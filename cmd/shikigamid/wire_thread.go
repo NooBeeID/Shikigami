@@ -227,5 +227,26 @@ func wireThread(srv *ipc.Server, d *Deps) {
 		d.Logger.Warn("thread: status.engine tidak tersedia, kartu aktivitas dinonaktifkan")
 	}
 	thread.RegisterClose(m)
+	rec := thread.NewRecovery(m)
+	m.SetPreSend(rec.PreSend)
+	m.OnStart(func(*thread.Manager) {
+		if err := rec.MarkDeadOnStart(); err != nil {
+			d.Logger.Warn("thread: gagal menandai agent mati saat start", "err", err)
+		}
+	})
+	m.OnStart(func(mm *thread.Manager) {
+		go func() {
+			defer func() {
+				if r := recover(); r != nil {
+					d.Logger.Error("thread: panic pembersihan yatim", "panic", r)
+				}
+			}()
+			if n, err := thread.CleanOrphans(mm); err != nil {
+				d.Logger.Warn("thread: pembersihan yatim selesai dengan galat", "cleaned", n, "err", err)
+			} else if n > 0 {
+				d.Logger.Info("thread: pembersihan yatim selesai", "cleaned", n)
+			}
+		}()
+	})
 	m.FireStart()
 }

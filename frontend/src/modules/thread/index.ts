@@ -7,6 +7,7 @@ import ThreadTab from './ThreadTab.svelte';
 import { subscribeThreadEvents } from './thread-store';
 import { installParticipants } from './participants';
 import { installClose } from './close';
+import { installRecovery } from './recovery';
 
 registerPaneKind({ kind: 'thread', component: ThreadPane, titleFor: (leaf) => leaf.title || 'Thread' });
 registerSidebarSection({ id: 'thread-sidebar', component: ThreadSection, order: 0 });
@@ -14,6 +15,7 @@ registerTabType({ type: 'thread', component: ThreadTab }); // jalur legacy; tida
 subscribeThreadEvents();
 installParticipants();
 installClose();
+installRecovery();
 
 export { registerThreadSlot } from './slots';
 export type { ThreadSlotName } from './slots';

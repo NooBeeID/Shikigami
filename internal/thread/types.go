@@ -68,6 +68,9 @@ type Participant struct {
 	ProjectID string `json:"projectId"` // kosong untuk master
 	Role      string `json:"role"`
 	Name      string `json:"name"`
+	// Ditambah epic thread-ticket-05 (pemulihan).
+	Dead               bool     `json:"dead,omitempty"`
+	PreviousSessionIDs []string `json:"previousSessionIds,omitempty"`
 }
 
 // ThreadMessage adalah satu baris log pesan. From: "user", sessionId, atau "system";

@@ -109,7 +109,7 @@ export function participantName(thread: Thread | undefined, id: string): string 
   if (id === 'user') return 'user';
   if (id === 'system') return 'sistem';
   if (id === 'all') return 'semua';
-  const p = thread?.participants.find((x) => x.sessionId === id);
+  const p = thread?.participants.find((x) => x.sessionId === id || x.previousSessionIds?.includes(id));
   if (p) {
     if (p.name) return p.name;
     if (p.role === 'master') return 'master';

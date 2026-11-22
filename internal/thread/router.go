@@ -155,6 +155,23 @@ func (r *routerImpl) Route(ctx context.Context, threadID, from, to, text string)
 	if err != nil {
 		return ThreadMessage{}, err
 	}
+	if len(targets) > 0 {
+		ids := make([]string, 0, len(targets))
+		for _, tg := range targets {
+			ids = append(ids, tg.SessionID)
+		}
+		if rep := r.mgr.runPreSend(threadID, ids); len(rep) > 0 {
+			targets = append([]Participant(nil), targets...)
+			for i := range targets {
+				if n := rep[targets[i].SessionID]; n != "" {
+					targets[i].SessionID = n
+				}
+			}
+			if n := rep[logTo]; n != "" {
+				logTo = n
+			}
+		}
+	}
 	rec, err := r.mgr.Post(threadID, ThreadMessage{From: from, To: logTo, Text: text, Kind: KindMessage})
 	if err != nil {
 		return ThreadMessage{}, err

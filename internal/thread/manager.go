@@ -118,6 +118,7 @@ type Manager struct {
 	onMessage          []func(Thread, ThreadMessage)
 	onParticipantAdded []func(Thread, Participant)
 	onClose            []func(Thread)
+	preSend            PreSendHook
 
 	lockMu sync.Mutex
 	locks  map[string]*sync.Mutex // mutex per thread untuk baca-ubah-simpan
@@ -456,6 +457,11 @@ func (m *Manager) Send(threadID, text string) (ThreadMessage, error) {
 		return ThreadMessage{}, ErrClosed
 	}
 	master, hasMaster := managerMaster(t)
+	if hasMaster {
+		if rep := m.runPreSend(threadID, []string{master.SessionID}); rep[master.SessionID] != "" {
+			master.SessionID = rep[master.SessionID]
+		}
+	}
 	to := ToAll
 	if hasMaster {
 		to = master.SessionID

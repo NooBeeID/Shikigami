@@ -2,7 +2,8 @@
 export type ThreadState = 'active' | 'closed';
 export type ThreadRole = 'master' | 'peer';
 export type ThreadKind = 'message' | 'system' | 'activity';
-export interface Participant { sessionId: string; projectId: string; role: ThreadRole; name: string }
+// dead/previousSessionIds ditambah epic thread-ticket-05
+export interface Participant { sessionId: string; projectId: string; role: ThreadRole; name: string; dead?: boolean; previousSessionIds?: string[] }
 export interface Thread {
   id: string; workspaceId: string; title: string; goal: string; state: ThreadState;
   createdAt: string; closedAt?: string; participants: Participant[]; readyToClose: boolean;
@@ -24,3 +25,7 @@ export const FROM_USER = 'user';
 export const FROM_SYSTEM = 'system';
 export const TO_USER = 'user';
 export const TO_ALL = 'all';
+
+export const RECOVERY_DEAD_NOTICE = 'daemon dimulai ulang: agent mati, akan dihidupkan saat pesan berikutnya';
+export const RECOVERY_RESPAWN_PREFIX = 'agent dihidupkan ulang: ';
+export const RECOVERY_FAILED_PREFIX = 'gagal menghidupkan ulang agent: ';
