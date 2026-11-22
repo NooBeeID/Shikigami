@@ -2,7 +2,7 @@
 id: welcome-screen-ticket-02-welcome-screen
 title: Layar welcome dan terakhir dibuka
 spec: docs/superpowers/specs/2026-11-22-welcome-screen-design.md
-status: ready
+status: implemented
 wave: 2
 depends_on: [welcome-screen-ticket-01-session-workspaces]
 ---

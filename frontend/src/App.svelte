@@ -2,8 +2,9 @@
   import './styles/theme.css';
   import './styles/base.css';
   import { onMount, onDestroy } from 'svelte';
-  import { connection, initStores } from './lib/stores';
+  import { connection, initStores, activeWorkspaceId } from './lib/stores';
   import LayoutArea from './modules/layout/LayoutArea.svelte';
+  import { Welcome } from './modules/welcome';
   import { ShellFrame, RightPanel } from './modules/shell';
   import './modules/shell/register';
   import Topbar from './modules/topbar/Topbar.svelte';
@@ -39,7 +40,7 @@
   <ShellFrame>
     {#snippet topbar()}<Topbar />{/snippet}
     {#snippet left()}<RailPanelHost />{/snippet}
-    {#snippet center()}<LayoutArea />{/snippet}
+    {#snippet center()}{#if $activeWorkspaceId === null}<Welcome />{:else}<LayoutArea />{/if}{/snippet}
     {#snippet right()}<RightPanel />{/snippet}
   </ShellFrame>
   <Palette />
