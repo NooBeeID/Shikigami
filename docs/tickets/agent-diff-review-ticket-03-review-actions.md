@@ -2,7 +2,7 @@
 id: agent-diff-review-ticket-03-review-actions
 title: Review: revert, terima, dan deteksi perubahan lain
 spec: docs/superpowers/specs/2026-11-22-agent-diff-review-design.md
-status: ready
+status: implemented
 wave: 3
 depends_on: [agent-diff-review-ticket-02-review-diff]
 ---

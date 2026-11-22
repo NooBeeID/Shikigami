@@ -4,10 +4,12 @@
   import { sessions } from '../../lib/stores/sessions';
   import { activeTab, findLeaf } from '../layout/model';
   import { openFilePane } from '../shell/helpers';
-  import { reviewFiles } from './store';
+  import { reviewFiles, refreshReview } from './store';
   import type { ReviewFile, ReviewStatus } from './types';
-  import { fetchDiff, type DiffResult } from './diff';
+  import { fetchDiff, type DiffResult, type Hunk } from './diff';
   import DiffView from './DiffView.svelte';
+  import HunkActions, { type ReviewActionResult } from './HunkActions.svelte';
+  import { attachReviewKeys } from './keys';
 
   let { onselect }: { onselect?: (file: ReviewFile) => void } = $props();
 
@@ -66,7 +68,72 @@
 
   const selectedFile = $derived(selectedPath === null ? null : (result.files.find((f) => f.path === selectedPath) ?? null));
 
+  let selectedHunkIndex = $state(0);
+  let diffPaneEl: HTMLElement | undefined = $state();
+  let hunkRefs = $state<Record<string, HunkActions | undefined>>({});
+  let fileActions: HunkActions | undefined = $state();
+  const selectedHunk = $derived(diffData?.hunks[selectedHunkIndex] ?? null);
+
+  // Clamp indeks hunk terpilih dan bersihkan registri basi saat diff berubah.
+  $effect(() => {
+    const hunks = diffData?.hunks ?? [];
+    untrack(() => {
+      const max = Math.max(0, hunks.length - 1);
+      if (selectedHunkIndex > max) selectedHunkIndex = max;
+      const ids = new Set(hunks.map((h) => h.id));
+      for (const k of Object.keys(hunkRefs)) if (!ids.has(k)) delete hunkRefs[k];
+    });
+  });
+
+  async function moveHunk(delta: number) {
+    const n = diffData?.hunks.length ?? 0;
+    if (n === 0 || !selectedHunk) return;
+    hunkRefs[selectedHunk.id]?.cancel();
+    selectedHunkIndex = Math.min(n - 1, Math.max(0, selectedHunkIndex + delta));
+    await tick();
+    if (!selectedHunk) return;
+    diffPaneEl?.querySelector(`[data-hunk-id="${CSS.escape(selectedHunk.id)}"]`)?.scrollIntoView({ block: 'nearest' });
+  }
+
+  function curRef(): HunkActions | undefined {
+    return selectedHunk ? hunkRefs[selectedHunk.id] : undefined;
+  }
+
+  $effect(() => {
+    const el = diffPaneEl;
+    if (!el) return;
+    return attachReviewKeys({
+      target: el,
+      next: () => void moveHunk(1),
+      prev: () => void moveHunk(-1),
+      accept: () => void curRef()?.accept(),
+      revert: () => {
+        const r = curRef();
+        if (!r) return;
+        if (r.isPending()) void r.confirmRevert();
+        else r.startRevert();
+      },
+      confirm: () => void curRef()?.confirmRevert(),
+      cancel: () => curRef()?.cancel(),
+      isConfirming: () => curRef()?.isPending() === true,
+    });
+  });
+
+  async function onActionDone(r: ReviewActionResult) {
+    const sid = sessionId;
+    if (!sid) return;
+    const idx = visible.findIndex((f) => f.path === selectedPath);
+    const nextPath = r.removed ? ((visible[idx + 1] ?? visible[idx - 1])?.path ?? null) : null;
+    await Promise.all([loadDiff({ silent: true }), refreshReview(sid)]);
+    if (r.removed) {
+      const next = nextPath ? $reviewFiles.files.find((f) => f.path === nextPath) : undefined;
+      if (next) openDiff(next);
+      else await backToList();
+    }
+  }
+
   function openDiff(f: ReviewFile) {
+    selectedHunkIndex = 0;
     savedScroll = listEl?.scrollTop ?? 0;
     selectedPath = f.path;
     diffData = null;
@@ -132,6 +199,11 @@
   }
 </script>
 
+{#snippet hunkActions(h: Hunk)}
+  <HunkActions bind:this={hunkRefs[h.id]} scope="hunk" hunk={h} sessionId={sessionId!} path={selectedPath!}
+    currentHash={diffData!.currentHash} external={selectedFile?.external ?? false} onDone={onActionDone} />
+{/snippet}
+
 <div class="review">
   {#if !result.supported}
     <div class="empty">Provider sesi ini tidak mendukung review perubahan</div>
@@ -165,6 +237,7 @@
                 {#if f.reviewed}<span class="done" title="Sudah ditinjau" aria-label="Sudah ditinjau">&#10003;</span>{/if}
                 {#if f.binary}<span class="tag" title="File biner">biner</span>{/if}
                 {#if f.tooLarge}<span class="tag" title="File terlalu besar">terlalu besar</span>{/if}
+                {#if f.external}<span class="tag ext" title="File diubah di luar agent">perubahan lain</span>{/if}
               </button>
               <button class="open" type="button" aria-label="Buka file {f.path}" title="Buka file" disabled={!session} onclick={(e) => openInPane(f, e)}>
                 <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M9 2h5v5M14 2L7 9M12 10v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3"/></svg>
@@ -175,12 +248,18 @@
       {/if}
     </div>
     {#if selectedPath !== null}
-      <div class="diffpane">
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+      <div class="diffpane" bind:this={diffPaneEl} tabindex="0">
         <div class="dhead">
           <button class="back" type="button" aria-label="Kembali ke daftar" onclick={backToList}>&lt; Kembali</button>
           <span class="dpath" title={selectedPath}>{selectedPath}</span>
           {#if selectedFile && !selectedFile.binary && !selectedFile.tooLarge}
             <span class="stat"><span class="plus">+{selectedFile.additions}</span> <span class="minus">-{selectedFile.deletions}</span></span>
+          {/if}
+          {#if selectedFile?.external}<span class="tag ext" title="File diubah di luar agent">perubahan lain</span>{/if}
+          {#if diffData && selectedFile}
+            <HunkActions bind:this={fileActions} scope="file" sessionId={sessionId!} path={selectedPath}
+              currentHash={diffData.currentHash} external={selectedFile.external} onDone={onActionDone} />
           {/if}
           <button class="open" type="button" aria-label="Buka file" title="Buka file" disabled={!session} onclick={(e) => openInPane(selectedPath!, e)}>
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M9 2h5v5M14 2L7 9M12 10v3a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h3"/></svg>
@@ -193,7 +272,7 @@
           </div>
         {/if}
         {#if diffData}
-          <DiffView diff={diffData} path={selectedPath} />
+          <DiffView diff={diffData} path={selectedPath} selectedHunkId={selectedHunk?.id} {hunkActions} />
         {:else if diffLoading}
           <div class="empty">Memuat diff...</div>
         {/if}
@@ -220,6 +299,8 @@
   .name { font-weight: 600; flex: none; }
   .dir { color: var(--fg-muted, #888); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .done { color: var(--ok, #16a34a); flex: none; }
+  .tag.ext { color: var(--warn, #d97706); }
+  .diffpane:focus-visible { outline: 1px solid color-mix(in srgb, var(--accent, currentColor) 50%, transparent); outline-offset: -1px; }
   .tag { color: var(--fg-muted, #888); font-size: 11px; flex: none; }
   .empty { flex: 1; display: flex; align-items: center; justify-content: center; padding: 12px; text-align: center; color: var(--fg-muted, #888); font-size: 14px; }
   .listpane { display: flex; flex-direction: column; flex: 1; min-height: 0; }

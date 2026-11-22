@@ -4,17 +4,19 @@
   - hunkActions: Snippet<[Hunk]> (nama slot publik `hunk-actions`), dirender di kanan header hunk.
   - footer: Snippet (nama slot publik `footer`), dirender di bawah semua hunk/pesan status.
   - onLineClick: callback klik baris.
+  - selectedHunkId: id hunk yang disorot (kelas `selected`, atribut data-hunk-id pada header hunk).
 -->
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import { hunkSummary, type DiffLine, type DiffResult, type Hunk } from './diff';
 
-  let { diff, path, onLineClick, hunkActions, footer }: {
+  let { diff, path, onLineClick, hunkActions, footer, selectedHunkId }: {
     diff: DiffResult;
     path: string;
     onLineClick?: (line: DiffLine, hunk: Hunk) => void;
     hunkActions?: Snippet<[Hunk]>;
     footer?: Snippet;
+    selectedHunkId?: string;
   } = $props();
 
   const status = $derived(
@@ -42,7 +44,7 @@
   {:else}
     <div class="diff" aria-label="Diff {path}">
       {#each diff.hunks as h, i (h.id + ':' + i)}
-        <div class="hunk-head">
+        <div class="hunk-head" class:selected={h.id === selectedHunkId} data-hunk-id={h.id}>
           <span class="range">@@ -{h.oldStart},{h.oldLines} +{h.newStart},{h.newLines} @@</span>
           <span class="sum">{hunkSummary(h)}</span>
           {#if hunkActions}<span class="actions">{@render hunkActions(h)}</span>{/if}
@@ -72,6 +74,7 @@
   .empty { flex: 1; display: flex; align-items: center; justify-content: center; padding: 12px; text-align: center; color: var(--fg-muted, #888); font-size: 14px; }
   .diff { flex: 1; min-height: 0; overflow: auto; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
   .hunk-head { display: flex; align-items: center; gap: 12px; min-width: max-content; padding: 2px 8px; background: color-mix(in srgb, var(--accent, currentColor) 8%, transparent); border-bottom: 1px solid var(--border, color-mix(in srgb, currentColor 20%, transparent)); color: var(--fg-muted, #888); }
+  .hunk-head.selected { background: color-mix(in srgb, var(--accent, currentColor) 22%, transparent); box-shadow: inset 2px 0 0 var(--accent, currentColor); }
   .actions { margin-left: auto; display: inline-flex; gap: 4px; }
   .line { display: flex; min-width: max-content; white-space: pre; line-height: 18px; }
   .line.add { background: color-mix(in srgb, var(--ok, #16a34a) 15%, transparent); }
