@@ -57,3 +57,44 @@ func TestHookListenerCancel(t *testing.T) {
 		t.Fatalf("n = %d, want 1", n)
 	}
 }
+
+func TestExitListenerFiresEvenWhenAlreadyDone(t *testing.T) {
+	e := newListenerEngine()
+	if err := e.Apply("s1", "Stop", nil); err != nil {
+		t.Fatal(err)
+	}
+	if st, _ := e.Get("s1"); st.Status != StatusDone {
+		t.Fatalf("status = %v, want done", st.Status)
+	}
+	var got []string
+	e.AddExitListener(func(id string) { got = append(got, id) })
+	e.handleExit("s1")
+	if len(got) != 1 || got[0] != "s1" {
+		t.Fatalf("got %v", got)
+	}
+}
+
+func TestExitListenerPanicIsContained(t *testing.T) {
+	e := newListenerEngine()
+	_ = e.Apply("s1", "Stop", nil)
+	called := false
+	e.AddExitListener(func(string) { panic("boom") })
+	e.AddExitListener(func(string) { called = true })
+	e.handleExit("s1")
+	if _, ok := e.states["s1"]; ok {
+		t.Fatal("Forget tidak jalan setelah panic")
+	}
+	_ = called // urutan map acak; yang dijamin: tidak panic keluar
+}
+
+func TestExitListenerCancel(t *testing.T) {
+	e := newListenerEngine()
+	n := 0
+	cancel := e.AddExitListener(func(string) { n++ })
+	cancel()
+	cancel()
+	e.handleExit("s1")
+	if n != 0 {
+		t.Fatalf("n = %d", n)
+	}
+}

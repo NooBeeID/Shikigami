@@ -31,10 +31,10 @@ func init() {
 					publish(sessionID)
 				}
 			})
-			eng.Subscribe(func(ev status.StatusEvent) {
-				if ev.Source == status.SourceExit {
-					reg.Forget(ev.SessionID)
-					publish(ev.SessionID)
+			// Listener exit (bukan event status): tetap jalan walau sesi sudah Done lewat Stop.
+			eng.AddExitListener(func(sessionID string) {
+				if reg.Forget(sessionID) {
+					publish(sessionID)
 				}
 			})
 		})

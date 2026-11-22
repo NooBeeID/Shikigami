@@ -5,12 +5,18 @@ import (
 	"encoding/json"
 
 	"github.com/NooBeeID/shikigami/internal/ipc"
+	"github.com/NooBeeID/shikigami/internal/session"
 	"github.com/NooBeeID/shikigami/internal/status"
 )
 
+// sessionLookup dipenuhi *status.Engine.
+type sessionLookup interface {
+	Lookup(sessionID string) (session.Session, bool)
+}
+
 // SessionIDsOfWorkspace membangun himpunan ID sesi milik workspace dari sesi
 // yang dikenal registry dan di-resolve Engine ke workspace itu.
-func SessionIDsOfWorkspace(reg *Registry, eng *status.Engine, workspaceID string) map[string]bool {
+func SessionIDsOfWorkspace(reg *Registry, eng sessionLookup, workspaceID string) map[string]bool {
 	set := map[string]bool{}
 	for _, run := range reg.List(nil) {
 		if set[run.SessionID] {
