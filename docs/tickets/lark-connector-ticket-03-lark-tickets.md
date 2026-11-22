@@ -2,7 +2,7 @@
 id: lark-connector-ticket-03-lark-tickets
 title: Tiket Base grid dan kanban
 spec: docs/superpowers/specs/2026-11-22-09-lark-connector-design.md
-status: ready
+status: implemented
 wave: 3
 depends_on: [lark-connector-ticket-02-lark-sources]
 ---

@@ -2,7 +2,7 @@
 id: lark-connector-ticket-04-lark-wiki
 title: Wiki pohon dan penampil dokumen
 spec: docs/superpowers/specs/2026-11-22-09-lark-connector-design.md
-status: ready
+status: implemented
 wave: 3
 depends_on: [lark-connector-ticket-02-lark-sources]
 ---
