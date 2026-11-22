@@ -19,17 +19,19 @@ import (
 var installOnce sync.Once
 
 // hookEvents adalah event hook Claude yang dipasang (8): lima event status lama
-// ditambah PreToolUse, SubagentStart, dan SubagentStop untuk registry runs.
-// ClassifyEvent hanya mengenal lima event lama; tiga yang baru tidak mengubah status.
+// ditambah PreToolUse, SubagentStart, dan SubagentStop untuk registry runs dan review.
+// ClassifyEvent tetap hanya mengenal lima event status lama, sehingga PreToolUse
+// (termasuk untuk tool edit) tidak mengubah status.
 var hookEvents = []string{
 	HookUserPromptSubmit, HookNotification, HookStop, HookSessionStart, HookPostToolUse,
 	HookPreToolUse, HookSubagentStart, HookSubagentStop,
 }
 
-// preToolUseMatcher membatasi PreToolUse ke tool Workflow dan Agent (matcher Claude
-// adalah regex atas nama tool), sehingga proses shikigamictl tidak dijalankan pada
-// setiap pemanggilan tool.
-const preToolUseMatcher = "Workflow|Agent"
+// preToolUseMatcher membatasi PreToolUse ke tool Workflow dan Agent (registry runs)
+// serta tool edit Edit, Write, MultiEdit, NotebookEdit (baseline review). Matcher
+// Claude adalah regex atas nama tool, sehingga proses shikigamictl tidak dijalankan
+// pada tool lain.
+const preToolUseMatcher = "Workflow|Agent|Edit|Write|MultiEdit|NotebookEdit"
 
 // newToken membuat launch token acak (16 hex).
 func newToken() (string, error) {
@@ -71,7 +73,8 @@ func hooksFilePath(dataDir, token string) string {
 
 // writeHooksFile menulis berkas hooks per sesi untuk Claude dan mengembalikan path-nya.
 // Semua event di hookEvents dipasang tanpa matcher, kecuali PreToolUse yang memakai
-// preToolUseMatcher.
+// preToolUseMatcher (tool Workflow, Agent, dan tool edit). ClassifyEvent tetap hanya
+// mengenal lima event status lama sehingga PreToolUse tool edit tidak mengubah status.
 //
 // Verifikasi skema (2026-11-22): `claude --help` pada mesin ini mengonfirmasi
 // flag `--settings <file-or-json>` ("Settings file or JSON string to load more

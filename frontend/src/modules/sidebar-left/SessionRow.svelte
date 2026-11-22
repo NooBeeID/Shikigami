@@ -4,6 +4,7 @@
   import { layout } from '../../lib/stores/layout';
   import { focusOrOpenSession, sessionTitle } from '../shell';
   import StatusBadge from '../status/StatusBadge.svelte';
+  import { ReviewBadge } from '../review';
   import { errMessage } from '../workspace/errors';
   import { sessionMenuItems } from './registry';
 
@@ -68,6 +69,7 @@
   <button type="button" class="main" onclick={openIt} title={title}>
     <StatusBadge sessionId={session.id} compact />
     <span class="title">{title}</span>
+    <ReviewBadge sessionId={session.id} />
     <span class="prov">{badge}</span>
     {#if inLayout}<span class="in" title="Tampil di layout" aria-label="Tampil di layout"></span>{/if}
   </button>
