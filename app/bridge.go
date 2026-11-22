@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"sync"
 
 	"github.com/NooBeeID/shikigami/internal/appconfig"
@@ -188,6 +189,12 @@ func (b *Bridge) Close() error {
 		return err
 	}
 	return nil
+}
+
+// AppPID mengembalikan PID proses app, dipakai frontend sebagai appPid
+// untuk resource.snapshot.
+func (b *Bridge) AppPID() int {
+	return os.Getpid()
 }
 
 // SetPageZoom mengatur zoom native webview; percent dibatasi 50-300.

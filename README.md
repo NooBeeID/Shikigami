@@ -19,6 +19,7 @@ Status: sembilan tiket pertama (fase 0–3 di spec) sudah ter-merge dan build lu
 - **Baca dan tulis file**: tree project (dimuat per folder), tab viewer, dan editor teks polos dengan simpan Cmd+S. `.txt` dan `.md` tampil dengan markdown view; jenis lain sebagai teks. File biner ditolak. Ada peringatan bila file berubah di disk saat tab terbuka.
 - **Status sesi**: berjalan / menunggu / selesai / idle, berbasis event hooks provider (bukan polling), dengan notifikasi di UI.
 - **Mention antar sesi**: dari user lewat UI (`@nama-sesi`, kirim dengan Cmd/Ctrl+Enter), dan dari agent lewat server MCP lokal (`list_sessions`, `send_message`, `read_output`). Pesan masuk antrean dan dikirim saat sesi target idle. Mode pengiriman dari agent: `auto`, `confirm_agent` (default), `user_only`.
+- **Monitor resource**: CPU dan memori total proses Shikigami tampil di bilah atas; klik untuk rincian per proses: daemon, app (termasuk WebKit), dan tiap sesi. Diukur tiap 5 detik, hanya saat jendela terlihat.
 
 Belum ada: knowledge/Grimoire dan penataan project otomatis (fase 4 dan 5 di spec), Windows, syntax highlighting.
 
@@ -138,3 +139,4 @@ Alur kerja memakai custom command di `.claude/commands/`:
 - Daemon yang menggantung bisa menahan startup app (ping tanpa timeout di klien IPC).
 - Target UI "di bawah 200 MB dengan 6 sesi" belum terukur; estimasi 189–212 MB (lihat laporan spike). Ukur ulang dengan banyak tab.
 - Tampilan UI belum diverifikasi secara visual oleh pengembang otomatis; coba langsung di window.
+- Monitor resource memakai API privat macOS (`responsibility_get_pid_responsible_for_pid`, dicari lewat dlsym) untuk menghitung proses WebKit milik app; bila simbol itu hilang, WebKit tidak dihitung (baris App jadi lebih kecil). RSS menghitung halaman bersama, jadi total proses bisa lebih besar dari pemakaian riil. CPU proses yang mulai dan selesai di antara dua sampel tidak terhitung.

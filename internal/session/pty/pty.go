@@ -23,4 +23,6 @@ type PTY interface {
 	// Wait memblok sampai proses selesai. Kode keluar normal = kode proses,
 	// bila di-signal = 128+signal. Hanya boleh dipanggil sekali.
 	Wait() (exitCode int, err error)
+	// Pid mengembalikan PID proses anak; 0 bila belum start.
+	Pid() int
 }

@@ -21,3 +21,9 @@ export function onEvent(topicPrefix: string, fn: (topic: string, payload: unknow
     if (ev && typeof ev.topic === 'string' && ev.topic.startsWith(topicPrefix)) fn(ev.topic, ev.payload);
   });
 }
+
+export function appPid(): Promise<number> {
+  const b = w().go?.main?.Bridge as (WailsBridge & { AppPID?: () => Promise<number> }) | undefined;
+  if (!b?.AppPID) return Promise.reject(new Error('bukan di dalam Wails'));
+  return b.AppPID();
+}

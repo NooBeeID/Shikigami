@@ -82,7 +82,7 @@ Gambar referensi kedua (rail ikon, sidebar kiri dengan workspace/project/grup se
 **Keputusan pembuat (sudah dijawab):**
 - **Grup sesi sebagai tab: MASUK v2.** Tab Development / CI / Services / Experiments dengan jumlah sesi; tiap grup punya layout sendiri. Ini menggantikan "layout bernama" dan menambah satu tingkat di model data (workspace → grup → layout).
 - **Mode tampilan per project: DITUNDA.** v2 membangun split bebas saja; bagian per project yang bisa dilipat (dengan jalankan/hentikan semua) belakangan.
-- **Meter sumber daya (CPU/Memori/Disk): TIDAK masuk v2**, karena bertentangan dengan prinsip tanpa polling.
+- **Meter sumber daya (CPU/Memori): kini masuk v2 dalam bentuk terbatas** (sampling hanya saat jendela terlihat, UI polling tiap 5 detik); lihat `docs/superpowers/specs/2026-11-22-resource-monitor-design.md`. Disk tetap tidak masuk.
 - **Feed aktivitas: MASUK v2 tanpa Approve/Reject.** Tab "Activity" di panel kanan di samping "Files" menampilkan tool call terbaru dari hooks (tiket 08). Tombol Approve/Reject tidak dibuat (lihat bagian 11b: agent selalu berjalan tanpa izin, jadi tidak ada permintaan izin yang perlu disetujui).
 
 **Tidak masuk v2** (calon spec lain): Orchestration (Agent Plan, progres tugas, agent Orchestrator/Coder/Tester), Tasks, composer "Instruct agents" yang menyiarkan ke banyak agent, dan rail ikon navigasi (Agents/Tasks/Knowledge). Ini mengarah ke lapisan orkestrasi dan knowledge/hooks (fase 4–5 spec pertama), dan lebih baik jadi spec v3 setelah v2 stabil.
@@ -177,7 +177,7 @@ Persyaratan **[call]**:
 3. **Layout multi-pane**: pohon pane, split, drag & drop, ubah ukuran, maksimalkan, header pane. Diakhiri dengan ukur ulang memori (gerbang bagian 8).
 4. **Bilah atas dan dua sidebar**: tab workspace, sidebar Agent (kiri) dan File (kanan), pane file di layout, palet perintah (Cmd+K), dan lonceng notifikasi.
 5. **Save workspace**: simpan otomatis layout, pulihkan saat dibuka, "Mulai ulang" untuk sesi yang mati.
-6. **Grup sesi dan feed aktivitas**: tab grup sesi dengan layout sendiri per grup (model workspace → grup → layout; sebaiknya sudah dipertimbangkan sejak fase 3 dan 5 agar data tidak perlu dimigrasi dua kali), dan tab "Activity" (tool call dari hooks, tanpa Approve/Reject). Meter sumber daya dan mode tampilan per project tidak termasuk. Orchestration/Tasks dipisah ke spec v3.
+6. **Grup sesi dan feed aktivitas**: tab grup sesi dengan layout sendiri per grup (model workspace → grup → layout; sebaiknya sudah dipertimbangkan sejak fase 3 dan 5 agar data tidak perlu dimigrasi dua kali), dan tab "Activity" (tool call dari hooks, tanpa Approve/Reject). Mode tampilan per project tidak termasuk; meter sumber daya masuk dalam bentuk terbatas (lihat docs/superpowers/specs/2026-11-22-resource-monitor-design.md). Orchestration/Tasks dipisah ke spec v3.
 
 Urutan 3 dan 4 bisa bertukar atau berjalan paralel bila kontrak layout sudah disepakati; tiket diputuskan oleh `/create-ticket-from-spec`.
 
@@ -187,7 +187,7 @@ Urutan 3 dan 4 bisa bertukar atau berjalan paralel bila kontrak layout sudah dis
 2. **Ikon dan bundle ID**: ikon sementara dibuat otomatis dan bundle ID `id.noobee.shikigami` adalah tebakan saya. Ada desain ikon atau ID yang diinginkan?
 3. **Pane file di layout** (bukan hanya tab): setuju, atau file tetap sebagai tab terpisah?
 4. **Grup sesi sebagai tab** (tiap grup punya layout sendiri, seperti Development / CI / Services di referensi kedua): masuk v2 atau cukup satu layout per workspace dulu?
-5. **Meter sumber daya** (CPU/Memori/Disk di sidebar kiri): masuk v2 dalam bentuk terbatas dan default mati, atau tidak usah?
+5. **Meter sumber daya** (CPU/Memori/Disk di sidebar kiri): **kini masuk v2 dalam bentuk terbatas** (sampling hanya saat jendela terlihat, UI polling tiap 5 detik; lihat `docs/superpowers/specs/2026-11-22-resource-monitor-design.md`).
 6. **Feed aktivitas dan Approve/Reject**: masuk v2 sebagai tab "Activity" (tanpa Approve/Reject dulu, karena belum terbukti), atau seluruhnya dipindah ke spec v3?
 
 **Jawaban pembuat (semua terjawab):**
@@ -195,7 +195,7 @@ Urutan 3 dan 4 bisa bertukar atau berjalan paralel bila kontrak layout sudah dis
 2. Ikon dan ID: **ikon sementara** dan bundle ID **`id.noobee.shikigami`**.
 3. Pane file: **pane di layout**.
 4. Grup sesi sebagai tab: **masuk v2**.
-5. Meter sumber daya: **tidak masuk v2**.
+5. Meter sumber daya: **tidak masuk v2**. (Direvisi 2026-11-22: kini masuk dalam bentuk terbatas; lihat docs/superpowers/specs/2026-11-22-resource-monitor-design.md.)
 6. Feed aktivitas: **masuk v2 tanpa Approve/Reject**.
 7. Mode tampilan per project: **belakangan** (v2 split bebas dulu).
 

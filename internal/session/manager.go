@@ -242,6 +242,22 @@ func (m *Manager) List() []Session {
 	return out
 }
 
+// RunningPids mengembalikan ID sesi -> PID untuk sesi yang masih running.
+func (m *Manager) RunningPids() map[string]int {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	out := make(map[string]int, len(m.sessions))
+	for id, e := range m.sessions {
+		if e.p == nil || !e.running() {
+			continue
+		}
+		if pid := e.p.Pid(); pid > 0 {
+			out[id] = pid
+		}
+	}
+	return out
+}
+
 // Get mengembalikan salinan sesi.
 func (m *Manager) Get(id string) (*Session, error) {
 	e, err := m.lookup(id)

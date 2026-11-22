@@ -74,6 +74,16 @@ func (p *unixPTY) Resize(size Size) error {
 	return cpty.Setsize(m, &cpty.Winsize{Cols: size.Cols, Rows: size.Rows})
 }
 
+// Pid mengembalikan PID proses anak, atau 0 bila belum start.
+func (p *unixPTY) Pid() int {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if p.cmd == nil || p.cmd.Process == nil {
+		return 0
+	}
+	return p.cmd.Process.Pid
+}
+
 func (p *unixPTY) Close() error {
 	p.mu.Lock()
 	if p.closed || p.cmd == nil {
