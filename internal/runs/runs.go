@@ -22,6 +22,8 @@ type AgentLine struct {
 	Label string `json:"label"`
 	Phase string `json:"phase"`
 	Done  bool   `json:"done"`
+	Model string `json:"model,omitempty"`
+	Usage *Usage `json:"usage,omitempty"`
 }
 
 // Progress: workflow = agent selesai/dimulai dari journal; sub agent = checklist.
@@ -30,6 +32,10 @@ type Progress struct {
 	Done       int         `json:"done"`
 	Total      int         `json:"total"`
 	Agents     []AgentLine `json:"agents,omitempty"`
+	// Model dan Usage: sub agent = milik agent itu; workflow = jumlah semua agent
+	// (Model workflow kosong, model ada per AgentLine).
+	Model string `json:"model,omitempty"`
+	Usage *Usage `json:"usage,omitempty"`
 }
 
 // Run adalah satu workflow atau sub agent. ID: tool_use_id (workflow) atau

@@ -3,7 +3,7 @@
   import { focusOrOpenSession, sessionTitle } from '../shell';
   import { sessions } from '../../lib/stores';
   import type { Run } from './types';
-  import { formatElapsed, runTitle, progressText, subagentProgress, agentsCount } from './format';
+  import { formatElapsed, runTitle, progressText, subagentProgress, agentsCount, usageText, usageTitle, shortModel, workflowModels } from './format';
 
   let open = $state(false);
   let now = $state(Date.now());
@@ -105,6 +105,16 @@
                   {#if r.kind === 'workflow' && progressText(r.progress)}
                     <span class="meta prog">{progressText(r.progress)}</span>
                   {/if}
+                  {#if r.kind === 'subagent' ? shortModel(r.progress?.model) || usageText(r.progress?.usage) : workflowModels(r.progress) || usageText(r.progress?.usage)}
+                    <span class="meta stat" title={usageTitle(r.progress?.usage)}>
+                      {#if r.kind === 'subagent'}
+                        {#if shortModel(r.progress?.model)}<span class="model">{shortModel(r.progress?.model)}</span>{/if}
+                      {:else if workflowModels(r.progress)}
+                        <span class="model">{workflowModels(r.progress)}</span>
+                      {/if}
+                      {#if usageText(r.progress?.usage)}<span>{usageText(r.progress?.usage)}</span>{/if}
+                    </span>
+                  {/if}
                   {#if !r.confirmed}<span class="tag">belum terkonfirmasi</span>{/if}
                 </span>
               </button>
@@ -115,7 +125,11 @@
                 {#if expanded[r.id]}
                   <ul class="agents">
                     {#each agents as a}
-                      <li class="agent" class:done={a.done}><span class="mark" aria-hidden="true">{a.done ? '☑' : '☐'}</span> {a.label}</li>
+                      <li class="agent" class:done={a.done}><span class="mark" aria-hidden="true">{a.done ? '☑' : '☐'}</span> {a.label}
+                        {#if a.model || a.usage}
+                          <span class="a-stat" title={usageTitle(a.usage)}>{[shortModel(a.model), usageText(a.usage)].filter(Boolean).join(' · ')}</span>
+                        {/if}
+                      </li>
                     {/each}
                   </ul>
                 {/if}
@@ -154,6 +168,9 @@
   .name { color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .meta { color: var(--fg-muted); font-size: 11px; }
   .prog { color: var(--fg); }
+  .stat { display: flex; gap: 6px; flex-wrap: wrap; }
+  .model { color: var(--accent); }
+  .a-stat { color: var(--fg-muted); margin-left: 4px; }
   .tag { align-self: flex-start; margin-top: 2px; font-size: 10px; color: var(--fg-muted); border: 1px solid var(--border); border-radius: 3px; padding: 0 4px; }
   .sub-toggle {
     display: block; margin: 0 10px 4px 20px; padding: 0 4px; background: transparent; border-color: transparent;

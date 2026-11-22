@@ -154,6 +154,23 @@ func readWorkflow(folder, runID string) Detail {
 		}
 	}
 	p.Total = len(p.Agents)
+	// Model dan usage per agent dari transkripnya; total workflow = jumlah semuanya.
+	dir := filepath.Join(folder, "subagents", "workflows", runID)
+	var sum Usage
+	for id, i := range idx {
+		if !safeID(id) {
+			continue
+		}
+		u, model := readUsage(filepath.Join(dir, "agent-"+id+".jsonl"))
+		p.Agents[i].Model = model
+		p.Agents[i].Usage = u
+		if u != nil {
+			sum = sum.add(*u)
+		}
+	}
+	if !sum.zero() {
+		p.Usage = &sum
+	}
 	d.Found = true
 	d.Progress = p
 	return d
@@ -170,6 +187,12 @@ func readSubagent(folder, agentID string) Detail {
 	}
 	d := Detail{Found: true, Finished: meta.Finished, Description: meta.Description}
 	d.Progress = readChecklist(base + ".jsonl")
+	if u, model := readUsage(base + ".jsonl"); u != nil || model != "" {
+		if d.Progress == nil {
+			d.Progress = &Progress{}
+		}
+		d.Progress.Model, d.Progress.Usage = model, u
+	}
 	return d
 }
 
