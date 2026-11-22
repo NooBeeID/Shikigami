@@ -27,6 +27,12 @@ type QueueConfig struct {
 	Namer    *Namer
 	Publish  func(topic string, payload any) // srv.Publish
 	Logger   *slog.Logger                    // boleh nil -> slog.Default()
+
+	// Alur agent (semua boleh nil; Agents/Spawner nil -> alur agent dilewati).
+	Agents   AgentResolver
+	Spawner  SessionSpawner
+	Projects ProjectDirectory
+	Labels   *SpawnLabels
 }
 
 type entry struct {
@@ -52,10 +58,14 @@ type Queue struct {
 	byID    map[string]*entry
 	done    map[string]State
 	doneIDs []string
+
+	spawnMu    sync.Mutex // melindungi spawnLocks
+	spawnLocks map[string]*sync.Mutex
 }
 
 var _ Enqueuer = (*Queue)(nil)
 var _ QueueReader = (*Queue)(nil)
+var _ TargetRouter = (*Queue)(nil)
 
 // NewQueue membuat Queue dengan mode default confirm_agent.
 func NewQueue(cfg QueueConfig) *Queue {
@@ -66,11 +76,12 @@ func NewQueue(cfg QueueConfig) *Queue {
 		cfg.Publish = func(string, any) {}
 	}
 	return &Queue{
-		cfg:     cfg,
-		mode:    ModeConfirmAgent,
-		targets: map[string]*target{},
-		byID:    map[string]*entry{},
-		done:    map[string]State{},
+		cfg:        cfg,
+		mode:       ModeConfirmAgent,
+		targets:    map[string]*target{},
+		byID:       map[string]*entry{},
+		done:       map[string]State{},
+		spawnLocks: map[string]*sync.Mutex{},
 	}
 }
 

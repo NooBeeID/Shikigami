@@ -117,6 +117,7 @@ type Runtime struct {
 	Namer         *Namer
 	Enqueuer      Enqueuer
 	Reader        QueueReader
+	Router        TargetRouter                    // nil -> jalur lama (Namer.Resolve + Enqueuer)
 	OnSessionExit func(fn func(sessionID string)) // boleh dipanggil beberapa kali
 }
 
@@ -167,7 +168,11 @@ type Namer struct {
 	src      SessionSource
 	dir      Directory
 	statusOf StatusFunc
+	labels   *SpawnLabels
 }
+
+// SetLabels memasang registri label spawn (nil boleh).
+func (n *Namer) SetLabels(l *SpawnLabels) { n.labels = l }
 
 type namedSession struct {
 	sess session.Session
@@ -231,6 +236,11 @@ func (n *Namer) snapshot(workspaceID string) []namedSession {
 	out := make([]namedSession, 0, len(list))
 	for _, s := range list {
 		base := baseName(s.ProviderID, n.projectName(s))
+		if n.labels != nil {
+			if name, ok := n.labels.Get(s.ID); ok {
+				base = baseName(name, n.projectName(s))
+			}
+		}
 		key := s.WorkspaceID + "\x00" + base
 		counts[key]++
 		name := base

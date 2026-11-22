@@ -1,6 +1,6 @@
 // Pembungkus IPC mention dan helper murni.
 import { call, onEvent } from '../../lib/ipc';
-import type { Message, NameInfo, QueueEvent } from './types';
+import type { AgentInfo, CategoryInfo, Message, MentionSendResult, MentionSuggestion, NameInfo, QueueEvent } from './types';
 
 export function asList<T>(res: unknown, key?: string): T[] {
   if (Array.isArray(res)) return res as T[];
@@ -20,6 +20,8 @@ export function errorText(e: unknown): string {
   }
   if (!msg) return 'Gagal menghubungi daemon';
   if (msg.includes('bukan di dalam Wails')) return 'Hanya tersedia di aplikasi desktop';
+  // galat Indonesia dari backend (project konteks / agent / gagal spawn) tampil apa adanya
+  if (/project konteks|Gagal membuka sesi|agent/i.test(msg)) return msg.slice(0, 160);
   if (/ERR_NOT_FOUND|not found|tidak ditemukan/i.test(msg)) return 'Sesi tidak ditemukan';
   if (/ERR_CONFLICT|penuh/i.test(msg)) return 'Antrean penuh (maks 50)';
   if (msg.includes('user_only')) return 'Mode user_only: pesan dari agent ditolak';
@@ -31,8 +33,64 @@ export async function listNames(workspaceId: string): Promise<NameInfo[]> {
   return asList<NameInfo>(await call('mention.names', { workspaceId }), 'names');
 }
 
-export function sendMention(workspaceId: string, to: string, text: string): Promise<Message> {
-  return call<Message>('mention.send', { workspaceId, to, text });
+export function sendMention(workspaceId: string, to: string, text: string, projectId?: string): Promise<MentionSendResult> {
+  const params: Record<string, string> = { workspaceId, to, text };
+  if (typeof projectId === 'string' && projectId) params.projectId = projectId;
+  return call<MentionSendResult>('mention.send', params);
+}
+
+function slug(s: string): string {
+  return s.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+// Daftar agent dan kategori global.
+export async function listAgents(): Promise<{ categories: CategoryInfo[]; agents: AgentInfo[] }> {
+  const res = await call<{ categories?: unknown; agents?: unknown }>('agents.list', {});
+  return { categories: asList<CategoryInfo>(res, 'categories'), agents: asList<AgentInfo>(res, 'agents') };
+}
+
+// Susun saran: sesi, lalu agent, lalu kategori ber-default; tanpa duplikasi nama.
+export function buildSuggestions(names: NameInfo[], agents: AgentInfo[], categories: CategoryInfo[]): MentionSuggestion[] {
+  const out: MentionSuggestion[] = names.map((n) => ({ kind: 'session' as const, ...n }));
+  const taken = new Set(names.map((n) => n.name));
+  const hasSession = (base: string) => names.some((n) => n.name.startsWith(base + '-'));
+  for (const a of agents) {
+    const name = slug(a.name);
+    if (!name || taken.has(name)) continue;
+    out.push({
+      kind: 'agent',
+      name,
+      categoryName: categories.find((c) => c.id === a.categoryId)?.name ?? a.categoryId,
+      providerId: a.providerId,
+      model: a.model,
+      isDefault: a.isDefault,
+      hasSession: hasSession(name),
+    });
+    taken.add(name);
+  }
+  for (const c of categories) {
+    const def = agents.find((a) => a.categoryId === c.id && a.isDefault);
+    if (!def) continue;
+    const name = slug(c.name);
+    if (!name || taken.has(name)) continue;
+    const defaultAgent = slug(def.name);
+    out.push({ kind: 'category', name, defaultAgent, hasSession: hasSession(name) || hasSession(defaultAgent) });
+    taken.add(name);
+  }
+  return out;
+}
+
+// Apakah nama merujuk agent, atau kategori yang punya agent default.
+export function matchAgentRef(name: string, agents: AgentInfo[], categories: CategoryInfo[]): boolean {
+  const n = slug(name);
+  if (agents.some((a) => slug(a.name) === n)) return true;
+  return categories.some(
+    (c) => (slug(c.name) === n || c.id.toLowerCase() === n) && agents.some((a) => a.categoryId === c.id && a.isDefault),
+  );
+}
+
+export function onAgentsChanged(fn: () => void): () => void {
+  return onEvent('agents.changed', () => fn());
 }
 
 export async function listQueue(): Promise<Message[]> {

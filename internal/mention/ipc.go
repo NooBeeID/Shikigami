@@ -14,6 +14,13 @@ type IPCOptions struct {
 	SessionCount func() int // jumlah sesi ber-MCP untuk mention.info; nil -> 0
 }
 
+// sendResult adalah hasil mention.send: Message (flat) + info spawn.
+type sendResult struct {
+	Message
+	Spawned        bool   `json:"spawned,omitempty"`
+	SpawnedSession string `json:"spawnedSession,omitempty"`
+}
+
 func decodeMentionParams(raw json.RawMessage, v any) error {
 	if len(raw) == 0 || string(raw) == "null" {
 		return nil
@@ -51,6 +58,7 @@ func RegisterIPC(srv *ipc.Server, q *Queue, namer *Namer, opts IPCOptions) {
 			To          string `json:"to"`
 			Text        string `json:"text"`
 			From        string `json:"from"`
+			ProjectID   string `json:"projectId"`
 		}
 		if err := decodeMentionParams(raw, &p); err != nil {
 			return nil, err
@@ -66,24 +74,29 @@ func RegisterIPC(srv *ipc.Server, q *Queue, namer *Namer, opts IPCOptions) {
 				return nil, ipc.NewError(ipc.ErrInvalid, "workspaceId wajib bila to berupa nama")
 			}
 		}
-		toID, err := namer.Resolve(ws, p.To)
-		if err != nil {
-			return nil, toIPCError(err)
-		}
-		var msg Message
-		if p.From == "" {
-			msg, err = q.Enqueue(ctx, "", toID, p.Text, SourceUser)
-		} else {
+		pc := ProjectContext{WorkspaceID: ws, ProjectID: p.ProjectID}
+		source := SourceUser
+		if p.From != "" {
 			fromID, ferr := namer.Resolve(ws, p.From)
 			if ferr != nil {
 				return nil, toIPCError(ferr)
 			}
-			msg, err = q.Enqueue(ctx, fromID, toID, p.Text, SourceAgent)
+			pc.FromSessionID = fromID
+			source = SourceAgent
+			if fs, gerr := q.cfg.Sessions.Get(fromID); gerr == nil && fs != nil && p.ProjectID == "" {
+				pc.ProjectID = fs.ProjectID
+				pc.Cwd = fs.Cwd
+			}
 		}
+		msg, spawned, err := q.ResolveOrSpawn(ctx, pc, p.To, p.Text, source)
 		if err != nil {
 			return nil, toIPCError(err)
 		}
-		return msg, nil
+		res := sendResult{Message: msg, Spawned: spawned}
+		if spawned {
+			res.SpawnedSession = namer.NameOf(msg.To)
+		}
+		return res, nil
 	})
 
 	srv.Register("mention.queue.list", func(ctx context.Context, raw json.RawMessage) (any, error) {

@@ -19,13 +19,17 @@ func init() {
 	})
 }
 
+type projInfo struct{ name, path string }
+
+var _ mention.ProjectDirectory = (*workspaceDirectory)(nil)
+
 // workspaceDirectory memenuhi mention.Directory lewat IPC internal (workspace.list).
 type workspaceDirectory struct {
 	socket string
 
 	mu        sync.Mutex
 	client    *ipc.Client
-	cache     map[string]string
+	cache     map[string]projInfo
 	fetchedAt time.Time
 }
 
@@ -37,7 +41,19 @@ func (w *workspaceDirectory) ProjectName(workspaceID, projectID string) string {
 			return ""
 		}
 	}
-	return w.cache[workspaceID+"/"+projectID]
+	return w.cache[workspaceID+"/"+projectID].name
+}
+
+// ProjectDir mengembalikan path absolut project ("" bila tak dikenal).
+func (w *workspaceDirectory) ProjectDir(workspaceID, projectID string) string {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	if w.cache == nil || time.Since(w.fetchedAt) > 5*time.Second {
+		if !w.refreshLocked() {
+			return ""
+		}
+	}
+	return w.cache[workspaceID+"/"+projectID].path
 }
 
 func (w *workspaceDirectory) refreshLocked() bool {
@@ -55,6 +71,7 @@ func (w *workspaceDirectory) refreshLocked() bool {
 	type proj struct {
 		ID   string `json:"id"`
 		Name string `json:"name"`
+		Path string `json:"path"`
 	}
 	type ws struct {
 		ID       string `json:"id"`
@@ -70,10 +87,10 @@ func (w *workspaceDirectory) refreshLocked() bool {
 		}
 		list = obj.Workspaces
 	}
-	cache := map[string]string{}
+	cache := map[string]projInfo{}
 	for _, x := range list {
 		for _, p := range x.Projects {
-			cache[x.ID+"/"+p.ID] = p.Name
+			cache[x.ID+"/"+p.ID] = projInfo{name: p.Name, path: p.Path}
 		}
 	}
 	w.cache = cache
@@ -121,9 +138,32 @@ func wireMention(srv *ipc.Server, d *Deps) {
 		return "running"
 	}
 	namer := mention.NewNamer(mgr, dir, statusOf)
-	q := mention.NewQueue(mention.QueueConfig{Sessions: mgr, Namer: namer, Publish: srv.Publish, Logger: d.Logger})
+
+	var resolver mention.AgentResolver
+	if v, ok := d.Lookup("agents.store"); ok {
+		if r, ok2 := v.(mention.AgentResolver); ok2 && r != nil {
+			resolver = r
+		}
+	}
+	if resolver == nil {
+		d.Logger.Warn("mention: agents.store tidak tersedia, mention agent dinonaktifkan")
+	}
+	labels := mention.NewSpawnLabels()
+	namer.SetLabels(labels)
+
+	q := mention.NewQueue(mention.QueueConfig{
+		Sessions: mgr,
+		Namer:    namer,
+		Publish:  srv.Publish,
+		Logger:   d.Logger,
+		Agents:   resolver,
+		Spawner:  mgr,
+		Projects: dir,
+		Labels:   labels,
+	})
 
 	hub := &exitHub{}
+	hub.add(labels.Delete)
 	hub.add(q.HandleExit)
 
 	var subscribeExit func(attempt int)
@@ -172,6 +212,7 @@ func wireMention(srv *ipc.Server, d *Deps) {
 		Namer:         namer,
 		Enqueuer:      q,
 		Reader:        q,
+		Router:        q,
 		OnSessionExit: hub.add,
 	}
 	if _, err := mention.Start(context.Background(), rt); err != nil {

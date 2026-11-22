@@ -1,12 +1,14 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
-  import { activeWorkspaceId, sessions, activeTabId } from '../../lib/stores';
+  import { activeWorkspaceId, activeProjectId, sessions, activeTabId } from '../../lib/stores';
   import { inWails } from '../../lib/ipc';
-  import { errorText, lastOutput, listNames, mentionQuery, onSessionExit, parseMention, sendMention } from './mention-client';
-  import type { NameInfo } from './types';
+  import { buildSuggestions, errorText, lastOutput, listAgents, listNames, matchAgentRef, mentionQuery, onAgentsChanged, onSessionExit, parseMention, sendMention } from './mention-client';
+  import type { AgentInfo, CategoryInfo, MentionSuggestion, NameInfo } from './types';
 
   let text = $state('');
   let names = $state<NameInfo[]>([]);
+  let agents = $state<AgentInfo[]>([]);
+  let categories = $state<CategoryInfo[]>([]);
   let namesError = $state('');
   let menuOpen = $state(false);
   let menuIndex = $state(0);
@@ -17,8 +19,25 @@
   let feedback = $state<{ kind: 'ok' | 'err'; msg: string } | null>(null);
   let textareaEl: HTMLTextAreaElement | undefined = $state();
 
-  const filtered = $derived(names.filter((n) => n.name.startsWith(query)));
+  const suggestions = $derived(buildSuggestions(names, agents, categories));
+  const filtered = $derived<MentionSuggestion[]>(suggestions.filter((s) => s.name.startsWith(query)));
   const showMenu = $derived(menuOpen && filtered.length > 0);
+
+  async function refreshAgents() {
+    if (!inWails) {
+      agents = [];
+      categories = [];
+      return;
+    }
+    try {
+      const r = await listAgents();
+      agents = r.agents;
+      categories = r.categories;
+    } catch {
+      agents = [];
+      categories = [];
+    }
+  }
 
   async function refreshNames() {
     if (!inWails) {
@@ -51,8 +70,13 @@
   });
 
   onMount(() => {
-    const off = onSessionExit(() => void refreshNames());
-    return off;
+    const offExit = onSessionExit(() => void refreshNames());
+    const offAgents = onAgentsChanged(() => void refreshAgents());
+    void refreshAgents();
+    return () => {
+      offExit();
+      offAgents();
+    };
   });
 
   function updateMenu() {
@@ -73,7 +97,7 @@
     updateMenu();
   }
 
-  async function pick(n: NameInfo) {
+  async function pick(n: MentionSuggestion) {
     const caret = textareaEl?.selectionStart ?? text.length;
     const ins = '@' + n.name + ' ';
     text = text.slice(0, mentionStart) + ins + text.slice(caret);
@@ -122,6 +146,15 @@
     }
   }
 
+  function spawnLabel(state: string, sess: string, error?: string): string {
+    switch (state) {
+      case 'delivered': return `Sesi baru @${sess} dibuka dan pesan terkirim`;
+      case 'queued': return `Sesi baru @${sess} dibuka dan pesan diantrekan`;
+      case 'awaiting_confirm': return `Sesi baru @${sess} dibuka; pesan menunggu konfirmasi`;
+      default: return stateLabel(state, sess, error);
+    }
+  }
+
   function fail(msg: string) {
     feedback = { kind: 'err', msg };
   }
@@ -133,11 +166,12 @@
     const ws = $activeWorkspaceId;
     if (!ws) return fail('Pilih workspace dulu');
     const parsed = parseMention(text);
-    if (!parsed) return fail('Awali pesan dengan @nama-sesi');
-    if (!namesError && names.length > 0 && !names.some((n) => n.name === parsed.name)) {
+    if (!parsed) return fail('Awali pesan dengan @nama-sesi atau @agent');
+    const known = names.some((n) => n.name === parsed.name) || matchAgentRef(parsed.name, agents, categories);
+    if (!namesError && names.length > 0 && !known) {
       return fail(`Sesi @${parsed.name} tidak ada di workspace ini`);
     }
-    if (!namesError && names.length === 0 && ws) {
+    if (!namesError && names.length === 0 && !known && ws) {
       // daftar berhasil dimuat tetapi kosong: tidak ada sesi sama sekali
       return fail(`Sesi @${parsed.name} tidak ada di workspace ini`);
     }
@@ -157,8 +191,12 @@
         if (!out) return fail('Output sesi aktif kosong');
         body = (parsed.text ? parsed.text + '\n\n' : '') + '--- output terakhir sesi aktif ---\n' + out + '\n--- selesai ---';
       }
-      const msg = await sendMention(ws, parsed.name, body);
-      feedback = { kind: msg.state === 'failed' ? 'err' : 'ok', msg: stateLabel(msg.state, parsed.name, msg.error) };
+      const project = $activeProjectId ?? undefined;
+      const msg = await sendMention(ws, parsed.name, body, project);
+      const label = msg.spawned && msg.state !== 'failed'
+        ? spawnLabel(msg.state, msg.spawnedSession || parsed.name, msg.error)
+        : stateLabel(msg.state, parsed.name, msg.error);
+      feedback = { kind: msg.state === 'failed' ? 'err' : 'ok', msg: label };
       if (msg.state !== 'failed') text = '';
     } catch (e) {
       fail(errorText(e));
@@ -173,7 +211,7 @@
   <div class="field">
     <textarea
       rows="3"
-      placeholder="@nama-sesi pesan..."
+      placeholder="@nama-sesi atau @agent pesan..."
       bind:this={textareaEl}
       bind:value={text}
       oninput={onInput}
@@ -183,7 +221,7 @@
     ></textarea>
     {#if showMenu}
       <ul class="menu" role="listbox">
-        {#each filtered as n, i (n.sessionId)}
+        {#each filtered as n, i (n.kind + ':' + n.name)}
           <li
             role="option"
             aria-selected={i === menuIndex}
@@ -191,8 +229,16 @@
             onmousedown={(e) => { e.preventDefault(); void pick(n); }}
           >
             <span class="nm">@{n.name}</span>
-            <span class="muted">{n.projectName} · {n.providerId}</span>
-            <span class="st st-{n.status}">{n.status}</span>
+            {#if n.kind === 'session'}
+              <span class="muted">{n.projectName} · {n.providerId}</span>
+              <span class="st st-{n.status}">{n.status}</span>
+            {:else if n.kind === 'agent'}
+              <span class="muted">{n.categoryName} · {n.providerId} · {n.model || 'default'}</span>
+              {#if !n.hasSession}<span class="new">agent baru</span>{/if}
+            {:else}
+              <span class="muted">kategori · default: @{n.defaultAgent}</span>
+              {#if !n.hasSession}<span class="new">agent baru</span>{/if}
+            {/if}
           </li>
         {/each}
       </ul>
@@ -228,6 +274,7 @@
   .muted { color: var(--fg-muted, #9b9ba6); }
   .small { font-size: 13px; }
   .st { margin-left: auto; font-size: 12px; }
+  .new { margin-left: auto; font-size: 12px; padding: 0 6px; border: 1px solid var(--accent, #5b94ff); border-radius: 8px; color: var(--accent, #5b94ff); }
   .st-running { color: var(--accent, #5b94ff); }
   .st-waiting { color: #e0a030; }
   .st-done, .st-idle { color: var(--ok, #4cc788); }

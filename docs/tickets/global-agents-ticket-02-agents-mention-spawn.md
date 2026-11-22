@@ -2,7 +2,7 @@
 id: global-agents-ticket-02-agents-mention-spawn
 title: Agent Global: Mention Spawn
 spec: docs/superpowers/specs/2026-11-22-global-agents-design.md
-status: ready
+status: implemented
 wave: 2
 depends_on: [global-agents-ticket-01-agents-registry]
 ---

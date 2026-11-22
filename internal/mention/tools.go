@@ -40,11 +40,11 @@ func toolDefs() []toolDef {
 		},
 		{
 			Name:        "send_message",
-			Description: "Kirim pesan ke sesi lain di workspace yang sama. Pesan diantrekan dan disuntik saat sesi target idle.",
+			Description: "Kirim pesan ke sesi lain di workspace yang sama. Pesan diantrekan dan disuntik saat sesi target idle. Target dapat berupa nama agent atau kategori; sesi baru akan dibuka di project sesi pemanggil bila belum ada.",
 			InputSchema: map[string]any{
 				"type": "object",
 				"properties": map[string]any{
-					"to":   map[string]any{"type": "string", "description": "Nama mention atau id sesi target"},
+					"to":   map[string]any{"type": "string", "description": "Nama mention atau id sesi target; boleh juga nama agent atau kategori (membuka sesi baru di project Anda bila belum ada)"},
 					"text": map[string]any{"type": "string", "description": "Isi pesan"},
 				},
 				"required": []string{"to", "text"},
@@ -68,6 +68,8 @@ func toolDefs() []toolDef {
 type caller struct {
 	SessionID   string
 	WorkspaceID string
+	ProjectID   string
+	Cwd         string
 }
 
 func resolveCaller(rt *Runtime, sessionID string) (caller, error) {
@@ -75,7 +77,7 @@ func resolveCaller(rt *Runtime, sessionID string) (caller, error) {
 	if err != nil || s == nil || s.Status != session.StatusRunning {
 		return caller{}, ErrNotFound
 	}
-	return caller{SessionID: s.ID, WorkspaceID: s.WorkspaceID}, nil
+	return caller{SessionID: s.ID, WorkspaceID: s.WorkspaceID, ProjectID: s.ProjectID, Cwd: s.Cwd}, nil
 }
 
 func toolText(s string) toolResult {
@@ -149,32 +151,57 @@ func toolSendMessage(ctx context.Context, rt *Runtime, c caller, args json.RawMe
 	if strings.TrimSpace(a.Text) == "" {
 		return toolError(fmt.Errorf("%w: text wajib tidak kosong", ErrInvalid))
 	}
-	if rt.Enqueuer == nil {
-		return toolError(errors.New("antrean tidak tersedia"))
-	}
-	target, err := rt.Namer.Resolve(c.WorkspaceID, a.To)
-	if err != nil {
-		return toolError(err)
-	}
-	if target == c.SessionID {
-		return toolError(errors.New("tidak dapat mengirim pesan ke sesi sendiri"))
-	}
-	msg, err := rt.Enqueuer.Enqueue(ctx, c.SessionID, target, a.Text, SourceAgent)
-	if err != nil {
-		return toolError(err)
+	var (
+		msg     Message
+		spawned bool
+	)
+	if rt.Router != nil {
+		var err error
+		msg, spawned, err = rt.Router.ResolveOrSpawn(ctx, ProjectContext{
+			WorkspaceID:   c.WorkspaceID,
+			ProjectID:     c.ProjectID,
+			Cwd:           c.Cwd,
+			FromSessionID: c.SessionID,
+		}, a.To, a.Text, SourceAgent)
+		if err != nil {
+			return toolError(err)
+		}
+	} else {
+		if rt.Enqueuer == nil {
+			return toolError(errors.New("antrean tidak tersedia"))
+		}
+		target, err := rt.Namer.Resolve(c.WorkspaceID, a.To)
+		if err != nil {
+			return toolError(err)
+		}
+		if target == c.SessionID {
+			return toolError(errors.New("tidak dapat mengirim pesan ke sesi sendiri"))
+		}
+		msg, err = rt.Enqueuer.Enqueue(ctx, c.SessionID, target, a.Text, SourceAgent)
+		if err != nil {
+			return toolError(err)
+		}
 	}
 	pos := 0
 	if rt.Reader != nil {
 		pos = rt.Reader.Position(msg.ID)
 	}
+	session := ""
+	if spawned {
+		session = rt.Namer.NameOf(msg.To)
+	}
 	return toolJSON(struct {
-		Queued    bool `json:"queued"`
-		Delivered bool `json:"delivered"`
-		Position  int  `json:"position"`
+		Queued    bool   `json:"queued"`
+		Delivered bool   `json:"delivered"`
+		Position  int    `json:"position"`
+		Spawned   bool   `json:"spawned,omitempty"`
+		Session   string `json:"session,omitempty"`
 	}{
 		Queued:    msg.State == StateQueued || msg.State == StateAwaitingConfirm,
 		Delivered: msg.State == StateDelivered,
 		Position:  pos,
+		Spawned:   spawned,
+		Session:   session,
 	})
 }
 
