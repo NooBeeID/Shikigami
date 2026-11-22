@@ -11,6 +11,8 @@ export interface Leaf {
   filePath?: string;
   title: string;
   workspaceId?: string; // tambahan: untuk pane file
+  root?: string; // root eksplisit untuk pane file read-only (mis. direktori grimoire)
+  readOnly?: boolean;
 }
 export interface Split {
   type: 'split';
@@ -35,6 +37,8 @@ export interface NewLeaf {
   provider?: string;
   filePath?: string;
   workspaceId?: string;
+  root?: string;
+  readOnly?: boolean;
   title?: string;
 }
 
@@ -132,6 +136,8 @@ function makeLeaf(nl: NewLeaf): Leaf {
   if (nl.provider !== undefined) leaf.provider = nl.provider;
   if (nl.filePath !== undefined) leaf.filePath = nl.filePath;
   if (nl.workspaceId !== undefined) leaf.workspaceId = nl.workspaceId;
+  if (nl.root !== undefined) leaf.root = nl.root;
+  if (nl.readOnly !== undefined) leaf.readOnly = nl.readOnly;
   return leaf;
 }
 
@@ -325,9 +331,10 @@ function hydrateNode(raw: unknown): Node | null {
       kind: r.kind as PaneKind,
       title: isStr(r.title) && r.title ? r.title : 'Pane',
     };
-    for (const k of ['sessionId', 'projectId', 'provider', 'filePath', 'workspaceId'] as const) {
+    for (const k of ['sessionId', 'projectId', 'provider', 'filePath', 'workspaceId', 'root'] as const) {
       if (isStr(r[k])) leaf[k] = r[k] as string;
     }
+    if (typeof r.readOnly === 'boolean') leaf.readOnly = r.readOnly;
     return leaf;
   }
   if (r.type === 'split') {

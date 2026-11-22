@@ -2,7 +2,7 @@
 id: grimoire-ticket-01-grimoire-build
 title: Grimoire: generate kerangka statik + panel sidebar
 spec: docs/superpowers/specs/2026-11-22-grimoire-design.md
-status: ready
+status: implemented
 wave: 1
 depends_on: []
 ---
