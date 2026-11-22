@@ -269,3 +269,71 @@ func TestProgressNotAliased(t *testing.T) {
 		t.Fatalf("state terpengaruh hasil List: %+v", again)
 	}
 }
+
+func preWorkflow(r *Registry, sid, toolUseID string) bool {
+	return r.Apply(sid, "PreToolUse", map[string]any{
+		"tool_name": "Workflow", "tool_use_id": toolUseID,
+		"tool_input": map[string]any{"args": map[string]any{"ticket": "docs/T01.md"}},
+	})
+}
+
+func preAgent(r *Registry, sid, toolUseID, desc string) {
+	r.Apply(sid, "PreToolUse", map[string]any{
+		"tool_name": "Agent", "tool_use_id": toolUseID,
+		"tool_input": map[string]any{"description": desc},
+	})
+}
+
+func TestStopDropsWorkflowNeverLaunched(t *testing.T) {
+	r := NewRegistry()
+	preWorkflow(r, "s1", "tu1") // izin ditolak: PostToolUse tidak pernah datang
+	if !r.Apply("s1", "Stop", map[string]any{}) {
+		t.Fatal("Stop harus melaporkan perubahan")
+	}
+	if l := r.List(nil); len(l) != 0 {
+		t.Fatalf("list = %+v", l)
+	}
+	// Stop kedua tidak mengubah apa pun.
+	if r.Apply("s1", "Stop", map[string]any{}) {
+		t.Fatal("Stop kedua tidak boleh berubah")
+	}
+}
+
+func TestStopClearsOrphanedAgentPending(t *testing.T) {
+	r := NewRegistry()
+	preAgent(r, "s1", "tuX", "agent yang ditolak")
+	r.Apply("s1", "Stop", map[string]any{})
+	r.Apply("s1", "SubagentStart", map[string]any{"agent_id": "ag1", "agent_type": "general-purpose"})
+	l := r.List(nil)
+	if len(l) != 1 || l[0].Identity != "" {
+		t.Fatalf("identitas basi menempel: %+v", l)
+	}
+}
+
+func TestStopKeepsLaunchedWorkflowsRunningSubagentsAndOtherSessions(t *testing.T) {
+	r := NewRegistry()
+	apply(r, "s1", fixture(t, "pretooluse_workflow.json"))
+	apply(r, "s1", fixture(t, "posttooluse_workflow.json")) // punya TaskID
+	apply(r, "s1", fixture(t, "subagentstart_agent.json"))  // sub agent sudah jalan
+	preWorkflow(r, "s2", "tu-s2")                           // sesi lain
+	preAgent(r, "s2", "tu-agent-s2", "milik s2")
+	preWorkflow(r, "s1", "tu-ghost")
+	r.Apply("s1", "Stop", fixture(t, "stop_with_workflow_running.json"))
+	got := map[string]bool{}
+	for _, run := range r.List(nil) {
+		got[run.SessionID+"/"+string(run.Kind)+"/"+run.ID] = true
+	}
+	if len(got) != 3 || got["s1/workflow/tu-ghost"] {
+		t.Fatalf("got = %v", got)
+	}
+	if !got["s2/workflow/tu-s2"] {
+		t.Fatalf("run sesi lain tersentuh: %v", got)
+	}
+	// Pending sesi lain tetap ada.
+	r.Apply("s2", "SubagentStart", map[string]any{"agent_id": "ag-s2", "agent_type": "t"})
+	for _, run := range r.List(nil) {
+		if run.ID == "ag-s2" && run.Identity != "milik s2" {
+			t.Fatalf("pending sesi lain hilang: %+v", run)
+		}
+	}
+}

@@ -141,9 +141,34 @@ func (r *Registry) Apply(sessionID, event string, payload map[string]any) bool {
 		}
 		return r.pruneWorkflows(sessionID, payload) || changed
 	case "Stop":
-		return r.pruneWorkflows(sessionID, payload)
+		// Akhir giliran: PostToolUse selalu sudah datang sebelum Stop, jadi
+		// sisa PreToolUse tanpa pasangan adalah panggilan yang batal.
+		dropped := r.dropUnlaunched(sessionID)
+		return r.pruneWorkflows(sessionID, payload) || dropped
 	}
 	return false
+}
+
+// dropUnlaunched membuang workflow sesi ini yang tak pernah mendapat TaskID
+// (izin ditolak, validasi gagal, Esc) dan semua pending Agent sesi ini yang
+// tak pernah menjadi sub agent. Sub agent yang sudah berjalan dan workflow
+// ber-TaskID tidak disentuh karena bisa hidup melewati Stop.
+func (r *Registry) dropUnlaunched(sid string) bool {
+	changed := false
+	for id, run := range r.runs {
+		if run.SessionID == sid && run.Kind == KindWorkflow && run.TaskID == "" {
+			delete(r.runs, id)
+			changed = true
+		}
+	}
+	kept := r.pend[:0]
+	for _, pe := range r.pend {
+		if pe.sessionID != sid {
+			kept = append(kept, pe)
+		}
+	}
+	r.pend = kept
+	return changed
 }
 
 func (r *Registry) preToolUse(sid string, p map[string]any) bool {
