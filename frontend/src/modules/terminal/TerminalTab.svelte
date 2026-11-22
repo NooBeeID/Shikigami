@@ -13,6 +13,7 @@
     type OutputEvent,
   } from './terminal-client';
   import { currentTerminalFontSize, registerTerminalInstance } from './font-scale';
+  import { registerTerminalPaste } from './paste';
 
   let { sessionId, scrollback = 2000, visible = true, fontSize, onTitle }:
     { sessionId: string; scrollback?: number; visible?: boolean; fontSize?: number; onTitle?: (t: string) => void } = $props();
@@ -123,6 +124,10 @@
     // Program (mis. Claude Code setelah /rename) mengubah judul lewat OSC 0/2.
     term.onTitleChange((t) => onTitle?.(t));
 
+    const unregisterPaste = registerTerminalPaste(id, (text) => {
+      if (!ended) term.paste(text);
+    });
+
     term.onData((d) => {
       if (ended) return;
       writeSession(id, d).catch(() => {});
@@ -163,6 +168,7 @@
 
     return () => {
       disposed = true;
+      unregisterPaste();
       unsubOut();
       unsubExit();
       unregisterFont();

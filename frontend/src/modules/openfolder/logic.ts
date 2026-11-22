@@ -7,6 +7,9 @@ import {
   createWorkspace,
   selectWorkspace,
 } from '../../lib/stores';
+import { layout } from '../../lib/stores/layout';
+import { findLeaf } from '../layout/model';
+import { pasteToSession, formatDroppedPaths } from '../terminal/paste';
 import { showToast } from './toast-store';
 
 export function basename(path: string): string {
@@ -119,7 +122,23 @@ export async function handleNewWorkspaceFromFolder(): Promise<void> {
   }
 }
 
-export async function handleDropped(p: { paths: string[] }): Promise<void> {
+// Pane terminal di titik jatuh (piksel CSS dari event drop Wails), bila ada.
+function terminalSessionAt(x: unknown, y: unknown): string | null {
+  if (typeof x !== 'number' || typeof y !== 'number') return null;
+  const el = document.elementFromPoint(x, y);
+  const paneId = el?.closest('[data-pane-id]')?.getAttribute('data-pane-id');
+  if (!paneId) return null;
+  const leaf = findLeaf(get(layout), paneId);
+  return leaf && leaf.kind === 'terminal' && leaf.sessionId ? leaf.sessionId : null;
+}
+
+export async function handleDropped(p: { paths: string[]; all?: string[]; x?: number; y?: number }): Promise<void> {
+  // Jatuh di atas pane terminal: ketik path-nya ke terminal (gambar/file untuk Claude Code).
+  const all = p?.all ?? [];
+  if (all.length > 0) {
+    const sid = terminalSessionAt(p.x, p.y);
+    if (sid && pasteToSession(sid, formatDroppedPaths(all))) return;
+  }
   if (busy) return;
   const paths = p?.paths ?? [];
   if (paths.length === 0) {

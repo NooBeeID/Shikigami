@@ -8,7 +8,7 @@ export type MenuEventName =
 
 export interface MenuPayloads {
   'menu:zoom': { action: 'in' | 'out' | 'reset' };
-  'files:dropped': { paths: string[] };
+  'files:dropped': { paths: string[]; all?: string[]; x?: number; y?: number };
 }
 
 export interface AppConfig {
