@@ -2,10 +2,9 @@ import { get } from 'svelte/store';
 import { pickDirectory } from '../appmenu';
 import {
   activeWorkspace,
-  activeWorkspaceId,
   addProject,
   createWorkspace,
-  selectWorkspace,
+  openWorkspace,
 } from '../../lib/stores';
 import { layout } from '../../lib/stores/layout';
 import { findLeaf } from '../layout/model';
@@ -44,8 +43,7 @@ export function isDuplicate(path: string): boolean {
 
 export async function newWorkspaceFromFolder(path: string): Promise<void> {
   const ws = await createWorkspace(basename(path));
-  await selectWorkspace(ws.id);
-  if (get(activeWorkspaceId) !== ws.id) activeWorkspaceId.set(ws.id);
+  await openWorkspace(ws.id);
   await addProject(path);
 }
 

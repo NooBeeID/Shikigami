@@ -58,6 +58,8 @@ type Workspace struct {
 	ActiveGroupID string  `json:"activeGroupId"`
 
 	Membership map[string]string `json:"membership"` // sessionId -> groupId; non-nil saat keluar
+
+	LastOpenedAt int64 `json:"lastOpenedAt"` // unix ms; 0 = belum pernah dibuka / data lama
 }
 
 // Group adalah satu grup layout di dalam workspace.

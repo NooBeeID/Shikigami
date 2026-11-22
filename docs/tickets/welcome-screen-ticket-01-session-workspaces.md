@@ -2,7 +2,7 @@
 id: welcome-screen-ticket-01-session-workspaces
 title: Workspace terbuka per sesi
 spec: docs/superpowers/specs/2026-11-22-welcome-screen-design.md
-status: ready
+status: implemented
 wave: 1
 depends_on: []
 ---

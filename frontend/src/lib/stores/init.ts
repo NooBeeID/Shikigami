@@ -34,6 +34,7 @@ export async function initStores(): Promise<() => void> {
       ),
     );
   });
+  // Event updated (termasuk dari workspace.touch) tidak mengaktifkan workspace dan tidak mengubah openWorkspaceIds.
   const off2 = onEvent('workspace.changed', () => {
     void loadWorkspaces().catch(() => {});
   });

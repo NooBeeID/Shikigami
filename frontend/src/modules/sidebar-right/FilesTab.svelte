@@ -142,6 +142,7 @@
   });
 
   function onOpenFolder() {
+    if (!hasWorkspace) return;
     pendingPick = true;
     clearTimeout(pendingTimer);
     pendingTimer = setTimeout(() => (pendingPick = false), 60000);
@@ -150,6 +151,7 @@
 
   async function onAddPath(e: SubmitEvent) {
     e.preventDefault();
+    if (!hasWorkspace) return;
     const path = pathInput.trim();
     if (!path) return;
     busy = true;

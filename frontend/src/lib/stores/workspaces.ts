@@ -17,6 +17,22 @@ export const activeProject: Readable<Project | null> = derived(
   ([$ws, $pid]) => $ws?.projects?.find((p) => p.id === $pid) ?? null,
 );
 
+// Memori saja, tidak dipersist; urutan = urutan tab.
+export const openWorkspaceIds: Writable<string[]> = writable<string[]>([]);
+
+// Tetangga kanan, kalau tidak ada tetangga kiri, dari urutan `order` (id sudah ada di dalamnya).
+function neighborOf(order: string[], id: string): string | null {
+  const i = order.indexOf(id);
+  if (i < 0) return null;
+  return order[i + 1] ?? order[i - 1] ?? null;
+}
+
+function clearActive(): void {
+  activeWorkspaceId.set(null);
+  activeProjectId.set(null);
+  sessions.set([]);
+}
+
 function firstProjectId(ws: Workspace | undefined | null): string | null {
   return ws?.projects?.[0]?.id ?? null;
 }
@@ -30,14 +46,12 @@ export async function loadWorkspaces(): Promise<void> {
   const res = await call('workspace.list');
   const list = normalizeList<Workspace>(res, 'workspaces');
   workspaces.set(list);
+  openWorkspaceIds.update((ids) => ids.filter((x) => list.some((w) => w.id === x)));
 
   const curId = get(activeWorkspaceId);
   const cur = list.find((w) => w.id === curId);
   if (!cur) {
-    const first = list[0] ?? null;
-    activeWorkspaceId.set(first ? first.id : null);
-    activeProjectId.set(firstProjectId(first));
-    await loadSessions();
+    clearActive();
     return;
   }
   const pid = get(activeProjectId);
@@ -76,17 +90,39 @@ export async function renameWorkspace(id: string, name: string): Promise<void> {
 // FINAL(shell-layout)
 export async function deleteWorkspace(id: string): Promise<void> {
   await call('workspace.delete', { id });
+  const order = get(openWorkspaceIds);
+  const wasActive = get(activeWorkspaceId) === id;
   const rest = get(workspaces).filter((w) => w.id !== id);
+  // tetangga dihitung dari urutan tab terbuka sebelum id dikeluarkan, hanya id yang masih ada
+  const candidates = order.filter((x) => x === id || rest.some((w) => w.id === x));
+  const next = neighborOf(candidates, id);
   workspaces.set(rest);
-  if (get(activeWorkspaceId) === id) {
-    if (rest.length > 0) {
-      await selectWorkspace(rest[0].id);
-    } else {
-      activeWorkspaceId.set(null);
-      activeProjectId.set(null);
-      sessions.set([]);
-    }
+  openWorkspaceIds.set(order.filter((x) => x !== id));
+  if (wasActive) {
+    if (next) await selectWorkspace(next);
+    else clearActive();
   }
+}
+
+export async function openWorkspace(id: string): Promise<void> {
+  openWorkspaceIds.update((ids) => (ids.includes(id) ? ids : [...ids, id]));
+  await selectWorkspace(id);
+  try {
+    const res = await call<Workspace | { workspace: Workspace }>('workspace.touch', { id });
+    const ws = (res && 'workspace' in res ? res.workspace : res) as Workspace | undefined;
+    if (ws && ws.id) replaceWorkspace(ws);
+  } catch {
+    // touch best-effort: gagal tidak membatalkan pembukaan
+  }
+}
+
+export async function closeWorkspaceTab(id: string): Promise<void> {
+  const order = get(openWorkspaceIds);
+  const next = neighborOf(order, id);
+  openWorkspaceIds.set(order.filter((x) => x !== id));
+  if (get(activeWorkspaceId) !== id) return;
+  if (next) await selectWorkspace(next);
+  else clearActive();
 }
 
 // FINAL(shell-layout)

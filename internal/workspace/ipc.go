@@ -252,4 +252,5 @@ func Register(srv *ipc.Server, s *Store) {
 	})
 
 	registerGroupMethods(srv, s)
+	registerTouch(srv, s)
 }

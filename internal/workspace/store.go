@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 )
 
 // Store menyimpan workspace dan konfigurasi global, dipersist ke DataDir.
@@ -130,6 +131,23 @@ func (s *Store) Rename(id, name string) (Workspace, error) {
 	}
 	next := cloneWorkspaces(s.workspaces)
 	next[i].Name = name
+	if err := s.persistLocked(next, s.ui); err != nil {
+		return Workspace{}, err
+	}
+	s.workspaces = next
+	return cloneWorkspace(next[i]), nil
+}
+
+// Touch mencatat waktu buka terakhir workspace (unix ms) dan mempersistnya.
+func (s *Store) Touch(id string) (Workspace, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	i := s.indexLocked(id)
+	if i < 0 {
+		return Workspace{}, fmt.Errorf("%w: workspace %q", ErrNotFound, id)
+	}
+	next := cloneWorkspaces(s.workspaces)
+	next[i].LastOpenedAt = time.Now().UnixMilli()
 	if err := s.persistLocked(next, s.ui); err != nil {
 		return Workspace{}, err
 	}

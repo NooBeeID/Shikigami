@@ -17,6 +17,7 @@ const workspaceUsage = `pemakaian: shikigamictl workspace <aksi>
   create <nama>
   rename <id> <nama>
   delete <id>
+  touch <id>
   add-project <workspaceId> <path> [nama]
   remove-project <workspaceId> <projectId>
   config get [workspaceId]
@@ -25,7 +26,7 @@ const workspaceUsage = `pemakaian: shikigamictl workspace <aksi>
 func init() {
 	RegisterCommand(Command{
 		Name:    "workspace",
-		Summary: "kelola workspace dan project (list, create, rename, delete, add-project, remove-project, config)",
+		Summary: "kelola workspace dan project (list, create, rename, delete, touch, add-project, remove-project, config)",
 		Run:     runWorkspace,
 	})
 }
@@ -53,6 +54,11 @@ func runWorkspace(ctx context.Context, c *ipc.Client, args []string) error {
 			return errors.New("pemakaian: shikigamictl workspace delete <id>")
 		}
 		return callAndPrint(c, "workspace.delete", map[string]any{"id": rest[0]})
+	case "touch":
+		if len(rest) != 1 {
+			return errors.New("pemakaian: shikigamictl workspace touch <id>")
+		}
+		return callAndPrint(c, "workspace.touch", map[string]any{"id": rest[0]})
 	case "add-project":
 		if len(rest) < 2 || len(rest) > 3 {
 			return errors.New("pemakaian: shikigamictl workspace add-project <workspaceId> <path> [nama]")

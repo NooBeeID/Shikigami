@@ -2,7 +2,7 @@ import { get } from 'svelte/store';
 import { call } from '../../lib/ipc';
 import { layout } from '../../lib/stores/layout';
 import { setPersistStatus } from '../../lib/stores/persist';
-import { activeWorkspaceId, loadWorkspaces, selectWorkspace, workspaces } from '../../lib/stores/workspaces';
+import { activeWorkspaceId, loadWorkspaces, workspaces } from '../../lib/stores/workspaces';
 import { enableWrites, flush, getCurrentWsId, scheduleSave, setBaseline, startWatching } from './autosave';
 import { applyUi, restoreWorkspace } from './restore';
 
@@ -52,18 +52,8 @@ async function run(): Promise<void> {
     } catch {
       // lanjut dengan yang ada
     }
-    const list = get(workspaces);
-    const wanted = ui?.activeWorkspaceId;
-    const target: string | null =
-      typeof wanted === 'string' && list.some((w) => w.id === wanted) ? wanted : (list[0]?.id ?? null);
+    const target: string | null = null; // start selalu kosong: tanpa workspace aktif
     applyUi(ui);
-    if (target && target !== get(activeWorkspaceId)) {
-      try {
-        await selectWorkspace(target);
-      } catch (e) {
-        console.warn('[persist] selectWorkspace gagal', e);
-      }
-    }
 
     try {
       await restoreWorkspace(target);

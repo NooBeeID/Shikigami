@@ -10,7 +10,13 @@
   let selectedProjectId = $state('');
   let root: HTMLElement | undefined = $state();
 
+  const noWorkspace = $derived(!$activeWorkspace);
   const projects = $derived($activeWorkspace?.projects ?? []);
+
+  // Tanpa workspace popup tidak boleh terbuka.
+  $effect(() => {
+    if (noWorkspace) open = false;
+  });
 
   $effect(() => {
     if (!open) return;
@@ -34,7 +40,7 @@
   });
 
   async function start(providerId: string) {
-    if (busy) return;
+    if (busy || noWorkspace) return;
     busy = true;
     try {
       await createAndOpenSession(providerId, selectedProjectId || undefined);
@@ -48,7 +54,7 @@
 </script>
 
 <div class="wrap" bind:this={root}>
-  {#if open}
+  {#if open && !noWorkspace}
     <div class="pop">
       {#if projects.length === 0}
         <div class="dim">Belum ada project</div>
@@ -65,7 +71,7 @@
       {/if}
     </div>
   {/if}
-  <button type="button" class="main" aria-haspopup="menu" aria-expanded={open} onclick={() => (open = !open)}>+ New Session</button>
+  <button type="button" class="main" aria-haspopup="menu" aria-expanded={open} disabled={noWorkspace} title={noWorkspace ? 'Buka atau buat workspace dulu' : undefined} onclick={() => (open = !open)}>+ New Session</button>
 </div>
 
 <style>

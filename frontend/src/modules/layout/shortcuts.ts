@@ -18,6 +18,7 @@ export async function splitPaneWithNewSession(
   if (inflight) return;
   const src = findLeaf(get(store), paneId);
   if (!src || src.kind !== 'terminal') return;
+  if (!get(activeWorkspace)) return;
   const providerId =
     src.provider ?? get(sessions).find((s) => s.id === src.sessionId)?.providerId;
   if (!providerId) {

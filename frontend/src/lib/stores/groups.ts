@@ -86,6 +86,8 @@ function applyGroupsState(state: GroupsState): void {
 }
 
 async function run<T>(label: string, fn: () => Promise<T>, fallback: T): Promise<T> {
+  // Tanpa workspace aktif tidak ada grup untuk dioperasikan: no-op, bukan galat.
+  if (!get(activeWorkspaceId)) return fallback;
   try {
     const res = await fn();
     errStore.set(null);

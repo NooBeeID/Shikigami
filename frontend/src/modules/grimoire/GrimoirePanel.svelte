@@ -1,6 +1,6 @@
 <script lang="ts">
   import { grimoire, startGrimoireStore, stopGrimoireStore, generate, type GrimoireState } from './store';
-  import { activeProject } from '../../lib/stores';
+  import { activeProject, activeWorkspaceId } from '../../lib/stores';
   import { openGrimoirePage } from './openPage';
   import type { GrimoireChapter } from './client';
   import LawsSlot from './laws/LawsSlot.svelte';
@@ -60,6 +60,8 @@
   <StaleSlot projectId={s.projectId} exists={s.exists} />
   {#if $lawsViewOpen && s.projectId && s.exists}
     <!-- editor laws menggantikan daftar buku -->
+  {:else if !$activeWorkspaceId}
+    <div class="msg">Tidak ada workspace aktif</div>
   {:else if !$activeProject || !s.projectId}
     <div class="msg">Pilih project</div>
   {:else}

@@ -1,7 +1,8 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
   import {
-    workspaces, activeWorkspaceId, selectWorkspace, createWorkspace, renameWorkspace, deleteWorkspace,
+    workspaces, openWorkspaceIds, activeWorkspaceId, selectWorkspace, openWorkspace, closeWorkspaceTab,
+    createWorkspace, renameWorkspace, deleteWorkspace,
   } from '../../lib/stores';
   import { defaultWorkspaceName, errText } from './util';
 
@@ -11,6 +12,12 @@
   let confirmId = $state<string | null>(null);
   let notice = $state('');
   let busy = $state(false);
+
+  const openTabs = $derived(
+    $openWorkspaceIds
+      .map((id) => $workspaces.find((w) => w.id === id))
+      .filter((w): w is NonNullable<typeof w> => !!w),
+  );
 
   let noticeTimer: ReturnType<typeof setTimeout> | undefined;
   let cancelled = false;
@@ -35,7 +42,7 @@
     busy = true;
     try {
       const ws = await createWorkspace(defaultWorkspaceName($workspaces));
-      await selectWorkspace(ws.id);
+      await openWorkspace(ws.id);
       startEdit(ws.id, ws.name);
     } catch (e) {
       say(errText(e));
@@ -86,7 +93,7 @@
   function onContext(e: MouseEvent, id: string) {
     e.preventDefault();
     const x = Math.max(0, Math.min(e.clientX, window.innerWidth - 160));
-    const y = Math.max(0, Math.min(e.clientY, window.innerHeight - 80));
+    const y = Math.max(0, Math.min(e.clientY, window.innerHeight - 120));
     menu = { id, x, y };
   }
 
@@ -95,6 +102,13 @@
     const ws = $workspaces.find((w) => w.id === menu!.id);
     if (ws) startEdit(ws.id, ws.name);
     menu = null;
+  }
+
+  async function menuClose() {
+    if (!menu) return;
+    const id = menu.id;
+    menu = null;
+    try { await closeWorkspaceTab(id); } catch (e) { say(errText(e)); }
   }
 
   function menuDelete() {
@@ -160,7 +174,7 @@
 
 <div class="tabs-wrap" bind:this={rootEl}>
   <div class="tabs" role="tablist">
-    {#each $workspaces as w (w.id)}
+    {#each openTabs as w (w.id)}
       {#if editingId === w.id}
         <input
           class="edit"
@@ -199,6 +213,7 @@
 {#if menu}
   <div class="ctx" role="menu" style:left="{menu.x}px" style:top="{menu.y}px">
     <button type="button" role="menuitem" onclick={menuRename}>Ganti nama</button>
+    <button type="button" role="menuitem" onclick={menuClose}>Tutup</button>
     <button type="button" role="menuitem" class:dim={$workspaces.length <= 1} aria-disabled={$workspaces.length <= 1} onclick={menuDelete}>Hapus</button>
   </div>
 {/if}
