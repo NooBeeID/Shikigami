@@ -41,7 +41,14 @@
     try { await selectWorkspace(id); } catch (e) { say(errText(e)); }
   }
 
-  function toggleAdd() {
+  let addPos = $state({ left: 0, top: 0 });
+
+  function toggleAdd(e: MouseEvent) {
+    if (!addMenu) {
+      const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      const w = 280;
+      addPos = { left: Math.max(8, Math.min(r.left, window.innerWidth - w - 8)), top: r.bottom + 4 };
+    }
     addMenu = !addMenu;
     showOpenList = false;
   }
@@ -240,7 +247,7 @@
   </div>
   <button type="button" class="add" aria-label="Workspace baru" title="Workspace baru" aria-haspopup="menu" aria-expanded={addMenu} disabled={busy} onclick={toggleAdd}>+</button>
   {#if addMenu}
-    <div class="addmenu" role="menu">
+    <div class="addmenu" role="menu" style:left="{addPos.left}px" style:top="{addPos.top}px">
       <button type="button" role="menuitem" onclick={add}>Create New</button>
       <button type="button" role="menuitem" aria-expanded={showOpenList} onclick={() => (showOpenList = !showOpenList)}>
         Open Workspace <span class="chev">{showOpenList ? '▾' : '›'}</span>
@@ -341,9 +348,7 @@
   .add:hover { background: var(--bg-hover, #333); color: var(--fg, inherit); }
   .addmenu {
     --wails-draggable: no-drag;
-    position: absolute;
-    top: calc(100% + 4px);
-    right: 0;
+    position: fixed;
     z-index: 1000;
     min-width: 200px;
     max-width: 280px;
