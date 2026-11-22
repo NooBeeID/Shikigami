@@ -2,7 +2,7 @@
 id: global-agents-ticket-03-agents-orchestrator
 title: Agent Global: Orchestrator di Thread
 spec: docs/superpowers/specs/2026-11-22-global-agents-design.md
-status: ready
+status: implemented
 wave: 3
 depends_on: [global-agents-ticket-01-agents-registry, global-agents-ticket-02-agents-mention-spawn]
 ---

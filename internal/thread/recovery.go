@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/NooBeeID/shikigami/internal/mention"
+	"github.com/NooBeeID/shikigami/internal/provider"
 	"github.com/NooBeeID/shikigami/internal/session"
 )
 
@@ -310,6 +311,64 @@ func (r *Recovery) ensureAlive(threadID string, ids []string) (map[string]string
 	return replaced, errors.Join(errs...)
 }
 
+// recoveryProvider memvalidasi provider tercatat: terdaftar dan tersedia. Tanpa fallback.
+func recoveryProvider(id string) (provider.Provider, error) {
+	p, ok := provider.Get(id)
+	if !ok {
+		return nil, fmt.Errorf("provider tercatat %q tidak terdaftar", id)
+	}
+	if _, err := p.Available(); err != nil {
+		return nil, fmt.Errorf("provider tercatat %q tidak tersedia: %v", id, err)
+	}
+	return p, nil
+}
+
+// recoveryPeerRole memulihkan PeerRole dari kategori terkini; resolver nil/tak ada kategori -> PeerRole{}.
+func (r *Recovery) recoveryPeerRole(old Participant) PeerRole {
+	if old.Category == "" || r.m.cfg.Agents == nil {
+		return PeerRole{}
+	}
+	cats, _ := r.m.cfg.Agents.List()
+	for _, c := range cats {
+		if c.ID == old.Category {
+			return PeerRole{CategoryName: c.Name, Text: c.Role}
+		}
+	}
+	return PeerRole{}
+}
+
+// recoveryFindRecord mencari rekaman worktree peserta: sesi cocok, lalu fallback satu-satunya rekaman project.
+func recoveryFindRecord(recs []WorktreeRecord, old Participant) *WorktreeRecord {
+	for i := range recs {
+		if recs[i].SessionID == old.SessionID {
+			rec := recs[i]
+			return &rec
+		}
+		for _, o := range old.PreviousSessionIDs {
+			if recoveryMatchID(recs[i].SessionID, o) {
+				rec := recs[i]
+				return &rec
+			}
+		}
+	}
+	idx := -1
+	for i := range recs {
+		if recs[i].ProjectID == old.ProjectID {
+			if idx >= 0 {
+				return nil
+			}
+			idx = i
+		}
+	}
+	if idx >= 0 {
+		rec := recs[idx]
+		return &rec
+	}
+	return nil
+}
+
+func recoveryMatchID(a, b string) bool { return a != "" && a == b }
+
 func (r *Recovery) respawnOne(t Thread, projects []ProjectInfo, old Participant) (string, error) {
 	fail := func(reason error) (string, error) {
 		r.m.log.Warn("thread: pemulihan agent gagal", "thread", t.ID, "participant", old.Name, "err", reason)
@@ -329,10 +388,18 @@ func (r *Recovery) respawnOne(t Thread, projects []ProjectInfo, old Participant)
 		projectID  string
 		prompt     string
 		peerRec    *WorktreeRecord
+		model      string
 	)
 	threadDir := r.m.Store().ThreadDir(t.ID)
 	if old.Role == RoleMaster {
-		prov, err := resolveMasterProvider()
+		var prov provider.Provider
+		var err error
+		if old.ProviderID != "" {
+			prov, err = recoveryProvider(old.ProviderID)
+			model = old.Model
+		} else {
+			prov, err = resolveMasterProvider()
+		}
 		if err != nil {
 			return fail(err)
 		}
@@ -342,9 +409,16 @@ func (r *Recovery) respawnOne(t Thread, projects []ProjectInfo, old Participant)
 		}
 		providerID = prov.ID()
 		cwd = dir
-		prompt = BuildMasterPrompt(t, projects) + "\n\n" + BuildRecoveryContext(t, projects, msgs, old)
+		prompt = BuildMasterPrompt(t, projects, r.m.agentsSection()) + "\n\n" + BuildRecoveryContext(t, projects, msgs, old)
 	} else {
-		prov, err := spawnResolveProvider()
+		var prov provider.Provider
+		var err error
+		if old.ProviderID != "" {
+			prov, err = recoveryProvider(old.ProviderID)
+			model = old.Model
+		} else {
+			prov, err = spawnResolveProvider()
+		}
 		if err != nil {
 			return fail(err)
 		}
@@ -352,13 +426,7 @@ func (r *Recovery) respawnOne(t Thread, projects []ProjectInfo, old Participant)
 		if err != nil {
 			return fail(fmt.Errorf("baca rekaman worktree: %w", err))
 		}
-		for i := range recs {
-			if recs[i].ProjectID == old.ProjectID {
-				rec := recs[i]
-				peerRec = &rec
-				break
-			}
-		}
+		peerRec = recoveryFindRecord(recs, old)
 		if peerRec == nil {
 			return fail(errors.New("worktree tidak ditemukan (tidak ada rekaman); agent tidak dihidupkan, master perlu memutuskan"))
 		}
@@ -372,7 +440,7 @@ func (r *Recovery) respawnOne(t Thread, projects []ProjectInfo, old Participant)
 		cwd = peerRec.Info.Path
 		projectID = old.ProjectID
 		brief := "Kamu dihidupkan ulang setelah daemon dimulai ulang; lanjutkan tugasmu di worktree ini; berikut konteks.\n\n" + BuildRecoveryContext(t, projects, msgs, old)
-		prompt = BuildPeerBrief(t, peerRec.ProjectName, brief, peerRec.Info)
+		prompt = BuildPeerBrief(t, peerRec.ProjectName, brief, peerRec.Info, r.recoveryPeerRole(old))
 	}
 
 	s, err := r.m.cfg.Sessions.Create(session.SessionSpec{
@@ -380,6 +448,7 @@ func (r *Recovery) respawnOne(t Thread, projects []ProjectInfo, old Participant)
 		ProjectID:   projectID,
 		Cwd:         cwd,
 		ProviderID:  providerID,
+		Model:       model,
 	})
 	if err != nil {
 		return fail(fmt.Errorf("buat sesi: %w", err))
@@ -400,6 +469,9 @@ func (r *Recovery) respawnOne(t Thread, projects []ProjectInfo, old Participant)
 			}
 			th.Participants[i].SessionID = s.ID
 			th.Participants[i].Dead = false
+			if th.Participants[i].ProviderID == "" {
+				th.Participants[i].ProviderID = providerID
+			}
 			th.Participants[i].PreviousSessionIDs = prev
 			found = true
 			return

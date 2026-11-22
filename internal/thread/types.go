@@ -60,6 +60,8 @@ type Thread struct {
 	Participants []Participant `json:"participants"` // selalu [] (bukan null)
 	ReadyToClose bool          `json:"readyToClose"`
 	CloseSummary string        `json:"closeSummary,omitempty"` // ringkasan usul tutup dari master (tiket thread-close)
+	// Ditambah epic global-agents-ticket-03.
+	NoOrchestrator bool `json:"noOrchestrator,omitempty"`
 }
 
 // Participant adalah sesi yang terlibat dalam thread (ProjectID kosong untuk master). Bentuk stabil; tiket lain hanya boleh menambah field opsional dengan omitempty.
@@ -71,6 +73,12 @@ type Participant struct {
 	// Ditambah epic thread-ticket-05 (pemulihan).
 	Dead               bool     `json:"dead,omitempty"`
 	PreviousSessionIDs []string `json:"previousSessionIds,omitempty"`
+	// Ditambah epic global-agents-ticket-03.
+	AgentID    string `json:"agentId,omitempty"`
+	AgentName  string `json:"agentName,omitempty"`
+	Category   string `json:"category,omitempty"` // id kategori
+	ProviderID string `json:"providerId,omitempty"`
+	Model      string `json:"model,omitempty"`
 }
 
 // ThreadMessage adalah satu baris log pesan. From: "user", sessionId, atau "system";

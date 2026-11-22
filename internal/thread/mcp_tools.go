@@ -269,7 +269,7 @@ func mcpDisplayName(t Thread, to string) string {
 func AgentToolsSection() string {
 	return strings.Join([]string{
 		"Kamu punya server MCP `shikigami-thread` dengan tool berikut:",
-		"- thread_spawn(project, brief): men-spawn agent peer di project workspace, di git worktree dan branch milik thread (auto-approve). Project non-git ditolak; spawn ulang project yang sama memakai agent yang sudah ada.",
+		"- thread_spawn(project, brief, agent?, category?): men-spawn agent peer di project workspace, di git worktree dan branch milik thread (auto-approve). agent = nama agent, category = id/nama kategori (mis. planner); keduanya opsional, kosong berarti agent default Executor. Project non-git ditolak; spawn ulang project yang sama dengan agent yang sama memakai peserta yang sudah ada, agent berbeda membuat peserta baru.",
 		"- thread_send(to, text): kirim pesan ke peserta (nama, `master`, `user`, atau `all`). Balasan peserta tiba di terminalmu sebagai `[pesan dari <nama>] [thread] ...`.",
 		"- thread_read(last_n): baca log thread terakhir.",
 		"- thread_participants(): lihat peserta beserta status kerja/idle.",

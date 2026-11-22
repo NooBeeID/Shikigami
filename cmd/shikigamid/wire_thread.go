@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"path/filepath"
 	"sync"
 	"time"
 
+	"github.com/NooBeeID/shikigami/internal/agents"
 	"github.com/NooBeeID/shikigami/internal/ipc"
 	"github.com/NooBeeID/shikigami/internal/mention"
 	"github.com/NooBeeID/shikigami/internal/paths"
@@ -192,7 +194,21 @@ func wireThread(srv *ipc.Server, d *Deps) {
 		}
 	})
 
+	// Registry agent (tiket 01): opsional. Jangan memberi interface berisi nil-pointer.
+	var resolver thread.AgentResolver
+	var agentStore *agents.Store
+	if av, aok := d.Lookup("agents.store"); aok {
+		if as, aok2 := av.(*agents.Store); aok2 && as != nil {
+			agentStore = as
+			resolver = as
+		}
+	}
+	if resolver == nil {
+		d.Logger.Warn("thread: agents.store tidak tersedia, thread memakai Claude polos")
+	}
+
 	m := thread.NewManager(thread.ManagerConfig{
+		Agents:     resolver,
 		Store:      store,
 		Sessions:   mgr,
 		Sender:     q,
@@ -205,6 +221,7 @@ func wireThread(srv *ipc.Server, d *Deps) {
 	thread.RegisterIPC(srv, m)
 	if _, err := thread.InstallAgents(context.Background(), thread.AgentsConfig{
 		Manager:    m,
+		Agents:     resolver,
 		Sessions:   mgr,
 		Workspaces: dir,
 		DataDir:    dataDir,
@@ -248,5 +265,45 @@ func wireThread(srv *ipc.Server, d *Deps) {
 			}
 		}()
 	})
+	if agentStore != nil {
+		// Guard dipanggil dengan kunci store terpegang: jangan memanggil agentStore.List()
+		// di dalamnya. Nama agent diambil dari cache yang dimuat sebelum guard berjalan.
+		var namesMu sync.RWMutex
+		names := map[string]string{}
+		reload := func() {
+			_, as := agentStore.List()
+			nm := make(map[string]string, len(as))
+			for _, a := range as {
+				nm[a.ID] = a.Name
+			}
+			namesMu.Lock()
+			names = nm
+			namesMu.Unlock()
+		}
+		reload()
+		go func() {
+			defer func() { _ = recover() }()
+			c, err := ipc.Dial(d.SocketPath)
+			if err != nil {
+				return
+			}
+			if _, err := c.Subscribe("agents.changed", func(string, json.RawMessage) { reload() }); err != nil {
+				_ = c.Close()
+			}
+		}()
+		agentStore.SetDeleteGuard(func(id string) error {
+			title, used := m.InUse(id)
+			if !used {
+				return nil
+			}
+			namesMu.RLock()
+			name := names[id]
+			namesMu.RUnlock()
+			if name == "" {
+				name = id
+			}
+			return fmt.Errorf("agent %q dipakai thread aktif %q", name, title)
+		})
+	}
 	m.FireStart()
 }

@@ -60,7 +60,7 @@ func InstallLaunchContribution(s *MCPServer, m *Manager, dataDir string, logger 
 	}
 	launchOnce.Do(func() {
 		provider.RegisterLaunchContribution(func(ctx *provider.LaunchContext) {
-			if ctx == nil || ctx.Provider == nil || !ctx.Provider.Capabilities().MCP {
+			if ctx == nil || ctx.Provider == nil {
 				return
 			}
 			id, ok := ThreadIDFromCwd(dataDir, ctx.Session.Cwd)
@@ -69,6 +69,10 @@ func InstallLaunchContribution(s *MCPServer, m *Manager, dataDir string, logger 
 			}
 			t, err := m.Get(id)
 			if err != nil || t.State != StateActive {
+				return
+			}
+			if !ctx.Provider.Capabilities().MCP {
+				logger.Warn("thread: provider tanpa MCP di cwd thread; tool thread tidak dipasang", "thread", id, "provider", ctx.Provider.ID())
 				return
 			}
 			u := s.URL()

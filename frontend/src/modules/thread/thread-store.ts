@@ -7,6 +7,7 @@ import {
   errorText, createThreadRpc, listMessages, listThreads, getThread, sendThread,
   onThreadMessage, onThreadUpdated,
 } from './thread-client';
+import { subscribeAgentEvents } from './thread-agents';
 import type { Thread, ThreadMessage } from './types';
 
 export const threads = writable<Thread[]>([]);
@@ -130,6 +131,7 @@ export function subscribeThreadEvents(): () => void {
     if (t.workspaceId === get(activeWorkspaceId)) upsertThread(t);
   });
   const offMessage = onThreadMessage((m) => putMessages(m.threadId, [m]));
+  const offAgents = subscribeAgentEvents();
   let first = true;
   const offWs = activeWorkspaceId.subscribe((id) => {
     // Langganan sudah aktif sebelum pemuatan awal; subscribe() langsung memanggil sekali.
@@ -140,6 +142,7 @@ export function subscribeThreadEvents(): () => void {
   const stop = () => {
     offUpdated();
     offMessage();
+    offAgents();
     offWs();
     cleanup = null;
   };

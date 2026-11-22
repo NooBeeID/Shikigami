@@ -60,6 +60,7 @@ type ManagerConfig struct {
 	Namer      *mention.Namer // untuk Participant.Name; boleh nil -> "master"
 	Publish    Publisher
 	Logger     *slog.Logger
+	Agents     AgentResolver // opsional; nil = perilaku lama
 }
 
 // ThreadCaller identitas pemanggil tool thread.

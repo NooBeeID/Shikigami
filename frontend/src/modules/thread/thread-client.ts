@@ -1,6 +1,9 @@
 // Pembungkus IPC thread dan helper murni.
 import { call, onEvent } from '../../lib/ipc';
-import { THREAD_EVENTS, THREAD_METHODS, type Thread, type ThreadMessage } from './types';
+import {
+  AGENTS_EVENTS, AGENTS_METHODS, THREAD_EVENTS, THREAD_METHODS,
+  type AgentCategoryInfo, type Participant, type Thread, type ThreadMessage,
+} from './types';
 
 export function asList<T>(res: unknown, key?: string): T[] {
   if (Array.isArray(res)) return res as T[];
@@ -27,8 +30,33 @@ export function errorText(e: unknown): string {
   return msg.slice(0, 160);
 }
 
+function normParticipant(p: Participant): Participant {
+  return {
+    ...p,
+    agentId: typeof p.agentId === 'string' ? p.agentId : undefined,
+    agentName: typeof p.agentName === 'string' ? p.agentName : undefined,
+    category: typeof p.category === 'string' ? p.category : undefined,
+    providerId: typeof p.providerId === 'string' ? p.providerId : undefined,
+    model: typeof p.model === 'string' ? p.model : undefined,
+  };
+}
+
 function normThread(t: Thread): Thread {
-  return { ...t, participants: Array.isArray(t.participants) ? t.participants : [] };
+  const parts = Array.isArray(t.participants) ? t.participants.filter((p) => p && typeof p === 'object').map(normParticipant) : [];
+  return { ...t, participants: parts, noOrchestrator: t.noOrchestrator === true };
+}
+
+export async function listAgentCategories(): Promise<AgentCategoryInfo[]> {
+  const res = await call<unknown>(AGENTS_METHODS.list, {});
+  return asList<AgentCategoryInfo>(res, 'categories').filter((c) => c && typeof c.id === 'string' && typeof c.name === 'string');
+}
+
+export function onAgentsChanged(fn: () => void): () => void {
+  try {
+    return onEvent(AGENTS_EVENTS.changed, () => fn());
+  } catch {
+    return () => {};
+  }
 }
 
 export async function listThreads(workspaceId: string): Promise<Thread[]> {

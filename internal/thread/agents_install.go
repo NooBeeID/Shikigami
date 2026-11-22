@@ -14,6 +14,7 @@ type AgentsConfig struct {
 	Workspaces    WorkspaceSource
 	DataDir       string
 	Logger        *slog.Logger
+	Agents        AgentResolver                   // opsional; nil = perilaku lama
 	OnSessionExit func(fn func(sessionID string)) // boleh dipanggil beberapa kali
 }
 
@@ -64,6 +65,7 @@ func installAgents(ctx context.Context, cfg AgentsConfig) (*Agents, error) {
 		Router:     router,
 		DataDir:    cfg.DataDir,
 		Logger:     cfg.Logger,
+		Agents:     cfg.Agents,
 	})
 	sp.RegisterTool()
 	ToolsSection = AgentToolsSection

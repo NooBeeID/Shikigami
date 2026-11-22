@@ -71,7 +71,7 @@ func LoadWorktreeRecords(threadDir string) ([]WorktreeRecord, error) {
 	return worktreeRecordsRead(threadDir)
 }
 
-// UpsertWorktreeRecord mengganti/menambah catatan berkunci ProjectID secara atomik.
+// UpsertWorktreeRecord mengganti/menambah catatan berkunci (ProjectID, ProjectSlug) secara atomik.
 func UpsertWorktreeRecord(threadDir string, rec WorktreeRecord) error {
 	if threadDir == "" {
 		return errors.New("threadDir kosong")
@@ -90,7 +90,7 @@ func UpsertWorktreeRecord(threadDir string, rec WorktreeRecord) error {
 	}
 	replaced := false
 	for i := range recs {
-		if recs[i].ProjectID == rec.ProjectID {
+		if recs[i].ProjectID == rec.ProjectID && recs[i].ProjectSlug == rec.ProjectSlug {
 			recs[i] = rec
 			replaced = true
 			break
@@ -102,7 +102,9 @@ func UpsertWorktreeRecord(threadDir string, rec WorktreeRecord) error {
 	return worktreeRecordsWrite(threadDir, recs)
 }
 
-// DeleteWorktreeRecord menghapus catatan; idempoten.
+// DeleteWorktreeRecord menghapus catatan ber-ProjectID tersebut yang worktree-nya sudah tidak ada
+// di disk (Info.Path kosong juga dihapus). Catatan yang worktree-nya masih ada dipertahankan.
+// Idempoten dan tidak menulis ulang berkas bila tidak ada yang berubah.
 func DeleteWorktreeRecord(threadDir, projectID string) error {
 	worktreeRecordsMu.Lock()
 	defer worktreeRecordsMu.Unlock()
@@ -112,12 +114,44 @@ func DeleteWorktreeRecord(threadDir, projectID string) error {
 	}
 	out := recs[:0:0]
 	for _, r := range recs {
-		if r.ProjectID != projectID {
-			out = append(out, r)
+		if r.ProjectID == projectID && (r.Info.Path == "" || !worktreeExists(r.Info.Path)) {
+			continue
 		}
+		out = append(out, r)
 	}
 	if len(out) == len(recs) {
 		return nil
 	}
 	return worktreeRecordsWrite(threadDir, out)
+}
+
+// DeleteWorktreeRecordSlug menghapus tepat satu catatan berkunci (projectID, slug) tanpa melihat disk; idempoten.
+func DeleteWorktreeRecordSlug(threadDir, projectID, slug string) error {
+	worktreeRecordsMu.Lock()
+	defer worktreeRecordsMu.Unlock()
+	recs, err := worktreeRecordsRead(threadDir)
+	if err != nil {
+		return err
+	}
+	out := recs[:0:0]
+	for _, r := range recs {
+		if r.ProjectID == projectID && r.ProjectSlug == slug {
+			continue
+		}
+		out = append(out, r)
+	}
+	if len(out) == len(recs) {
+		return nil
+	}
+	return worktreeRecordsWrite(threadDir, out)
+}
+
+// worktreeRecordsSlugTaken: true bila ada catatan ber-ProjectSlug sama (slug = nama direktori worktree).
+func worktreeRecordsSlugTaken(recs []WorktreeRecord, slug string) bool {
+	for _, r := range recs {
+		if r.ProjectSlug == slug {
+			return true
+		}
+	}
+	return false
 }

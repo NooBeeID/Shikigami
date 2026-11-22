@@ -2,6 +2,7 @@
   import { statusOf } from '../../status/store';
   import { avatarColor, initials } from '../format';
   import type { Participant, Thread } from '../types';
+  import { agentCategories, participantSub } from '../thread-agents';
   import { openParticipantTerminal } from './terminal';
 
   let { participant, thread, projectName }: { participant: Participant; thread: Thread; projectName: string } = $props();
@@ -13,14 +14,16 @@
   const label = $derived(
     participant.name || (participant.role === 'master' ? 'master' : participant.sessionId.slice(0, 8)),
   );
-  const sub = $derived([participant.role, projectName].filter(Boolean).join(' · '));
+  let categoryNames = $state<Record<string, string>>({});
+  $effect(() => agentCategories.subscribe((v) => (categoryNames = v)));
+  const sub = $derived(participantSub(participant, projectName, categoryNames));
 </script>
 
 <button type="button" class="row" title="Buka terminal" onclick={() => openParticipantTerminal(participant, thread)}>
   <span class="avatar" style:background={avatarColor(participant.name || participant.sessionId)} aria-hidden="true">{initials(label)}</span>
   <span class="text">
     <span class="top"><span class="name">{label}</span><span class="badge">thread</span></span>
-    <span class="sub">{sub}</span>
+    <span class="sub" title={sub}>{sub}</span>
   </span>
   <span class="state" aria-label={working ? 'kerja' : 'idle'}>
     <span class="dot" class:working></span>{working ? 'kerja' : 'idle'}
