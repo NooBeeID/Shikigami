@@ -157,14 +157,31 @@
       }
     };
 
-    const ro = new ResizeObserver(() => {
+    // fit() memakai ukuran sel xterm yang ter-cache; xterm mengukur ulang sel
+    // lewat event DPR terpisah (mis. zoom native webview). Fit ulang setelah
+    // ukuran sel mengendap, baru kirim ukuran ke PTY.
+    const refitSettled = () => {
       if (!visibleNow) return;
       tryOpen();
       safeFit();
       clearTimeout(timer);
-      timer = setTimeout(sendResize, 100);
-    });
+      timer = setTimeout(() => {
+        if (!visibleNow || disposed) return;
+        safeFit();
+        sendResize();
+      }, 100);
+    };
+    const ro = new ResizeObserver(refitSettled);
     ro.observe(host);
+
+    let dprMq: MediaQueryList | undefined;
+    const onDprChange = () => { refitSettled(); watchDpr(); };
+    const watchDpr = () => {
+      dprMq?.removeEventListener('change', onDprChange);
+      dprMq = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
+      dprMq.addEventListener('change', onDprChange, { once: true });
+    };
+    watchDpr();
 
     return () => {
       disposed = true;
@@ -173,6 +190,7 @@
       unsubExit();
       unregisterFont();
       ro.disconnect();
+      dprMq?.removeEventListener('change', onDprChange);
       clearTimeout(timer);
       queue = [];
       applyVisible = () => {};
