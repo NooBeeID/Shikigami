@@ -45,17 +45,17 @@ func TestListOnlyActiveWorkspaceSessions(t *testing.T) {
 func TestReconcile(t *testing.T) {
 	// Folder sesi s1: wf r-run berjalan, wf r-done selesai, wf r-none tanpa jejak.
 	tp := folderFixture(t, map[string]string{
-		"subagents/workflows/r-run/journal.jsonl": "journal_running.jsonl",
-		"workflows/wf_r-done.json":                "wf_completed.json",
+		"subagents/workflows/wf_run-1/journal.jsonl": "journal_running.jsonl",
+		"workflows/wf_done-1.json":                "wf_completed.json",
 	})
 	reg := NewRegistry()
 	reg.Apply("s1", "SubagentStart", map[string]any{"agent_id": "x", "agent_type": "t", "transcript_path": tp})
 	reg.mu.Lock()
 	reg.transcripts["s1"] = tp
-	reg.runs["w1"] = &Run{ID: "w1", SessionID: "s1", Kind: KindWorkflow, RunID: "r-run"}
-	reg.runs["w2"] = &Run{ID: "w2", SessionID: "s1", Kind: KindWorkflow, RunID: "r-done"}
-	reg.runs["w3"] = &Run{ID: "w3", SessionID: "s1", Kind: KindWorkflow, RunID: "r-none"}
-	reg.runs["g1"] = &Run{ID: "g1", SessionID: "ghost", Kind: KindWorkflow, RunID: "r-none"}
+	reg.runs["w1"] = &Run{ID: "w1", SessionID: "s1", Kind: KindWorkflow, RunID: "wf_run-1"}
+	reg.runs["w2"] = &Run{ID: "w2", SessionID: "s1", Kind: KindWorkflow, RunID: "wf_done-1"}
+	reg.runs["w3"] = &Run{ID: "w3", SessionID: "s1", Kind: KindWorkflow, RunID: "wf_none-1"}
+	reg.runs["g1"] = &Run{ID: "g1", SessionID: "ghost", Kind: KindWorkflow, RunID: "wf_none-1"}
 	reg.mu.Unlock()
 	lk := fakeLookup{"s1": "ws1"}
 

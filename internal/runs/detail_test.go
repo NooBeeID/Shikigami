@@ -29,16 +29,16 @@ func folderFixture(t *testing.T, files map[string]string) string {
 }
 
 func TestReadDetailWorkflowFinished(t *testing.T) {
-	tp := folderFixture(t, map[string]string{"workflows/wf_r1.json": "wf_completed.json"})
-	d := ReadDetail(tp, Run{Kind: KindWorkflow, RunID: "r1"})
+	tp := folderFixture(t, map[string]string{"workflows/wf_e8ae7cd1-a8d.json": "wf_completed.json"})
+	d := ReadDetail(tp, Run{Kind: KindWorkflow, RunID: "wf_e8ae7cd1-a8d"})
 	if !d.Finished {
 		t.Fatalf("detail = %+v", d)
 	}
 }
 
 func TestReadDetailWorkflowRunning(t *testing.T) {
-	tp := folderFixture(t, map[string]string{"subagents/workflows/r1/journal.jsonl": "journal_running.jsonl"})
-	d := ReadDetail(tp, Run{Kind: KindWorkflow, RunID: "r1"})
+	tp := folderFixture(t, map[string]string{"subagents/workflows/wf_e8ae7cd1-a8d/journal.jsonl": "journal_running.jsonl"})
+	d := ReadDetail(tp, Run{Kind: KindWorkflow, RunID: "wf_e8ae7cd1-a8d"})
 	if !d.Found || d.Finished || d.Progress == nil {
 		t.Fatalf("detail = %+v", d)
 	}
@@ -52,12 +52,12 @@ func TestReadDetailWorkflowRunning(t *testing.T) {
 }
 
 func TestReadDetailWorkflowPartialLastLine(t *testing.T) {
-	tp := folderFixture(t, map[string]string{"subagents/workflows/r1/journal.jsonl": "journal_running.jsonl"})
-	jp := filepath.Join(strings.TrimSuffix(tp, ".jsonl"), "subagents/workflows/r1/journal.jsonl")
+	tp := folderFixture(t, map[string]string{"subagents/workflows/wf_e8ae7cd1-a8d/journal.jsonl": "journal_running.jsonl"})
+	jp := filepath.Join(strings.TrimSuffix(tp, ".jsonl"), "subagents/workflows/wf_e8ae7cd1-a8d/journal.jsonl")
 	f, _ := os.OpenFile(jp, os.O_APPEND|os.O_WRONLY, 0o644)
 	f.WriteString(`{"type":"result","agentId":"a6f34`)
 	f.Close()
-	d := ReadDetail(tp, Run{Kind: KindWorkflow, RunID: "r1"})
+	d := ReadDetail(tp, Run{Kind: KindWorkflow, RunID: "wf_e8ae7cd1-a8d"})
 	if !d.Found || d.Progress == nil || d.Progress.Total != 2 || d.Progress.Done != 1 {
 		t.Fatalf("detail = %+v", d)
 	}
@@ -65,7 +65,7 @@ func TestReadDetailWorkflowPartialLastLine(t *testing.T) {
 
 func TestReadDetailWorkflowNoJournalMeansUnconfirmed(t *testing.T) {
 	tp := folderFixture(t, map[string]string{"subagents/other.txt": "agent.meta.json"})
-	d := ReadDetail(tp, Run{Kind: KindWorkflow, RunID: "r1"})
+	d := ReadDetail(tp, Run{Kind: KindWorkflow, RunID: "wf_e8ae7cd1-a8d"})
 	if d.Found || d.Finished {
 		t.Fatalf("detail = %+v", d)
 	}
@@ -92,7 +92,7 @@ func TestReadDetailSubagentNoChecklist(t *testing.T) {
 
 func TestReadDetailMissingPath(t *testing.T) {
 	for _, tp := range []string{"", "/nonexistent/x/sess.jsonl"} {
-		if d := ReadDetail(tp, Run{Kind: KindWorkflow, RunID: "r1"}); d != (Detail{}) {
+		if d := ReadDetail(tp, Run{Kind: KindWorkflow, RunID: "wf_e8ae7cd1-a8d"}); d != (Detail{}) {
 			t.Fatalf("detail = %+v", d)
 		}
 		if d := ReadDetail(tp, Run{Kind: KindSubagent, AgentID: "a"}); d != (Detail{}) {
@@ -105,14 +105,14 @@ func TestReadDetailCorruptJSON(t *testing.T) {
 	tp := folderFixture(t, map[string]string{"subagents/x": "agent.meta.json"})
 	folder := strings.TrimSuffix(tp, ".jsonl")
 	os.WriteFile(filepath.Join(folder, "subagents/agent-ag1.meta.json"), []byte("{rusak"), 0o644)
-	os.MkdirAll(filepath.Join(folder, "subagents/workflows/r1"), 0o755)
-	os.WriteFile(filepath.Join(folder, "subagents/workflows/r1/journal.jsonl"), []byte("bukan json\n{{{\n"), 0o644)
+	os.MkdirAll(filepath.Join(folder, "subagents/workflows/wf_e8ae7cd1-a8d"), 0o755)
+	os.WriteFile(filepath.Join(folder, "subagents/workflows/wf_e8ae7cd1-a8d/journal.jsonl"), []byte("bukan json\n{{{\n"), 0o644)
 	os.MkdirAll(filepath.Join(folder, "workflows"), 0o755)
-	os.WriteFile(filepath.Join(folder, "workflows/wf_r1.json"), []byte("{rusak"), 0o644)
+	os.WriteFile(filepath.Join(folder, "workflows/wf_e8ae7cd1-a8d.json"), []byte("{rusak"), 0o644)
 	if d := ReadDetail(tp, Run{Kind: KindSubagent, AgentID: "ag1"}); d != (Detail{}) {
 		t.Fatalf("subagent = %+v", d)
 	}
-	if d := ReadDetail(tp, Run{Kind: KindWorkflow, RunID: "r1"}); d != (Detail{}) {
+	if d := ReadDetail(tp, Run{Kind: KindWorkflow, RunID: "wf_e8ae7cd1-a8d"}); d != (Detail{}) {
 		t.Fatalf("workflow = %+v", d)
 	}
 }
@@ -120,11 +120,11 @@ func TestReadDetailCorruptJSON(t *testing.T) {
 func TestReadDetailRejectsPathTraversal(t *testing.T) {
 	tp := folderFixture(t, map[string]string{
 		"subagents/agent-ag1.meta.json":        "agent.meta.json",
-		"subagents/workflows/r1/journal.jsonl": "journal.jsonl",
-		"workflows/wf_r1.json":                 "wf_completed.json",
+		"subagents/workflows/wf_e8ae7cd1-a8d/journal.jsonl": "journal.jsonl",
+		"workflows/wf_e8ae7cd1-a8d.json":                 "wf_completed.json",
 	})
 	// Setelah filepath.Join membersihkan path, ID ini mendarat di berkas nyata.
-	for _, id := range []string{"r1/../r1", "x/../r1", "../r1/../r1"} {
+	for _, id := range []string{"wf_e8ae7cd1-a8d/../wf_e8ae7cd1-a8d", "x/../wf_e8ae7cd1-a8d", "../wf_e8ae7cd1-a8d/../wf_e8ae7cd1-a8d"} {
 		if d := ReadDetail(tp, Run{Kind: KindWorkflow, RunID: id}); d != (Detail{}) {
 			t.Errorf("runId %q = %+v", id, d)
 		}
@@ -139,8 +139,8 @@ func TestReadDetailRejectsPathTraversal(t *testing.T) {
 	if d := ReadDetail(tp, Run{Kind: KindSubagent, AgentID: "ag1"}); !d.Found {
 		t.Fatalf("kontrol ag1 = %+v", d)
 	}
-	if d := ReadDetail(tp, Run{Kind: KindWorkflow, RunID: "r1"}); !d.Found {
-		t.Fatalf("kontrol r1 = %+v", d)
+	if d := ReadDetail(tp, Run{Kind: KindWorkflow, RunID: "wf_e8ae7cd1-a8d"}); !d.Found {
+		t.Fatalf("kontrol wf = %+v", d)
 	}
 }
 

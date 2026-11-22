@@ -99,12 +99,13 @@ func ReadDetail(transcriptPath string, run Run) (d Detail) {
 	return Detail{}
 }
 
+// runID asli sudah berawalan "wf_" (sama dengan nama berkas di workflows/).
 func readWorkflow(folder, runID string) Detail {
 	var d Detail
 	var wf struct {
 		Status string `json:"status"`
 	}
-	if readSmallJSON(filepath.Join(folder, "workflows", "wf_"+runID+".json"), &wf) {
+	if readSmallJSON(filepath.Join(folder, "workflows", runID+".json"), &wf) {
 		s := strings.ToLower(wf.Status)
 		d.Finished = s != "" && s != "running"
 	}
