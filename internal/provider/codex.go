@@ -22,9 +22,12 @@ func (codexProvider) Name() string { return "Codex" }
 func (codexProvider) Capabilities() Capabilities { return codexCapabilities }
 
 // Command menjalankan codex dengan --dangerously-bypass-approvals-and-sandbox
-// (selalu); MCP diabaikan.
+// (selalu); memakai -m <m> bila ctx.Model terisi (ctx.Args yang sudah memuat
+// -m/--model menang); MCP diabaikan.
 func (codexProvider) Command(ctx *LaunchContext) (string, []string, []string) {
-	return "codex", withFlag(append([]string(nil), ctx.Args...), codexBypassFlag), nil
+	args := withFlag(append([]string(nil), ctx.Args...), codexBypassFlag)
+	args = withValueFlag(args, "-m", "--model", ctx.Model)
+	return "codex", args, nil
 }
 
 // SendInput menulis teks lewat WriteInput.

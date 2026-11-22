@@ -3,6 +3,7 @@ package provider
 import (
 	"os"
 	"sort"
+	"strings"
 	"sync"
 	"sync/atomic"
 
@@ -19,6 +20,9 @@ type LaunchContext struct {
 	Env map[string]string
 	// Args adalah argumen tambahan untuk binary provider.
 	Args []string
+	// Model adalah nama model yang diminta (kosong = default provider). Diisi
+	// Launcher dari Session.Model; Command tiap provider menerjemahkannya ke flag.
+	Model string
 	// MCPServers memetakan nama ke konfigurasi server MCP (tidak pernah nil saat diberikan).
 	MCPServers map[string]any
 }
@@ -41,6 +45,25 @@ func withFlag(args []string, flag string) []string {
 		}
 	}
 	return append([]string{flag}, args...)
+}
+
+// withValueFlag mengembalikan args dengan "<flag> <value>" ditambahkan di akhir
+// bila value tidak kosong dan args belum memuat flag tersebut. Args yang sudah
+// ada MENANG: bila args memuat flag, alias (bila tidak kosong), atau bentuk
+// "flag=..." / "alias=...", args dikembalikan apa adanya (tidak digandakan,
+// tidak ditimpa). value kosong (setelah strings.TrimSpace) = args apa adanya.
+func withValueFlag(args []string, flag, alias, value string) []string {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return args
+	}
+	for _, a := range args {
+		if a == flag || (alias != "" && a == alias) ||
+			strings.HasPrefix(a, flag+"=") || (alias != "" && strings.HasPrefix(a, alias+"=")) {
+			return args
+		}
+	}
+	return append(args, flag, value)
 }
 
 var pathSource atomic.Pointer[func() string]
@@ -103,6 +126,7 @@ func (Launcher) Command(s session.SessionSpec) (string, []string, []string) {
 	ctx := &LaunchContext{
 		Session:    s,
 		Provider:   p,
+		Model:      s.Model,
 		Env:        map[string]string{},
 		MCPServers: map[string]any{},
 	}

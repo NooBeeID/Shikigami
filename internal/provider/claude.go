@@ -72,9 +72,11 @@ func writeMCPConfig(servers map[string]any) (string, error) {
 }
 
 // Command menjalankan claude dengan --dangerously-skip-permissions (selalu);
-// menambah --mcp-config bila ada server MCP.
+// menambah --model <m> bila ctx.Model terisi (ctx.Args yang sudah memuat --model/-m
+// menang); menambah --mcp-config bila ada server MCP.
 func (claudeProvider) Command(ctx *LaunchContext) (string, []string, []string) {
 	args := withFlag(append([]string(nil), ctx.Args...), claudeSkipPermissionsFlag)
+	args = withValueFlag(args, "--model", "-m", ctx.Model)
 	if err := trustClaudeFolder(ctx.Session.Cwd); err != nil {
 		slog.Warn("provider claude: gagal menandai folder trusted", "cwd", ctx.Session.Cwd, "err", err)
 	}

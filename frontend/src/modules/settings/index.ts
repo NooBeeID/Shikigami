@@ -3,6 +3,7 @@ import { registerSettingsPage } from './pages';
 import ConnectorsPlaceholder from './ConnectorsPlaceholder.svelte';
 import McpPage from './McpPage.svelte';
 import SettingsModal from './SettingsModal.svelte';
+import './agents';
 
 // Tiket 02 menimpa halaman `connectors` lewat registerSettingsPage (id sama).
 registerSettingsPage({ id: 'connectors', title: 'Connector', order: 10, component: ConnectorsPlaceholder });

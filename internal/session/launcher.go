@@ -7,6 +7,8 @@ type Launcher interface {
 	Command(s SessionSpec) (cmd string, args []string, env []string)
 }
 
+// defaultLauncher menjalankan login shell; Spec.Model sengaja diabaikan di sini
+// dan diteruskan oleh provider.Launcher ke LaunchContext.Model.
 type defaultLauncher struct{}
 
 // DefaultLauncher mengembalikan launcher login shell default.

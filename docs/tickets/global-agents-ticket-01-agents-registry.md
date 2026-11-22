@@ -2,7 +2,7 @@
 id: global-agents-ticket-01-agents-registry
 title: Agent Global: Registry dan Settings
 spec: docs/superpowers/specs/2026-11-22-global-agents-design.md
-status: ready
+status: implemented
 wave: 1
 depends_on: []
 ---

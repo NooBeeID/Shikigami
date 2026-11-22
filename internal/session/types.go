@@ -32,6 +32,11 @@ type SessionSpec struct {
 	WorkspaceID, ProjectID, Cwd, ProviderID string
 	Cols, Rows                              uint16
 	Env                                     []string
+	// Model adalah nama model untuk provider; kosong = default provider.
+	// Nilai tidak divalidasi aplikasi (daftar model tidak dikenal); CLI provider
+	// yang menolaknya, dan keluar awal itu terlihat sebagai sesi exited
+	// (output tetap di scrollback).
+	Model string
 }
 
 // AttachResult adalah hasil Attach: sesi, scrollback, dan offset kumulatif.
