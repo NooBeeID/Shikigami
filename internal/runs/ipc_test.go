@@ -2,7 +2,11 @@ package runs
 
 import (
 	"encoding/json"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
+	"unicode/utf8"
 
 	"github.com/NooBeeID/shikigami/internal/session"
 )
@@ -46,7 +50,7 @@ func TestReconcile(t *testing.T) {
 	// Folder sesi s1: wf r-run berjalan, wf r-done selesai, wf r-none tanpa jejak.
 	tp := folderFixture(t, map[string]string{
 		"subagents/workflows/wf_run-1/journal.jsonl": "journal_running.jsonl",
-		"workflows/wf_done-1.json":                "wf_completed.json",
+		"workflows/wf_done-1.json":                   "wf_completed.json",
 	})
 	reg := NewRegistry()
 	reg.Apply("s1", "SubagentStart", map[string]any{"agent_id": "x", "agent_type": "t", "transcript_path": tp})
@@ -117,5 +121,57 @@ func TestReconcileKeepsLiveUnconfirmedRuns(t *testing.T) {
 	}
 	if l := reg.List(nil); len(l) != 0 {
 		t.Fatalf("list = %+v", l)
+	}
+}
+
+// Identitas dari FIFO bisa tertukar antar Agent paralel; meta.json yang benar.
+func TestReconcileCorrectsSubagentIdentityFromMeta(t *testing.T) {
+	tp := folderFixture(t, map[string]string{"subagents/agent-ag1.meta.json": "agent.meta.json"})
+	build := func(identity string) *Registry {
+		reg := NewRegistry()
+		reg.mu.Lock()
+		reg.transcripts["s1"] = tp
+		reg.runs["ag1"] = &Run{ID: "ag1", SessionID: "s1", Kind: KindSubagent, AgentID: "ag1", Identity: identity}
+		reg.mu.Unlock()
+		return reg
+	}
+	lk := fakeLookup{"s1": "ws1"}
+
+	reg := build("milik agent lain")
+	// meta fixture: finished=true; tulis ulang agar masih berjalan.
+	rewriteMeta(t, tp, `{"description":"Spike probe agent","finished":false}`)
+	if c := Reconcile(reg, lk, "ws1"); len(c) != 1 {
+		t.Fatalf("changed = %v", c)
+	}
+	if got := reg.List(nil)[0].Identity; got != "Spike probe agent" {
+		t.Fatalf("identity = %q", got)
+	}
+	if c := Reconcile(reg, lk, "ws1"); len(c) != 0 {
+		t.Fatalf("changed kedua = %v", c)
+	}
+
+	// Description kosong: identitas dibiarkan.
+	reg = build("dari fifo")
+	rewriteMeta(t, tp, `{"description":"","finished":false}`)
+	Reconcile(reg, lk, "ws1")
+	if got := reg.List(nil)[0].Identity; got != "dari fifo" {
+		t.Fatalf("identity = %q", got)
+	}
+
+	// Terpotong dengan aturan 60 rune yang sama.
+	reg = build("x")
+	rewriteMeta(t, tp, `{"description":"`+strings.Repeat("é", 100)+`","finished":false}`)
+	Reconcile(reg, lk, "ws1")
+	got := reg.List(nil)[0].Identity
+	if utf8.RuneCountInString(got) != 60 || !strings.HasSuffix(got, "…") {
+		t.Fatalf("identity = %q", got)
+	}
+}
+
+func rewriteMeta(t *testing.T, transcriptPath, content string) {
+	t.Helper()
+	p := filepath.Join(strings.TrimSuffix(transcriptPath, ".jsonl"), "subagents", "agent-ag1.meta.json")
+	if err := os.WriteFile(p, []byte(content), 0o644); err != nil {
+		t.Fatal(err)
 	}
 }

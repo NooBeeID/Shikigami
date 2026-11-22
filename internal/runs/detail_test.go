@@ -119,9 +119,9 @@ func TestReadDetailCorruptJSON(t *testing.T) {
 
 func TestReadDetailRejectsPathTraversal(t *testing.T) {
 	tp := folderFixture(t, map[string]string{
-		"subagents/agent-ag1.meta.json":        "agent.meta.json",
+		"subagents/agent-ag1.meta.json":                     "agent.meta.json",
 		"subagents/workflows/wf_e8ae7cd1-a8d/journal.jsonl": "journal.jsonl",
-		"workflows/wf_e8ae7cd1-a8d.json":                 "wf_completed.json",
+		"workflows/wf_e8ae7cd1-a8d.json":                    "wf_completed.json",
 	})
 	// Setelah filepath.Join membersihkan path, ID ini mendarat di berkas nyata.
 	for _, id := range []string{"wf_e8ae7cd1-a8d/../wf_e8ae7cd1-a8d", "x/../wf_e8ae7cd1-a8d", "../wf_e8ae7cd1-a8d/../wf_e8ae7cd1-a8d"} {
@@ -173,5 +173,13 @@ func TestReadTailBounded(t *testing.T) {
 	}
 	if total > maxReadBytes || lines[len(lines)-1] != `{"ok":1}` {
 		t.Fatalf("total=%d last=%q", total, lines[len(lines)-1])
+	}
+}
+
+func TestReadDetailSubagentDescription(t *testing.T) {
+	tp := folderFixture(t, map[string]string{"subagents/agent-ag1.meta.json": "agent.meta.json"})
+	d := ReadDetail(tp, Run{Kind: KindSubagent, AgentID: "ag1"})
+	if d.Description != "Spike probe agent" {
+		t.Fatalf("description = %q", d.Description)
 	}
 }

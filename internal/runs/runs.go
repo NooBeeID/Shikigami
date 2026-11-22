@@ -366,6 +366,18 @@ func (r *Registry) MarkConfirmed(id string, p *Progress) {
 	}
 }
 
+// SetIdentity mengganti identitas run; true bila nilainya benar-benar berubah.
+func (r *Registry) SetIdentity(id, identity string) bool {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	run, ok := r.runs[id]
+	if !ok || run.Identity == identity {
+		return false
+	}
+	run.Identity = identity
+	return true
+}
+
 func jsonString(v any) string {
 	b, err := json.Marshal(v)
 	if err != nil {

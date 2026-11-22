@@ -17,6 +17,9 @@ const maxReadBytes = 4 << 20
 type Detail struct {
 	Found, Finished bool
 	Progress        *Progress
+	// Description hanya untuk sub agent: description dari agent-<id>.meta.json,
+	// sumber identitas yang pasti (FIFO pending bisa tertukar).
+	Description string
 }
 
 // safeID menolak ID kosong atau yang bisa dipakai untuk keluar dari folder.
@@ -159,12 +162,13 @@ func readWorkflow(folder, runID string) Detail {
 func readSubagent(folder, agentID string) Detail {
 	base := filepath.Join(folder, "subagents", "agent-"+agentID)
 	var meta struct {
-		Finished bool `json:"finished"`
+		Finished    bool   `json:"finished"`
+		Description string `json:"description"`
 	}
 	if !readSmallJSON(base+".meta.json", &meta) {
 		return Detail{}
 	}
-	d := Detail{Found: true, Finished: meta.Finished}
+	d := Detail{Found: true, Finished: meta.Finished, Description: meta.Description}
 	d.Progress = readChecklist(base + ".jsonl")
 	return d
 }

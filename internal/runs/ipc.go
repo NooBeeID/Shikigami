@@ -51,6 +51,12 @@ func Reconcile(reg *Registry, eng sessionLookup, workspaceID string) []string {
 				reg.MarkConfirmed(run.ID, d.Progress)
 				changed[run.SessionID] = true
 			}
+			// Identitas sub agent dari meta.json mengalahkan tebakan FIFO.
+			if run.Kind == KindSubagent && d.Description != "" {
+				if reg.SetIdentity(run.ID, truncate(d.Description, 60)) {
+					changed[run.SessionID] = true
+				}
+			}
 		case !known:
 			if reg.Remove(run.ID) {
 				changed[run.SessionID] = true
