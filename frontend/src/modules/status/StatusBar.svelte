@@ -27,5 +27,5 @@
 <span class="summary" aria-live="polite">{#if counts.total > 0}{text}{/if}</span>
 
 <style>
-  .summary { font-size: 12px; color: var(--fg-muted, #8b949e); white-space: nowrap; }
+  .summary { font-size: 14px; color: var(--fg-muted, #8b949e); white-space: nowrap; }
 </style>

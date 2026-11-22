@@ -48,7 +48,7 @@
     background: none;
     border: none;
     color: var(--fg-muted, #888);
-    font-size: 12px;
+    font-size: 14px;
     cursor: pointer;
   }
   .add:hover:not(:disabled) {
@@ -62,6 +62,6 @@
     margin: 0;
     padding: 4px 6px;
     color: var(--fg-muted, #888);
-    font-size: 12px;
+    font-size: 14px;
   }
 </style>

@@ -64,7 +64,7 @@ export function startPaneDrag(e: PointerEvent, paneId: string, title: string, st
     g.textContent = title;
     g.style.cssText =
       'position:fixed;z-index:10000;pointer-events:none;max-width:240px;overflow:hidden;' +
-      'text-overflow:ellipsis;white-space:nowrap;padding:3px 8px;border-radius:4px;font-size:12px;' +
+      'text-overflow:ellipsis;white-space:nowrap;padding:3px 8px;border-radius:4px;font-size:14px;' +
       'opacity:0.9;background:var(--bg-elev,#222);border:1px solid var(--border,#444);color:var(--fg,#ddd);' +
       `left:${startX + 12}px;top:${startY + 12}px`;
     document.body.appendChild(g);

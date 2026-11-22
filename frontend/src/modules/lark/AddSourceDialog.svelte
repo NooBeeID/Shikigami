@@ -160,7 +160,7 @@
     flex-direction: column;
     gap: 8px;
     color: var(--fg, #ddd);
-    font-size: 13px;
+    font-size: 15px;
     min-width: 0;
   }
   p {
@@ -168,7 +168,7 @@
   }
   label {
     color: var(--fg-muted, #888);
-    font-size: 12px;
+    font-size: 14px;
   }
   input {
     background: var(--bg-elev, #222);
@@ -176,7 +176,7 @@
     border: 1px solid var(--border, #333);
     border-radius: 4px;
     padding: 5px 8px;
-    font-size: 13px;
+    font-size: 15px;
   }
   .muted {
     color: var(--fg-muted, #888);
@@ -195,7 +195,7 @@
     border: 1px solid var(--border, #333);
     border-radius: 4px;
     padding: 4px 12px;
-    font-size: 13px;
+    font-size: 15px;
     cursor: pointer;
   }
   button:hover:not(:disabled) {

@@ -12,5 +12,5 @@
 {/if}
 
 <style>
-  .empty { padding: 16px; font-size: 12px; color: var(--fg-muted, #888); }
+  .empty { padding: 16px; font-size: 14px; color: var(--fg-muted, #888); }
 </style>

@@ -88,7 +88,7 @@
     background: none;
     border: none;
     color: var(--fg-muted, #888);
-    font-size: 12px;
+    font-size: 14px;
     cursor: pointer;
   }
   .add:hover:not(:disabled) {
@@ -112,7 +112,7 @@
     color: var(--fg-muted, #888);
     width: 18px;
     cursor: pointer;
-    font-size: 11px;
+    font-size: 13px;
     padding: 0;
   }
   .open {
@@ -128,13 +128,13 @@
     padding: 4px 6px;
     cursor: pointer;
     border-radius: 4px;
-    font-size: 13px;
+    font-size: 15px;
   }
   .open:hover {
     background: var(--bg-hover, #2c2c2c);
   }
   .auto {
     color: var(--fg-muted, #888);
-    font-size: 10px;
+    font-size: 12px;
   }
 </style>

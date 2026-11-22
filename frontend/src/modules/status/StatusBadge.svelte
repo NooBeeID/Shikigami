@@ -21,7 +21,7 @@
 </span>
 
 <style>
-  .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--fg-muted, #8b949e); }
+  .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: var(--fg-muted, #8b949e); }
   .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
   .running { background: var(--accent, #4f8cff); animation: pulse 1.4s ease-in-out infinite; }
   .waiting { background: #e5b13a; }

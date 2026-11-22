@@ -88,12 +88,12 @@
   .dot { width: 7px; height: 7px; border-radius: 50%; flex: none; background: transparent; border: 1px solid var(--border, #8884); }
   .text { display: flex; flex-direction: column; min-width: 0; }
   .name, .path { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .path { font-size: 11px; color: var(--fg-muted, #888); }
+  .path { font-size: 13px; color: var(--fg-muted, #888); }
   .form { display: flex; flex-direction: column; gap: 4px; }
   .row { display: flex; gap: 4px; flex-wrap: wrap; }
   input { width: 100%; box-sizing: border-box; font: inherit; color: var(--fg, #222); background: var(--bg-elev, transparent); border: 1px solid var(--border, #8884); border-radius: 4px; padding: 3px 6px; }
-  button { font: inherit; font-size: 12px; color: var(--fg, #222); background: transparent; border: 1px solid var(--border, #8884); border-radius: 4px; padding: 2px 8px; cursor: pointer; }
-  button.main { border: none; font-size: 13px; }
+  button { font: inherit; font-size: 14px; color: var(--fg, #222); background: transparent; border: 1px solid var(--border, #8884); border-radius: 4px; padding: 2px 8px; cursor: pointer; }
+  button.main { border: none; font-size: 15px; }
   button:hover:not(:disabled) { background: var(--bg-hover, #0001); }
   button:disabled { opacity: 0.5; cursor: default; }
   button.danger { color: var(--danger, #d33); border-color: var(--danger, #d33); }

@@ -113,7 +113,7 @@
 <style>
   .bar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 6px 8px; border-bottom: 1px solid var(--border, #8884); }
   button, select, input[type='search'] {
-    font: inherit; font-size: 11px; border: 1px solid var(--border, #8884); border-radius: 4px;
+    font: inherit; font-size: 13px; border: 1px solid var(--border, #8884); border-radius: 4px;
     padding: 2px 8px; background: transparent; color: var(--fg, inherit); cursor: pointer;
   }
   input[type='search'] { cursor: text; min-width: 140px; }
@@ -123,12 +123,12 @@
   .seg button:first-child { border-top-right-radius: 0; border-bottom-right-radius: 0; }
   .seg button:last-child { border-top-left-radius: 0; border-bottom-left-radius: 0; border-left: 0; }
   .seg button.on { background: var(--bg-hover, #0002); }
-  .hint { font-size: 11px; color: var(--fg-muted, #888); }
+  .hint { font-size: 13px; color: var(--fg-muted, #888); }
   .extra { position: relative; }
   .menu {
     position: absolute; top: 100%; left: 0; z-index: 10; margin-top: 2px; min-width: 180px; max-height: 240px; overflow: auto;
     background: var(--bg, #fff); border: 1px solid var(--border, #8884); border-radius: 4px; padding: 4px;
     display: flex; flex-direction: column; gap: 2px;
   }
-  .menu label { display: flex; gap: 6px; align-items: center; font-size: 11px; color: var(--fg, inherit); padding: 2px 4px; white-space: nowrap; }
+  .menu label { display: flex; gap: 6px; align-items: center; font-size: 13px; color: var(--fg, inherit); padding: 2px 4px; white-space: nowrap; }
 </style>

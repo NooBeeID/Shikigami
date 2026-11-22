@@ -7,7 +7,7 @@
 <style>
   .stale-badge {
     color: var(--danger, inherit);
-    font-size: 10px;
+    font-size: 12px;
     flex: none;
     white-space: nowrap;
   }

@@ -23,9 +23,9 @@
 
 <style>
   .panel { padding: 8px; }
-  .title { margin: 0 0 6px; padding: 0 8px; font-size: 12px; font-weight: 600; color: var(--fg, #222); }
+  .title { margin: 0 0 6px; padding: 0 8px; font-size: 14px; font-weight: 600; color: var(--fg, #222); }
   .count { color: var(--fg-muted, #888); font-weight: 400; }
   .list { display: flex; flex-direction: column; gap: 4px; }
   .row { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 2px 8px; }
-  .name { font-size: 12px; color: var(--fg, #222); }
+  .name { font-size: 14px; color: var(--fg, #222); }
 </style>

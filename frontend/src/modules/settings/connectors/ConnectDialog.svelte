@@ -157,7 +157,7 @@
     flex-direction: column;
     gap: 10px;
     color: var(--fg, #ddd);
-    font-size: 13px;
+    font-size: 15px;
     min-width: 0;
   }
   p {
@@ -194,7 +194,7 @@
     border-radius: 4px;
     overflow-x: auto;
     font-family: ui-monospace, Menlo, monospace;
-    font-size: 12px;
+    font-size: 14px;
     white-space: pre-wrap;
     word-break: break-all;
   }
@@ -209,7 +209,7 @@
     border: 1px solid var(--border, #333);
     border-radius: 4px;
     padding: 4px 12px;
-    font-size: 13px;
+    font-size: 15px;
     cursor: pointer;
   }
   button:hover:not(:disabled) {

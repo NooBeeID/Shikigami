@@ -71,17 +71,17 @@
 <style>
   .board { flex: 1; min-width: 0; min-height: 0; display: flex; gap: 8px; padding: 8px; overflow-x: auto; align-items: stretch; }
   .col { flex: 0 0 260px; width: 260px; display: flex; flex-direction: column; min-height: 0; border: 1px solid var(--border, #8884); border-radius: 6px; }
-  header { display: flex; justify-content: space-between; gap: 6px; padding: 6px 8px; font-size: 12px; font-weight: 600; color: var(--fg, inherit); border-bottom: 1px solid var(--border, #8884); }
+  header { display: flex; justify-content: space-between; gap: 6px; padding: 6px 8px; font-size: 14px; font-weight: 600; color: var(--fg, inherit); border-bottom: 1px solid var(--border, #8884); }
   .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .count { color: var(--fg-muted, #888); font-weight: 400; }
   .cards { flex: 1; min-height: 0; overflow-y: auto; padding: 6px; display: flex; flex-direction: column; gap: 6px; }
   .card {
-    font: inherit; font-size: 12px; text-align: left; display: flex; flex-direction: column; gap: 3px;
+    font: inherit; font-size: 14px; text-align: left; display: flex; flex-direction: column; gap: 3px;
     padding: 6px 8px; border: 1px solid var(--border, #8884); border-radius: 4px; background: transparent;
     color: var(--fg, inherit); cursor: pointer;
   }
   .card:hover { background: var(--bg-hover, #0001); }
   .card.selected { background: var(--bg-hover, #0002); }
   .ttl { display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
-  .meta { font-size: 11px; color: var(--fg-muted, #888); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .meta { font-size: 13px; color: var(--fg-muted, #888); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 </style>

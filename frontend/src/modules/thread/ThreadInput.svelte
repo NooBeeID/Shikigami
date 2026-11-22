@@ -57,11 +57,11 @@
 
 <style>
   .wrap { padding: 8px 12px; border-top: 1px solid var(--border, #8884); }
-  .err { color: var(--danger, #e5484d); font-size: 12px; margin-bottom: 4px; }
+  .err { color: var(--danger, #e5484d); font-size: 14px; margin-bottom: 4px; }
   .row { display: flex; gap: 8px; align-items: flex-end; }
-  textarea { flex: 1; resize: none; font: inherit; font-size: 13px; line-height: 20px; color: var(--fg, #222); background: var(--bg-elev, #fff); border: 1px solid var(--border, #8884); border-radius: 6px; padding: 6px 8px; min-height: 34px; box-sizing: border-box; }
+  textarea { flex: 1; resize: none; font: inherit; font-size: 15px; line-height: 20px; color: var(--fg, #222); background: var(--bg-elev, #fff); border: 1px solid var(--border, #8884); border-radius: 6px; padding: 6px 8px; min-height: 34px; box-sizing: border-box; }
   textarea:disabled { opacity: 0.6; }
-  button { font: inherit; font-size: 12px; color: var(--fg, #222); background: var(--bg-elev, #fff); border: 1px solid var(--border, #8884); border-radius: 6px; padding: 7px 12px; cursor: pointer; }
+  button { font: inherit; font-size: 14px; color: var(--fg, #222); background: var(--bg-elev, #fff); border: 1px solid var(--border, #8884); border-radius: 6px; padding: 7px 12px; cursor: pointer; }
   button:hover:not(:disabled) { background: var(--bg-hover, #0001); }
   button:disabled { opacity: 0.5; cursor: default; }
 </style>

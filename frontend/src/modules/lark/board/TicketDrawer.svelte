@@ -161,7 +161,7 @@
     background: var(--bg-elev, var(--bg));
     border-left: 1px solid var(--border, transparent);
     box-shadow: -4px 0 16px color-mix(in srgb, black 25%, transparent);
-    font-size: 12px;
+    font-size: 14px;
     animation: slide-in 150ms ease-out;
     outline: none;
   }
@@ -180,7 +180,7 @@
     flex: none;
     border-bottom: 1px solid var(--border, transparent);
   }
-  h2 { margin: 0; font-size: 13px; font-weight: 600; }
+  h2 { margin: 0; font-size: 15px; font-weight: 600; }
   .close, .btn {
     background: none;
     border: 1px solid transparent;
@@ -203,7 +203,7 @@
   .err { color: var(--danger, inherit); display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
   .err p { margin: 0; }
   dl { margin: 0; display: flex; flex-direction: column; gap: 10px; }
-  dt { color: var(--fg-muted, inherit); font-size: 11px; font-weight: 600; }
+  dt { color: var(--fg-muted, inherit); font-size: 13px; font-weight: 600; }
   dd { margin: 2px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
   .foot {
     flex: none;

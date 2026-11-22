@@ -26,14 +26,14 @@
   .row {
     display: flex; align-items: center; gap: 6px; width: 100%;
     padding: 3px 8px; border: 0; background: transparent; color: var(--fg, inherit);
-    font: inherit; font-size: 12px; text-align: left; cursor: pointer;
+    font: inherit; font-size: 14px; text-align: left; cursor: pointer;
   }
   .row:hover:not(.dead) { background: var(--bg-hover, rgba(128, 128, 128, 0.15)); }
   .row.dead { opacity: 0.5; cursor: default; }
   .time { font-family: ui-monospace, monospace; color: var(--fg-muted, #888); flex: none; }
   .name { max-width: 80px; flex: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .tool {
-    flex: none; padding: 0 5px; font-size: 11px; border-radius: 3px;
+    flex: none; padding: 0 5px; font-size: 13px; border-radius: 3px;
     background: var(--bg-elev, transparent); border: 1px solid var(--border, #444);
   }
   .summary { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--fg-muted, #888); }

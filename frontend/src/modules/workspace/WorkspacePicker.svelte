@@ -93,7 +93,7 @@
   .row { display: flex; gap: 4px; flex-wrap: wrap; min-width: 0; }
   select, input { width: 100%; min-width: 0; box-sizing: border-box; font: inherit; color: var(--fg, #222); background: var(--bg-elev, transparent); border: 1px solid var(--border, #8884); border-radius: 4px; padding: 3px 6px; }
   .row input { flex: 1; width: auto; }
-  button { font: inherit; font-size: 12px; color: var(--fg, #222); background: transparent; border: 1px solid var(--border, #8884); border-radius: 4px; padding: 2px 8px; cursor: pointer; }
+  button { font: inherit; font-size: 14px; color: var(--fg, #222); background: transparent; border: 1px solid var(--border, #8884); border-radius: 4px; padding: 2px 8px; cursor: pointer; }
   button:hover:not(:disabled) { background: var(--bg-hover, #0001); }
   button:disabled { opacity: 0.5; cursor: default; }
   button.danger { color: var(--danger, #d33); border-color: var(--danger, #d33); }

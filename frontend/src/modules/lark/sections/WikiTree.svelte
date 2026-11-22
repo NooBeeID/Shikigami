@@ -345,7 +345,7 @@
 <style>
   .wikitree {
     --indent: 14px;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--fg, inherit);
     padding-left: 18px;
     min-width: 0;

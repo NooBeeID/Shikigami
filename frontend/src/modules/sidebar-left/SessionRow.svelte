@@ -102,17 +102,17 @@
   .row { position: relative; display: flex; align-items: center; min-width: 0; border-radius: 6px; margin-bottom: 2px; }
   .row:hover { background: var(--bg-hover, #0001); }
   .row.exited { opacity: 0.5; }
-  .main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; text-align: left; font: inherit; font-size: 13px; color: var(--fg, #222); background: transparent; border: 0; padding: 10px 8px 10px 22px; cursor: pointer; }
+  .main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; text-align: left; font: inherit; font-size: 15px; color: var(--fg, #222); background: transparent; border: 0; padding: 10px 8px 10px 22px; cursor: pointer; }
   .title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .prov { font-size: 10px; color: var(--fg-muted, #888); border: 1px solid var(--border, #8884); border-radius: 3px; padding: 1px 5px; flex: none; }
+  .prov { font-size: 12px; color: var(--fg-muted, #888); border: 1px solid var(--border, #8884); border-radius: 3px; padding: 1px 5px; flex: none; }
   .in { width: 6px; height: 6px; border-radius: 50%; background: var(--accent, #3b82f6); flex: none; }
   .more { flex: none; font: inherit; color: var(--fg-muted, #888); background: transparent; border: 0; padding: 4px 10px; margin-right: 4px; cursor: pointer; border-radius: 4px; }
   .more:hover { color: var(--fg, #222); }
   .menu { position: absolute; top: 100%; right: 0; z-index: 20; min-width: 140px; padding: 4px; background: var(--bg-elev, #fff); border: 1px solid var(--border, #8884); border-radius: 6px; box-shadow: 0 6px 18px #0004; display: flex; flex-direction: column; gap: 2px; }
-  .menu button { text-align: left; font: inherit; font-size: 12px; color: var(--fg, #222); background: transparent; border: 0; border-radius: 4px; padding: 5px 8px; cursor: pointer; }
+  .menu button { text-align: left; font: inherit; font-size: 14px; color: var(--fg, #222); background: transparent; border: 0; border-radius: 4px; padding: 5px 8px; cursor: pointer; }
   .menu button:hover:not(:disabled) { background: var(--bg-hover, #0001); }
   .menu button:disabled { opacity: 0.4; cursor: default; }
-  .ask { font-size: 12px; padding: 4px 8px; }
+  .ask { font-size: 14px; padding: 4px 8px; }
   .btns { display: flex; gap: 4px; }
   .menu .btns button { flex: 1; text-align: center; border: 1px solid var(--border, #8884); }
   .menu .btns .danger { color: var(--danger, #e5484d); border-color: var(--danger, #e5484d); }

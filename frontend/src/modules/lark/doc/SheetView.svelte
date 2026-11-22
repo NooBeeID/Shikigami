@@ -47,12 +47,12 @@
 <style>
   .sheet { flex: 1; min-height: 0; min-width: 0; display: flex; flex-direction: column; color: var(--fg, inherit); }
   .scroll { flex: 1; min-height: 0; overflow: auto; max-height: 100%; }
-  table { border-collapse: separate; border-spacing: 0; font-size: 12px; }
+  table { border-collapse: separate; border-spacing: 0; font-size: 14px; }
   th, td { border-right: 1px solid var(--border, currentColor); border-bottom: 1px solid var(--border, currentColor); padding: 3px 8px; text-align: left; vertical-align: top; }
   td { white-space: pre-wrap; overflow-wrap: anywhere; max-width: 32ch; }
   th { background: var(--bg-elev, var(--bg, Canvas)); color: var(--fg-muted, inherit); font-weight: 600; }
   thead th { position: sticky; top: 0; z-index: 2; }
   tbody th { position: sticky; left: 0; z-index: 1; text-align: right; }
   thead th.corner { left: 0; z-index: 3; }
-  .empty, .note { margin: 0; padding: 8px 10px; color: var(--fg-muted, inherit); font-size: 12px; }
+  .empty, .note { margin: 0; padding: 8px 10px; color: var(--fg-muted, inherit); font-size: 14px; }
 </style>

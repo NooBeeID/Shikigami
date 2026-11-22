@@ -13,5 +13,5 @@
 {/if}
 
 <style>
-  .callout { margin: 2px 8px 6px; padding: 4px 8px; border-left: 3px solid #d9a400; background: rgba(217, 164, 0, 0.14); border-radius: 4px; font-size: 11px; color: var(--fg, #222); display: flex; gap: 6px; flex-wrap: wrap; }
+  .callout { margin: 2px 8px 6px; padding: 4px 8px; border-left: 3px solid #d9a400; background: rgba(217, 164, 0, 0.14); border-radius: 4px; font-size: 13px; color: var(--fg, #222); display: flex; gap: 6px; flex-wrap: wrap; }
 </style>

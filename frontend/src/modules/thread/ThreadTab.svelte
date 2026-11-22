@@ -71,7 +71,7 @@
   .mid { flex: 1; min-height: 0; display: flex; }
   .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
   aside { width: 260px; flex: none; border-left: 1px solid var(--border, #8884); overflow-y: auto; }
-  .state { margin: auto; display: flex; flex-direction: column; gap: 8px; align-items: center; font-size: 12px; color: var(--fg-muted, #888); }
+  .state { margin: auto; display: flex; flex-direction: column; gap: 8px; align-items: center; font-size: 14px; color: var(--fg-muted, #888); }
   .err { color: var(--danger, #e5484d); }
-  button { font: inherit; font-size: 12px; color: var(--fg, #222); background: var(--bg-elev, #fff); border: 1px solid var(--border, #8884); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+  button { font: inherit; font-size: 14px; color: var(--fg, #222); background: var(--bg-elev, #fff); border: 1px solid var(--border, #8884); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
 </style>

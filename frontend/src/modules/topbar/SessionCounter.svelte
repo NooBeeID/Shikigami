@@ -30,7 +30,7 @@
     align-items: center;
     gap: 6px;
     padding: 0 12px;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--fg-muted, #888);
     white-space: nowrap;
   }

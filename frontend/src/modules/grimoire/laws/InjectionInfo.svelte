@@ -10,5 +10,5 @@
 {/if}
 
 <style>
-  .inject-info { font-size: 11px; color: var(--fg-muted); padding: 2px 12px; }
+  .inject-info { font-size: 13px; color: var(--fg-muted); padding: 2px 12px; }
 </style>

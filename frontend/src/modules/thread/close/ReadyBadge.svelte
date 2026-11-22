@@ -9,5 +9,5 @@
 {/if}
 
 <style>
-  .chip { font-size: 11px; color: var(--ok, #30a46c); border: 1px solid var(--ok, #30a46c); border-radius: 10px; padding: 0 7px; flex: none; white-space: nowrap; }
+  .chip { font-size: 13px; color: var(--ok, #30a46c); border: 1px solid var(--ok, #30a46c); border-radius: 10px; padding: 0 7px; flex: none; white-space: nowrap; }
 </style>

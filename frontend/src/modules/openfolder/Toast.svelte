@@ -8,7 +8,7 @@
 
 <style>
   .toast {
-    font-size: 12px;
+    font-size: 14px;
     white-space: nowrap;
     max-width: 420px;
     overflow: hidden;

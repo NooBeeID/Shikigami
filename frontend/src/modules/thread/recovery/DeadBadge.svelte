@@ -9,5 +9,5 @@
 {/if}
 
 <style>
-  .badge { display: inline-block; padding: 1px 7px; border-radius: 999px; font-size: 10px; line-height: 1.5; background: rgba(217, 164, 0, 0.14); color: var(--fg, #222); }
+  .badge { display: inline-block; padding: 1px 7px; border-radius: 999px; font-size: 12px; line-height: 1.5; background: rgba(217, 164, 0, 0.14); color: var(--fg, #222); }
 </style>

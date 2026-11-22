@@ -16,7 +16,7 @@
     align-items: center;
     gap: 6px;
     min-width: 0;
-    font-size: 11px;
+    font-size: 13px;
     color: var(--fg-muted, inherit);
   }
   .current {

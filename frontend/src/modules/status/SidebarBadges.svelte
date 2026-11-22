@@ -34,10 +34,10 @@
 
 <style>
   .wrap { padding: 6px 8px; border-top: 1px solid var(--border, #8884); color: var(--fg, inherit); }
-  .title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--fg-muted, #888); margin-bottom: 4px; }
-  .muted { font-size: 12px; color: var(--fg-muted, #888); }
+  .title { font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--fg-muted, #888); margin-bottom: 4px; }
+  .muted { font-size: 14px; color: var(--fg-muted, #888); }
   ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
-  li { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 2px 4px; border-radius: 4px; font-size: 12px; }
+  li { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 2px 4px; border-radius: 4px; font-size: 14px; }
   li:hover { background: var(--bg-hover, #0001); }
   .name { flex: none; }
   .cwd { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--fg-muted, #888); }

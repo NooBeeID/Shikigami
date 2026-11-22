@@ -402,11 +402,11 @@
   .lark-pane { flex: 1; min-height: 0; min-width: 0; display: flex; flex-direction: column; position: relative; background: var(--bg, transparent); color: var(--fg, inherit); }
   .lark-pane[hidden] { display: none; }
   .body { flex: 1; min-height: 0; overflow: hidden; display: flex; }
-  .center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-size: 12px; color: var(--fg-muted, #888); text-align: center; padding: 12px; }
+  .center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-size: 14px; color: var(--fg-muted, #888); text-align: center; padding: 12px; }
   .center p { margin: 0; }
-  .note { font-size: 11px; }
-  .more-error { padding: 4px 8px; font-size: 11px; color: var(--fg-muted, #888); border-bottom: 1px solid var(--border, #8884); }
-  button { font: inherit; font-size: 11px; border: 1px solid var(--border, #8884); border-radius: 4px; padding: 2px 8px; background: transparent; color: var(--fg, inherit); cursor: pointer; }
+  .note { font-size: 13px; }
+  .more-error { padding: 4px 8px; font-size: 13px; color: var(--fg-muted, #888); border-bottom: 1px solid var(--border, #8884); }
+  button { font: inherit; font-size: 13px; border: 1px solid var(--border, #8884); border-radius: 4px; padding: 2px 8px; background: transparent; color: var(--fg, inherit); cursor: pointer; }
   button:hover { background: var(--bg-hover, #0001); }
   button.secondary { color: var(--fg-muted, #888); }
 </style>

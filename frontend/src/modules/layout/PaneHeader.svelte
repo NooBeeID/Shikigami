@@ -136,14 +136,14 @@
   {#if chip}<span class="chip" title={chip.tip}>{chip.text}</span>{/if}
   <span class="spacer"></span>
   <button type="button" class="hbtn" aria-label="Bagi kanan" title="Bagi kanan" onclick={() => onSplit('h')}>
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1.5" y="2" width="11" height="10" rx="1"/><path d="M7 2v10"/></svg>
+    <svg width="18" height="18" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1.5" y="2" width="11" height="10" rx="1"/><path d="M7 2v10"/></svg>
   </button>
   <button type="button" class="hbtn" aria-label="Bagi bawah" title="Bagi bawah" onclick={() => onSplit('v')}>
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1.5" y="2" width="11" height="10" rx="1"/><path d="M1.5 7h11"/></svg>
+    <svg width="18" height="18" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1.5" y="2" width="11" height="10" rx="1"/><path d="M1.5 7h11"/></svg>
   </button>
   {#if isTerminal}
     <button type="button" class="hbtn" aria-label="Minimize" title="Minimize (sesi tetap jalan)" onclick={onMinimize}>
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 11h8"/></svg>
+      <svg width="18" height="18" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 11h8"/></svg>
     </button>
   {/if}
   <button
@@ -154,13 +154,13 @@
     onclick={onMaximizeToggle}
   >
     {#if maximized}
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="4" y="1.5" width="8.5" height="8.5" rx="1"/><path d="M1.5 4.5v8h8"/></svg>
+      <svg width="18" height="18" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="4" y="1.5" width="8.5" height="8.5" rx="1"/><path d="M1.5 4.5v8h8"/></svg>
     {:else}
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="2" width="10" height="10" rx="1"/></svg>
+      <svg width="18" height="18" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="2" width="10" height="10" rx="1"/></svg>
     {/if}
   </button>
   <button type="button" class="hbtn close" aria-label="Tutup pane" title="Tutup pane" onclick={onClose}>
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 3l8 8M11 3l-8 8"/></svg>
+    <svg width="18" height="18" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 3l8 8M11 3l-8 8"/></svg>
   </button>
   <button
     type="button"
@@ -172,7 +172,7 @@
     aria-expanded={menuOpen}
     onclick={() => (menuOpen = !menuOpen)}
   >
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><circle cx="3" cy="7" r="1.1"/><circle cx="7" cy="7" r="1.1"/><circle cx="11" cy="7" r="1.1"/></svg>
+    <svg width="18" height="18" viewBox="0 0 14 14" fill="currentColor"><circle cx="3" cy="7" r="1.1"/><circle cx="7" cy="7" r="1.1"/><circle cx="11" cy="7" r="1.1"/></svg>
   </button>
   {#if menuOpen && menuBtn}
     <PaneMenu
@@ -198,7 +198,7 @@
     background: var(--bg-elev, #222);
     border-bottom: 1px solid var(--border, #444);
     color: var(--fg, #ddd);
-    font-size: 12px;
+    font-size: 14px;
     cursor: grab;
     user-select: none;
     min-width: 0;
@@ -214,7 +214,7 @@
     box-sizing: border-box;
     border-radius: 8px;
     background: var(--bg-hover, #333);
-    font-size: 10px;
+    font-size: 12px;
     line-height: 16px;
     text-align: center;
   }
@@ -237,7 +237,7 @@
     outline: none;
   }
   .badge {
-    font-size: 10px;
+    font-size: 12px;
     padding: 0 4px;
     border: 1px solid var(--border, #444);
     border-radius: 3px;
@@ -249,7 +249,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 11px;
+    font-size: 13px;
     color: var(--fg-muted, #999);
     background: var(--bg-hover, #333);
     border-radius: 3px;
@@ -258,8 +258,8 @@
   }
   .spacer { flex: 1; }
   .hbtn {
-    width: 22px;
-    height: 22px;
+    width: 28px;
+    height: 28px;
     flex: none;
     display: inline-flex;
     align-items: center;

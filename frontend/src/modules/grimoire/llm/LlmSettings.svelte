@@ -146,7 +146,7 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-    font-size: 12px;
+    font-size: 14px;
     flex: none;
   }
   .row {
@@ -160,7 +160,7 @@
     min-width: 0;
   }
   .muted {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--fg-muted, inherit);
   }
   .switch {
@@ -248,7 +248,7 @@
   }
   .err {
     color: var(--danger, inherit);
-    font-size: 11px;
+    font-size: 13px;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;

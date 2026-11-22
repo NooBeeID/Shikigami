@@ -377,7 +377,7 @@
     padding: 4px 8px;
     border-bottom: 1px solid var(--border, currentColor);
     background: var(--bg-elev, transparent);
-    font-size: 12px;
+    font-size: 14px;
   }
   .name { font-weight: 600; }
   .dot { color: var(--accent, currentColor); margin-left: 4px; }
@@ -404,7 +404,7 @@
     align-items: center;
     gap: 8px;
     padding: 6px 8px;
-    font-size: 12px;
+    font-size: 14px;
     border-bottom: 1px solid var(--border, currentColor);
     background: var(--bg-elev, transparent);
   }
@@ -421,7 +421,7 @@
     outline: none;
     padding: 8px;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.5;
     tab-size: 4;
     white-space: pre;

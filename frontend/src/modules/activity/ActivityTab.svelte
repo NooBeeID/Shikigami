@@ -69,9 +69,9 @@
   .activity { display: flex; flex-direction: column; height: 100%; min-height: 0; }
   .head { padding: 4px 8px; border-bottom: 1px solid var(--border, #444); }
   select {
-    width: 100%; font: inherit; font-size: 12px; background: var(--bg-elev, transparent);
+    width: 100%; font: inherit; font-size: 14px; background: var(--bg-elev, transparent);
     color: var(--fg, inherit); border: 1px solid var(--border, #444); border-radius: 3px;
   }
   .list { flex: 1; min-height: 0; overflow-y: auto; }
-  .empty { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--fg-muted, #888); font-size: 12px; }
+  .empty { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--fg-muted, #888); font-size: 14px; }
 </style>

@@ -66,12 +66,12 @@
 <style>
   .overlay { position: fixed; inset: 0; z-index: 100; background: #0006; display: flex; align-items: center; justify-content: center; }
   .dlg { width: min(520px, 92vw); background: var(--bg-elev, #fff); color: var(--fg, #222); border: 1px solid var(--border, #8884); border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 10px 30px #0006; }
-  h3 { margin: 0; font-size: 14px; }
-  label { font-size: 12px; color: var(--fg-muted, #888); }
-  textarea { font: inherit; font-size: 13px; color: var(--fg, #222); background: var(--bg, #fff); border: 1px solid var(--border, #8884); border-radius: 6px; padding: 8px; resize: vertical; }
-  .err { color: var(--danger, #e5484d); font-size: 12px; }
+  h3 { margin: 0; font-size: 16px; }
+  label { font-size: 14px; color: var(--fg-muted, #888); }
+  textarea { font: inherit; font-size: 15px; color: var(--fg, #222); background: var(--bg, #fff); border: 1px solid var(--border, #8884); border-radius: 6px; padding: 8px; resize: vertical; }
+  .err { color: var(--danger, #e5484d); font-size: 14px; }
   .btns { display: flex; justify-content: flex-end; gap: 8px; }
-  button { font: inherit; font-size: 12px; color: var(--fg, #222); background: transparent; border: 1px solid var(--border, #8884); border-radius: 6px; padding: 6px 14px; cursor: pointer; }
+  button { font: inherit; font-size: 14px; color: var(--fg, #222); background: transparent; border: 1px solid var(--border, #8884); border-radius: 6px; padding: 6px 14px; cursor: pointer; }
   button.primary { background: var(--accent, #3b82f6); color: #fff; border-color: transparent; }
   button:disabled { opacity: 0.5; cursor: default; }
 </style>

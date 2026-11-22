@@ -177,7 +177,7 @@
     overflow: auto;
     position: relative;
     font-family: ui-monospace, monospace;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 18px;
     color: var(--fg, inherit);
     outline: none;
@@ -201,11 +201,11 @@
     display: flex;
     gap: 12px;
     padding: 2px 8px;
-    font-size: 11px;
+    font-size: 13px;
     color: var(--fg-muted, inherit);
     border-top: 1px solid var(--border, transparent);
   }
   .note { color: var(--danger, inherit); }
   .msg { margin: auto; padding: 16px; text-align: center; color: var(--fg-muted, inherit); }
-  .path { margin-top: 6px; font-size: 12px; font-family: ui-monospace, monospace; word-break: break-all; }
+  .path { margin-top: 6px; font-size: 14px; font-family: ui-monospace, monospace; word-break: break-all; }
 </style>

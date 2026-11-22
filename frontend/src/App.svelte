@@ -11,6 +11,7 @@
   import Palette from './modules/palette/Palette.svelte';
   import Toast from './modules/openfolder/Toast.svelte';
   import { SettingsModal } from './modules/settings';
+  import ZoomHud from './modules/zoom/ZoomHud.svelte';
 
   let dispose: (() => void) | null = null;
 
@@ -44,6 +45,7 @@
   <Palette />
   <SettingsModal />
   <div class="toast-host"><Toast /></div>
+  <ZoomHud />
 {/if}
 
 <style>

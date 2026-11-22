@@ -11,7 +11,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 11px;
+    font-size: 13px;
     color: var(--fg-muted, inherit);
   }
   .pulse {

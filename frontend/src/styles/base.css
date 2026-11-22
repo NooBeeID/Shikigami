@@ -2,7 +2,7 @@
 html, body, #app { height: 100%; margin: 0; }
 body {
   font-family: system-ui, sans-serif;
-  font-size: 13px;
+  font-size: 15px;
   background: var(--bg);
   color: var(--fg);
   overflow: hidden;

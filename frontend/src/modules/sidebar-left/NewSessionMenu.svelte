@@ -70,13 +70,13 @@
 
 <style>
   .wrap { position: relative; padding: 14px 16px; border-top: 1px solid var(--border, #8884); }
-  .main { width: 100%; font: inherit; font-size: 12px; color: var(--fg, #222); background: transparent; border: 1px solid var(--accent, #3b82f6); border-radius: 6px; padding: 10px 14px; cursor: pointer; }
+  .main { width: 100%; font: inherit; font-size: 14px; color: var(--fg, #222); background: transparent; border: 1px solid var(--accent, #3b82f6); border-radius: 6px; padding: 10px 14px; cursor: pointer; }
   .main:hover { background: var(--bg-hover, #0001); }
   .pop { position: absolute; bottom: 100%; left: 8px; right: 8px; z-index: 20; margin-bottom: 2px; padding: 6px; display: flex; flex-direction: column; gap: 3px; max-height: 300px; overflow: auto; background: var(--bg-elev, #fff); border: 1px solid var(--border, #8884); border-radius: 6px; box-shadow: 0 6px 18px #0004; }
-  .lbl { font-size: 11px; color: var(--fg-muted, #888); padding: 2px 2px 0; }
-  .dim { font-size: 12px; color: var(--fg-muted, #888); padding: 4px 2px; }
-  select { font: inherit; font-size: 12px; min-width: 0; color: var(--fg, #222); background: var(--bg-elev, transparent); border: 1px solid var(--border, #8884); border-radius: 4px; padding: 3px 6px; }
-  .item { text-align: left; font: inherit; font-size: 12px; color: var(--fg, #222); background: transparent; border: 0; border-radius: 4px; padding: 5px 6px; cursor: pointer; }
+  .lbl { font-size: 13px; color: var(--fg-muted, #888); padding: 2px 2px 0; }
+  .dim { font-size: 14px; color: var(--fg-muted, #888); padding: 4px 2px; }
+  select { font: inherit; font-size: 14px; min-width: 0; color: var(--fg, #222); background: var(--bg-elev, transparent); border: 1px solid var(--border, #8884); border-radius: 4px; padding: 3px 6px; }
+  .item { text-align: left; font: inherit; font-size: 14px; color: var(--fg, #222); background: transparent; border: 0; border-radius: 4px; padding: 5px 6px; cursor: pointer; }
   .item:hover:not(:disabled) { background: var(--bg-hover, #0001); }
   .item:disabled, .main:disabled { opacity: 0.5; cursor: default; }
 </style>

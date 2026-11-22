@@ -18,7 +18,7 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
-    font-size: 11px;
+    font-size: 13px;
     color: var(--fg-muted, inherit);
     overflow-wrap: anywhere;
   }

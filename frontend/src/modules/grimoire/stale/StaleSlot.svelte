@@ -45,7 +45,7 @@
   }
   .err {
     color: var(--danger, inherit);
-    font-size: 11px;
+    font-size: 13px;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;

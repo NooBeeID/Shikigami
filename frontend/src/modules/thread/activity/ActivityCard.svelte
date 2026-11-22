@@ -58,7 +58,7 @@
     gap: 8px;
     width: 100%;
     font: inherit;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--fg, #222);
     background: none;
     border: 0;
@@ -89,7 +89,7 @@
     font-weight: 600;
   }
   .status {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--fg-muted, #888);
     flex: none;
   }
@@ -108,7 +108,7 @@
   }
   .item,
   .more {
-    font-size: 12px;
+    font-size: 14px;
     color: var(--fg-muted, #888);
     padding: 2px 8px 2px 24px;
     min-width: 0;

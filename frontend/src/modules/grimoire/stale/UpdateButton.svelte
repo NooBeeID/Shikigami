@@ -25,7 +25,7 @@
     background: var(--bg-elev, transparent);
     color: var(--fg, inherit);
     border-radius: 4px;
-    font-size: 11px;
+    font-size: 13px;
     padding: 2px 8px;
     cursor: pointer;
   }

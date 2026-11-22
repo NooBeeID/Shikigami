@@ -227,7 +227,7 @@
   .tabs::-webkit-scrollbar { display: none; }
   .tab, .add, .edit {
     --wails-draggable: no-drag;
-    font-size: 12px;
+    font-size: 14px;
   }
   .tab {
     flex: none;
@@ -262,7 +262,7 @@
     border-radius: 4px;
     color: var(--fg-muted, #888);
     cursor: pointer;
-    font-size: 16px;
+    font-size: 18px;
   }
   .add:hover { background: var(--bg-hover, #333); color: var(--fg, inherit); }
   .confirm {
@@ -274,7 +274,7 @@
     align-items: center;
     gap: 8px;
     padding: 6px 10px;
-    font-size: 12px;
+    font-size: 14px;
     white-space: nowrap;
     background: var(--bg-elev, #222);
     border: 1px solid var(--border, #444);
@@ -282,7 +282,7 @@
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
   }
   .danger { color: var(--danger, #f85149); }
-  .notice { flex: none; font-size: 11px; color: var(--danger, #f85149); white-space: nowrap; }
+  .notice { flex: none; font-size: 13px; color: var(--danger, #f85149); white-space: nowrap; }
   .ctx {
     --wails-draggable: no-drag;
     position: fixed;
@@ -302,7 +302,7 @@
     border: none;
     border-radius: 4px;
     color: var(--fg, inherit);
-    font-size: 12px;
+    font-size: 14px;
     text-align: left;
     cursor: pointer;
   }

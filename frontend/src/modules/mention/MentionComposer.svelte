@@ -209,7 +209,7 @@
 </div>
 
 <style>
-  .composer { padding: 8px; border-top: 1px solid var(--border, #35353d); position: relative; color: var(--fg, #e6e6ea); font-size: 12px; }
+  .composer { padding: 8px; border-top: 1px solid var(--border, #35353d); position: relative; color: var(--fg, #e6e6ea); font-size: 14px; }
   .title { font-weight: 600; margin-bottom: 6px; }
   .field { position: relative; }
   textarea {
@@ -226,8 +226,8 @@
   .menu li.active { background: var(--bg-hover, #2f2f37); }
   .nm { font-weight: 600; }
   .muted { color: var(--fg-muted, #9b9ba6); }
-  .small { font-size: 11px; }
-  .st { margin-left: auto; font-size: 10px; }
+  .small { font-size: 13px; }
+  .st { margin-left: auto; font-size: 12px; }
   .st-running { color: var(--accent, #5b94ff); }
   .st-waiting { color: #e0a030; }
   .st-done, .st-idle { color: var(--ok, #4cc788); }

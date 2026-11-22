@@ -79,10 +79,10 @@
   .laws-editor { padding: 8px 12px; display: flex; flex-direction: column; gap: 8px; box-sizing: border-box; min-width: 0; }
   .head { display: flex; align-items: center; gap: 8px; }
   .title { font-weight: 600; color: var(--fg); }
-  .note { margin: 0; font-size: 11px; color: var(--fg-muted); }
+  .note { margin: 0; font-size: 13px; color: var(--fg-muted); }
   textarea {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 12px;
+    font-size: 14px;
     background: var(--bg-elev);
     color: var(--fg);
     border: 1px solid var(--border);
@@ -94,14 +94,14 @@
   }
   textarea:focus { outline: none; border-color: var(--accent); }
   textarea:disabled { opacity: .5; }
-  .status { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 11px; }
+  .status { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 13px; }
   .count { color: var(--fg-muted); }
   .count.over { color: var(--danger); }
   .ok { color: var(--fg-muted); }
-  .err { color: var(--danger); font-size: 11px; }
+  .err { color: var(--danger); font-size: 13px; }
   .btn {
     background: transparent; color: var(--fg); border: 1px solid var(--border);
-    border-radius: 4px; padding: 3px 10px; cursor: pointer; font-size: 12px;
+    border-radius: 4px; padding: 3px 10px; cursor: pointer; font-size: 14px;
   }
   .btn:hover:not(:disabled) { background: var(--bg-hover); }
   .btn.save { border-color: var(--accent); color: var(--accent); }

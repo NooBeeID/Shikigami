@@ -105,7 +105,7 @@
     border-radius: 6px;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
     color: var(--fg, #ddd);
-    font-size: 12px;
+    font-size: 14px;
     display: flex;
     flex-direction: column;
   }

@@ -149,7 +149,7 @@
   .empty {
     margin: auto;
     color: var(--fg-muted);
-    font-size: 13px;
+    font-size: 15px;
     text-align: center;
     padding: 16px;
   }

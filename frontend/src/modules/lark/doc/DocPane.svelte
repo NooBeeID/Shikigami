@@ -159,17 +159,17 @@
   .doc-pane[hidden] { display: none; }
   .header { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-bottom: 1px solid var(--border, currentColor); }
   .title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
-  .btn { background: transparent; color: inherit; border: 1px solid var(--border, currentColor); border-radius: 4px; padding: 2px 8px; font-size: 12px; cursor: pointer; }
+  .btn { background: transparent; color: inherit; border: 1px solid var(--border, currentColor); border-radius: 4px; padding: 2px 8px; font-size: 14px; cursor: pointer; }
   .btn:hover:not(:disabled) { background: var(--bg-hover, color-mix(in srgb, currentColor 10%, transparent)); }
   .btn:focus-visible { outline: 1px solid var(--accent, currentColor); }
   .btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .body { flex: 1; min-height: 0; display: flex; flex-direction: column; }
   .muted { color: var(--fg-muted, inherit); }
-  .hint { margin: 0; padding: 4px 10px; font-size: 12px; }
+  .hint { margin: 0; padding: 4px 10px; font-size: 14px; }
   .pad { padding: 10px; margin: 0; }
   .error { padding: 10px; color: var(--danger, inherit); }
   .error p { margin: 0 0 6px; }
-  .error .small { font-size: 12px; color: var(--fg-muted, inherit); }
+  .error .small { font-size: 14px; color: var(--fg-muted, inherit); }
   .row { display: flex; gap: 6px; }
   .center { margin: auto; text-align: center; padding: 16px; }
   .center a { color: var(--accent, inherit); }

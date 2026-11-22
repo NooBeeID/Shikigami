@@ -76,7 +76,7 @@
 
 <div class="wrap" bind:this={wrapEl}>
   <button class="btn" aria-label="Aktivitas" aria-haspopup="dialog" aria-expanded={open} onclick={toggle}>
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
     </svg>
     {#if $runsCount > 0}
@@ -147,7 +147,7 @@
   .btn { position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 4px 6px; background: transparent; border-color: transparent; --wails-draggable: no-drag; }
   .badge {
     position: absolute; top: -4px; right: -4px; min-width: 16px; height: 16px; padding: 0 4px;
-    border-radius: 8px; background: var(--accent); color: #fff; font-size: 10px; line-height: 16px; text-align: center;
+    border-radius: 8px; background: var(--accent); color: #fff; font-size: 12px; line-height: 16px; text-align: center;
   }
   .dropdown {
     position: absolute; top: calc(100% + 4px); right: 0; width: 340px; max-height: 60vh; overflow-y: auto; z-index: 1000;
@@ -166,18 +166,18 @@
   .row.gone { opacity: 0.35; cursor: default; }
   .body { display: flex; flex-direction: column; min-width: 0; }
   .name { color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .meta { color: var(--fg-muted); font-size: 11px; }
+  .meta { color: var(--fg-muted); font-size: 13px; }
   .prog { color: var(--fg); }
   .stat { display: flex; gap: 6px; flex-wrap: wrap; }
   .model { color: var(--accent); }
   .a-stat { color: var(--fg-muted); margin-left: 4px; }
-  .tag { align-self: flex-start; margin-top: 2px; font-size: 10px; color: var(--fg-muted); border: 1px solid var(--border); border-radius: 3px; padding: 0 4px; }
+  .tag { align-self: flex-start; margin-top: 2px; font-size: 12px; color: var(--fg-muted); border: 1px solid var(--border); border-radius: 3px; padding: 0 4px; }
   .sub-toggle {
     display: block; margin: 0 10px 4px 20px; padding: 0 4px; background: transparent; border-color: transparent;
-    font-size: 11px; color: var(--fg-muted);
+    font-size: 13px; color: var(--fg-muted);
   }
   .agents { margin: 0 10px 6px 28px; }
-  .agent { font-size: 11px; color: var(--fg); padding: 1px 0; }
+  .agent { font-size: 13px; color: var(--fg); padding: 1px 0; }
   .agent.done { color: var(--fg-muted); }
   .mark { color: var(--accent); }
 </style>

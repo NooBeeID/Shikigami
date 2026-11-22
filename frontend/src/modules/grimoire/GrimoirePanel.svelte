@@ -110,14 +110,14 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--fg, inherit);
     background: color-mix(in srgb, var(--bg, #1b1b1f) 88%, black);
     border-top: 1px solid var(--border, transparent);
     min-height: 0;
   }
   .header { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; flex: none; }
-  .title { font-weight: 600; text-transform: uppercase; font-size: 11px; color: var(--fg-muted); }
+  .title { font-weight: 600; text-transform: uppercase; font-size: 13px; color: var(--fg-muted); }
   .icon { background: none; border: none; color: inherit; font: inherit; cursor: pointer; padding: 0 4px; }
   .icon:hover, .icon:focus-visible { background: var(--bg-hover, color-mix(in srgb, currentColor 10%, transparent)); }
   .book, .chapter, .generate {

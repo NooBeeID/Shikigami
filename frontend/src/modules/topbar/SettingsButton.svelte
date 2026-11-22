@@ -3,6 +3,7 @@
   import { toggleLeft, toggleRight, leftSidebar, rightSidebar } from '../../lib/stores/shell';
   import { errText } from './util';
   import { openSettings } from '../settings';
+  import { zoomPercent } from '../zoom';
 
   let open = $state(false);
   let error = $state('');
@@ -14,7 +15,7 @@
     [
       { label: 'Perbesar', hint: '⌘=', run: () => zoom('in') },
       { label: 'Perkecil', hint: '⌘-', run: () => zoom('out') },
-      { label: 'Reset zoom', hint: '⌘0', run: () => zoom('reset') },
+      { label: `Reset zoom (${$zoomPercent}%)`, hint: '⌘0', run: () => zoom('reset') },
     ],
     [
       { label: `${$leftSidebar.visible ? 'Sembunyikan' : 'Tampilkan'} sidebar kiri`, hint: '⌘B', run: toggleLeft },
@@ -78,7 +79,7 @@
 
 <div class="wrap" bind:this={root}>
   <button type="button" class="gear" bind:this={gearBtn} aria-label="Pengaturan" title="Pengaturan" aria-haspopup="menu" aria-expanded={open} onclick={toggle}>
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <circle cx="12" cy="12" r="3" />
       <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
     </svg>
@@ -106,8 +107,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 26px;
-    height: 26px;
+    width: 32px;
+    height: 32px;
     padding: 0;
     background: transparent;
     border: none;
@@ -138,12 +139,12 @@
     border: none;
     border-radius: 4px;
     color: var(--fg, inherit);
-    font-size: 12px;
+    font-size: 14px;
     text-align: left;
     cursor: pointer;
   }
   .item:hover, .item:focus-visible { background: var(--bg-hover, #333); outline: none; }
   .hint { color: var(--fg-muted, #888); }
   .sep { height: 1px; margin: 4px 0; background: var(--border, #444); }
-  .err { padding: 4px 8px; font-size: 11px; color: var(--danger, #f85149); }
+  .err { padding: 4px 8px; font-size: 13px; color: var(--danger, #f85149); }
 </style>

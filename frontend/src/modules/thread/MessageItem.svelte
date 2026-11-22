@@ -26,13 +26,13 @@
 <ThreadSlot name="message-extra" {thread} {message} />
 
 <style>
-  .sys { text-align: center; font-size: 11px; color: var(--fg-muted, #888); padding: 2px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .sys { text-align: center; font-size: 13px; color: var(--fg-muted, #888); padding: 2px 0; white-space: pre-wrap; overflow-wrap: anywhere; }
   .msg { display: flex; gap: 8px; padding: 6px 8px; border-radius: 6px; }
   .msg.user { background: var(--bg-elev, #fff); }
-  .avatar { flex: none; width: 28px; height: 28px; border-radius: 50%; color: #fff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+  .avatar { flex: none; width: 28px; height: 28px; border-radius: 50%; color: #fff; font-size: 13px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
   .body { min-width: 0; flex: 1; }
-  .meta { display: flex; gap: 8px; align-items: baseline; font-size: 11px; color: var(--fg-muted, #888); }
+  .meta { display: flex; gap: 8px; align-items: baseline; font-size: 13px; color: var(--fg-muted, #888); }
   .who { font-weight: 600; color: var(--fg, #222); }
   .t { color: var(--fg-muted, #888); }
-  .text { font-size: 13px; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--fg, #222); }
+  .text { font-size: 15px; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--fg, #222); }
 </style>

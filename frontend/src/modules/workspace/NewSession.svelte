@@ -43,8 +43,8 @@
 <style>
   .new { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; min-width: 0; }
   select { flex: 1; min-width: 0; font: inherit; color: var(--fg, #222); background: var(--bg-elev, transparent); border: 1px solid var(--border, #8884); border-radius: 4px; padding: 3px 6px; }
-  button { font: inherit; font-size: 12px; color: var(--fg, #222); background: transparent; border: 1px solid var(--accent, #3b82f6); border-radius: 4px; padding: 3px 10px; cursor: pointer; }
+  button { font: inherit; font-size: 14px; color: var(--fg, #222); background: transparent; border: 1px solid var(--accent, #3b82f6); border-radius: 4px; padding: 3px 10px; cursor: pointer; }
   button:hover:not(:disabled) { background: var(--bg-hover, #0001); }
   button:disabled { opacity: 0.5; cursor: default; border-color: var(--border, #8884); }
-  .hint { flex-basis: 100%; font-size: 11px; color: var(--fg-muted, #888); }
+  .hint { flex-basis: 100%; font-size: 13px; color: var(--fg-muted, #888); }
 </style>

@@ -229,12 +229,12 @@
     background: transparent;
     color: var(--fg);
     outline: none;
-    font-size: 14px;
+    font-size: 16px;
   }
   .list { overflow-y: auto; padding: 4px 0 6px; }
   .group-label {
     padding: 8px 14px 4px;
-    font-size: 11px;
+    font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--fg-muted);
@@ -252,7 +252,7 @@
   .title { white-space: nowrap; flex-shrink: 0; max-width: 60%; overflow: hidden; text-overflow: ellipsis; }
   .subtitle {
     color: var(--fg-muted);
-    font-size: 12px;
+    font-size: 14px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -260,7 +260,7 @@
   }
   .badge {
     margin-left: auto;
-    font-size: 11px;
+    font-size: 13px;
     color: var(--fg-muted);
     border: 1px solid var(--border);
     border-radius: 4px;

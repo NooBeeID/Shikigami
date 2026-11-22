@@ -39,10 +39,10 @@
 
 <style>
   .groups { flex: 1; min-height: 0; overflow: auto; padding: 12px 14px; }
-  .ghead { display: flex; align-items: center; gap: 6px; width: 100%; text-align: left; font: inherit; font-size: 12px; font-weight: 600; color: var(--fg-muted, #888); background: transparent; border: 0; padding: 14px 8px 8px; cursor: pointer; }
+  .ghead { display: flex; align-items: center; gap: 6px; width: 100%; text-align: left; font: inherit; font-size: 14px; font-weight: 600; color: var(--fg-muted, #888); background: transparent; border: 0; padding: 14px 8px 8px; cursor: pointer; }
   .gname { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .chev { width: 10px; flex: none; }
   .count { font-weight: 400; }
-  .dim { font-size: 12px; color: var(--fg-muted, #888); padding: 10px 14px; }
+  .dim { font-size: 14px; color: var(--fg-muted, #888); padding: 10px 14px; }
   .empty { padding-left: 26px; opacity: 0.7; }
 </style>

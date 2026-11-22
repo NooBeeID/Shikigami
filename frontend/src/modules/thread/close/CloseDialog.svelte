@@ -139,10 +139,10 @@
 <style>
   .overlay { position: fixed; inset: 0; z-index: 100; background: #0006; display: flex; align-items: center; justify-content: center; outline: none; }
   .dlg { width: min(560px, 92vw); max-height: 90vh; background: var(--bg-elev, #fff); color: var(--fg, #222); border: 1px solid var(--border, #8884); border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 10px 30px #0006; }
-  h3 { margin: 0; font-size: 14px; }
-  .hint { margin: 0; font-size: 12px; color: var(--fg-muted, #888); }
-  .danger { color: var(--danger, #e5484d); border: 1px solid var(--danger, #e5484d); background: color-mix(in srgb, var(--danger, #e5484d) 10%, transparent); border-radius: 6px; padding: 8px; font-size: 12px; overflow-wrap: anywhere; }
-  .content { max-height: 50vh; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; gap: 8px; font-size: 12px; overflow-wrap: anywhere; }
+  h3 { margin: 0; font-size: 16px; }
+  .hint { margin: 0; font-size: 14px; color: var(--fg-muted, #888); }
+  .danger { color: var(--danger, #e5484d); border: 1px solid var(--danger, #e5484d); background: color-mix(in srgb, var(--danger, #e5484d) 10%, transparent); border-radius: 6px; padding: 8px; font-size: 14px; overflow-wrap: anywhere; }
+  .content { max-height: 50vh; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; gap: 8px; font-size: 14px; overflow-wrap: anywhere; }
   .muted { color: var(--fg-muted, #888); }
   .loaderr { color: var(--danger, #e5484d); }
   .clean { color: var(--ok, #30a46c); }
@@ -151,10 +151,10 @@
   .meta { color: var(--fg-muted, #888); }
   .sub { font-weight: bold; margin-top: 4px; }
   ul { margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 2px; }
-  code { font-family: ui-monospace, monospace; font-size: 11px; overflow-wrap: anywhere; }
-  .err { color: var(--danger, #e5484d); font-size: 12px; overflow-wrap: anywhere; }
+  code { font-family: ui-monospace, monospace; font-size: 13px; overflow-wrap: anywhere; }
+  .err { color: var(--danger, #e5484d); font-size: 14px; overflow-wrap: anywhere; }
   .btns { display: flex; justify-content: flex-end; gap: 8px; }
-  button { font: inherit; font-size: 12px; color: var(--fg, #222); background: transparent; border: 1px solid var(--border, #8884); border-radius: 6px; padding: 6px 14px; cursor: pointer; align-self: flex-start; }
+  button { font: inherit; font-size: 14px; color: var(--fg, #222); background: transparent; border: 1px solid var(--border, #8884); border-radius: 6px; padding: 6px 14px; cursor: pointer; align-self: flex-start; }
   .btns button { align-self: auto; }
   button.danger-btn { background: var(--danger, #e5484d); color: #fff; border-color: transparent; }
   button:disabled { opacity: 0.5; cursor: default; }

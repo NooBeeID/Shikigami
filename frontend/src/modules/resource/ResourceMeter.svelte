@@ -61,7 +61,7 @@
   .wrap { --wails-draggable: no-drag; position: relative; display: inline-flex; align-items: center; padding: 0 6px; }
   .meter {
     padding: 4px 8px; background: transparent; border-color: transparent; color: var(--fg-muted, #888);
-    font-size: 11px; font-variant-numeric: tabular-nums; border-radius: 4px; cursor: pointer; --wails-draggable: no-drag;
+    font-size: 13px; font-variant-numeric: tabular-nums; border-radius: 4px; cursor: pointer; --wails-draggable: no-drag;
   }
   .meter:hover, .meter[aria-expanded='true'] { background: var(--bg-hover, #333); color: var(--fg, inherit); }
   .menu {
@@ -69,9 +69,9 @@
     background: var(--bg-elev, #222); border: 1px solid var(--border, #444); border-radius: 6px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
     --wails-draggable: no-drag;
   }
-  .row { display: flex; align-items: center; gap: 12px; padding: 5px 8px; font-size: 12px; color: var(--fg, inherit); }
+  .row { display: flex; align-items: center; gap: 12px; padding: 5px 8px; font-size: 14px; color: var(--fg, inherit); }
   .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .num { flex: none; min-width: 52px; text-align: right; font-variant-numeric: tabular-nums; color: var(--fg-muted, #888); }
-  .err { padding: 4px 8px; font-size: 11px; color: var(--danger, #f85149); }
-  .foot { margin-top: 4px; padding: 6px 8px 4px; border-top: 1px solid var(--border, #444); font-size: 10px; color: var(--fg-muted, #888); }
+  .err { padding: 4px 8px; font-size: 13px; color: var(--danger, #f85149); }
+  .foot { margin-top: 4px; padding: 6px 8px 4px; border-top: 1px solid var(--border, #444); font-size: 12px; color: var(--fg-muted, #888); }
 </style>

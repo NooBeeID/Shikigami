@@ -117,7 +117,7 @@
 
 <style>
   .badge {
-    font-size: 12px; line-height: 1; padding: 0 6px; border: 0; background: transparent; cursor: pointer;
+    font-size: 14px; line-height: 1; padding: 0 6px; border: 0; background: transparent; cursor: pointer;
     color: var(--fg-muted, #9b9ba6); display: inline-flex; align-items: center; gap: 4px; height: 100%;
   }
   .badge.active { color: var(--accent, #5b94ff); }
@@ -126,7 +126,7 @@
   .popover {
     position: fixed; z-index: 1000; width: min(420px, calc(100vw - 16px)); max-height: 50vh; overflow: auto;
     background: var(--bg-elev, #24242a); color: var(--fg, #e6e6ea); border: 1px solid var(--border, #35353d);
-    border-radius: 6px; font-size: 12px; line-height: 1.3; box-sizing: border-box;
+    border-radius: 6px; font-size: 14px; line-height: 1.3; box-sizing: border-box;
   }
   .empty { padding: 10px; color: var(--fg-muted, #9b9ba6); }
   .item { padding: 8px; border-bottom: 1px solid var(--border, #35353d); }
@@ -136,9 +136,9 @@
   .txt { margin: 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .actions { display: flex; gap: 6px; align-items: center; }
   .actions button {
-    font-size: 11px; padding: 2px 8px; border: 1px solid var(--border, #35353d); border-radius: 4px;
+    font-size: 13px; padding: 2px 8px; border: 1px solid var(--border, #35353d); border-radius: 4px;
     background: var(--bg-hover, #2f2f37); color: var(--fg, #e6e6ea); cursor: pointer;
   }
   .actions button:disabled { opacity: 0.6; cursor: default; }
-  .rerr { color: var(--danger, #ff6b81); font-size: 11px; }
+  .rerr { color: var(--danger, #ff6b81); font-size: 13px; }
 </style>

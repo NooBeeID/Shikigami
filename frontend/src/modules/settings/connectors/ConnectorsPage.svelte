@@ -76,13 +76,13 @@
 <style>
   h2 {
     margin: 0 0 8px;
-    font-size: 16px;
+    font-size: 18px;
     color: var(--fg, #ddd);
   }
   .muted {
     margin: 0;
     color: var(--fg-muted, #888);
-    font-size: 13px;
+    font-size: 15px;
   }
   ul {
     list-style: none;
@@ -110,13 +110,13 @@
   }
   .name {
     color: var(--fg, #ddd);
-    font-size: 14px;
+    font-size: 16px;
   }
   .msg {
     margin-top: 4px;
   }
   .badge {
-    font-size: 11px;
+    font-size: 13px;
     padding: 2px 8px;
     border-radius: 10px;
     border: 1px solid transparent;
@@ -142,7 +142,7 @@
     gap: 12px;
     margin-bottom: 8px;
     color: #e49a9a;
-    font-size: 13px;
+    font-size: 15px;
   }
   button {
     background: var(--bg-elev, #222);
@@ -150,7 +150,7 @@
     border: 1px solid var(--border, #333);
     border-radius: 4px;
     padding: 4px 12px;
-    font-size: 13px;
+    font-size: 15px;
     cursor: pointer;
   }
   button:hover:not(:disabled) {

@@ -107,8 +107,8 @@
     text-align: center;
   }
   .title { font-weight: 600; }
-  .info { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--fg-muted, #999); }
-  .note, .err { color: var(--danger, #f44); font-size: 12px; }
+  .info { display: flex; flex-direction: column; gap: 2px; font-size: 14px; color: var(--fg-muted, #999); }
+  .note, .err { color: var(--danger, #f44); font-size: 14px; }
   button {
     border: 1px solid var(--accent, #4a9eff);
     background: var(--accent, #4a9eff);

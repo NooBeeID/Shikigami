@@ -133,7 +133,7 @@
     background: transparent;
     border: none;
     color: var(--fg-muted, #999);
-    font-size: 18px;
+    font-size: 20px;
     line-height: 1;
     padding: 2px 8px;
     border-radius: 4px;

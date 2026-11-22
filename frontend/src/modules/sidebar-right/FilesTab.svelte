@@ -247,7 +247,7 @@
             onkeydown={() => {}}
           >
             <span class="arrow">{isDir ? (row.expanded ? '▾' : '▸') : ''}</span>
-            <svg class="ico" class:dir={isDir} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg class="ico" class:dir={isDir} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               {#if isDir && row.expanded}
                 <path d="M3 8a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v1H3z" />
                 <path d="M3 11h19l-2 7a2 2 0 0 1-2 1.5H5a2 2 0 0 1-2-2z" />
@@ -293,7 +293,7 @@
     flex-direction: column;
     min-width: 0;
     min-height: 0;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--fg, inherit);
   }
   .header {
@@ -325,7 +325,7 @@
     color: inherit;
     cursor: pointer;
     padding: 0 4px;
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1;
   }
   .icon:hover {
@@ -436,7 +436,7 @@
   }
   .retry {
     flex: none;
-    font-size: 11px;
+    font-size: 13px;
     cursor: pointer;
   }
 </style>

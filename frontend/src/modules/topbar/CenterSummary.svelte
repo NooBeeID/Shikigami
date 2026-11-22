@@ -38,7 +38,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--fg, inherit);
   }
   .name { overflow: hidden; text-overflow: ellipsis; }
@@ -55,7 +55,7 @@
   .dot.on { background: var(--ok, #3fb950); opacity: 1; }
   .badge {
     padding: 0 6px;
-    font-size: 10px;
+    font-size: 12px;
     border: 1px solid var(--border, #444);
     border-radius: 8px;
     color: var(--fg-muted, #888);

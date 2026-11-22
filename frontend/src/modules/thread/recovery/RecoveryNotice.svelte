@@ -22,6 +22,6 @@
 {/if}
 
 <style>
-  .callout { margin: 2px 8px 6px; padding: 4px 8px; border-left: 3px solid #3b82c4; background: rgba(59, 130, 196, 0.12); border-radius: 4px; font-size: 11px; color: var(--fg, #222); display: flex; gap: 6px; flex-wrap: wrap; }
+  .callout { margin: 2px 8px 6px; padding: 4px 8px; border-left: 3px solid #3b82c4; background: rgba(59, 130, 196, 0.12); border-radius: 4px; font-size: 13px; color: var(--fg, #222); display: flex; gap: 6px; flex-wrap: wrap; }
   .callout.failed { border-left-color: #c0392b; background: rgba(192, 57, 43, 0.12); }
 </style>

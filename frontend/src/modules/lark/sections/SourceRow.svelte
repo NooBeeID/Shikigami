@@ -148,7 +148,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    font-size: 13px;
+    font-size: 15px;
     color: var(--fg, #ddd);
   }
   .line {
@@ -168,7 +168,7 @@
     padding: 4px 6px;
     cursor: pointer;
     border-radius: 4px;
-    font-size: 13px;
+    font-size: 15px;
   }
   .open:hover,
   .more:hover {
@@ -206,7 +206,7 @@
     text-align: left;
     padding: 5px 10px;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 14px;
   }
   .menu button:hover {
     background: var(--bg-hover, #2c2c2c);
@@ -218,7 +218,7 @@
     border: 1px solid var(--border, #333);
     border-radius: 4px;
     padding: 3px 6px;
-    font-size: 13px;
+    font-size: 15px;
   }
   .confirm {
     display: flex;
@@ -233,7 +233,7 @@
     border: 1px solid var(--border, #333);
     border-radius: 4px;
     padding: 2px 8px;
-    font-size: 12px;
+    font-size: 14px;
     cursor: pointer;
   }
   .confirm .danger {
@@ -241,7 +241,7 @@
   }
   .err {
     color: var(--danger, #e49a9a);
-    font-size: 11px;
+    font-size: 13px;
     padding: 0 6px 2px;
   }
 </style>

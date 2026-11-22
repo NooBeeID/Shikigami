@@ -60,7 +60,7 @@
 
 <div class="wrap" bind:this={bellEl}>
   <button class="bell" aria-label="Notifikasi" aria-haspopup="true" aria-expanded={open} onclick={toggle}>
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
       <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
     </svg>
@@ -103,7 +103,7 @@
   .bell { position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 4px 6px; background: transparent; border-color: transparent; --wails-draggable: no-drag; }
   .badge {
     position: absolute; top: -4px; right: -4px; min-width: 16px; height: 16px; padding: 0 4px;
-    border-radius: 8px; background: var(--danger, #e5484d); color: #fff; font-size: 10px; line-height: 16px; text-align: center;
+    border-radius: 8px; background: var(--danger, #e5484d); color: #fff; font-size: 12px; line-height: 16px; text-align: center;
   }
   .dropdown {
     position: absolute; top: calc(100% + 4px); right: 0; width: 320px; max-height: 60vh; overflow-y: auto; z-index: 1000;
@@ -112,7 +112,7 @@
   }
   .head { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border-bottom: 1px solid var(--border); }
   .title { flex: 1; font-weight: 600; color: var(--fg); }
-  .txt { background: transparent; border-color: transparent; padding: 2px 4px; font-size: 11px; color: var(--fg-muted); }
+  .txt { background: transparent; border-color: transparent; padding: 2px 4px; font-size: 13px; color: var(--fg-muted); }
   .empty { padding: 16px; text-align: center; color: var(--fg-muted); }
   ul { list-style: none; margin: 0; padding: 0; }
   .row {
@@ -126,5 +126,5 @@
   .dot.on { background: var(--accent); }
   .body { display: flex; flex-direction: column; min-width: 0; }
   .name { color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .meta { color: var(--fg-muted); font-size: 11px; }
+  .meta { color: var(--fg-muted); font-size: 13px; }
 </style>

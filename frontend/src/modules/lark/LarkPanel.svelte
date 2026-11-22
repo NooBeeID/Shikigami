@@ -87,7 +87,7 @@
     padding: 8px 10px;
   }
   .title {
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.08em;
     color: var(--fg-muted, #888);
   }
@@ -96,7 +96,7 @@
     border: none;
     color: var(--fg-muted, #888);
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
   }
   .icon:hover {
     color: var(--fg, #ddd);
@@ -111,7 +111,7 @@
     margin: 0;
     padding: 6px 10px;
     color: var(--fg-muted, #888);
-    font-size: 12px;
+    font-size: 14px;
   }
   .errbox {
     margin: 4px 6px 8px;
@@ -120,7 +120,7 @@
     border: 1px solid var(--border, #333);
     border-radius: 4px;
     color: var(--danger, #e49a9a);
-    font-size: 12px;
+    font-size: 14px;
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -136,7 +136,7 @@
     border: 1px solid var(--border, #333);
     border-radius: 4px;
     padding: 2px 8px;
-    font-size: 12px;
+    font-size: 14px;
     cursor: pointer;
   }
   .acts button:hover {
@@ -150,7 +150,7 @@
     background: none;
     border: none;
     color: var(--fg, #ddd);
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 600;
     text-align: left;
     padding: 5px 8px;

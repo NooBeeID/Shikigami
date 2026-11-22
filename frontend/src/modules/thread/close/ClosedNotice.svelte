@@ -18,5 +18,5 @@
 {/if}
 
 <style>
-  .notice { margin: 6px 12px; padding: 6px 10px; font-size: 12px; color: var(--fg-muted, #888); border: 1px solid var(--border, #8884); border-radius: 6px; }
+  .notice { margin: 6px 12px; padding: 6px 10px; font-size: 14px; color: var(--fg-muted, #888); border: 1px solid var(--border, #8884); border-radius: 6px; }
 </style>
