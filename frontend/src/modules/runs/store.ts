@@ -57,6 +57,12 @@ export const runsCount: Readable<number> = derived(runs, ($r) => $r.length);
 // daripada balasan, jadi dipertahankan.
 let touched = new Set<string>();
 
+// Nomor muat terbaru: hanya balasan dari muat terbaru yang boleh menyentuh store.
+let loadSeq = 0;
+export function isLatestLoad(seq: number, current: number): boolean {
+  return seq === current;
+}
+
 function handler(_topic: string, payload: unknown): void {
   const p = payload as { sessionId?: unknown; runs?: unknown } | null;
   if (!p || typeof p.sessionId !== 'string' || !Array.isArray(p.runs)) return;
@@ -68,8 +74,8 @@ function handler(_topic: string, payload: unknown): void {
 
 // Ganti isi store dengan hasil panggilan workspace `wid`, kecuali sesi yang
 // baru diubah event, dan abaikan balasan basi bila workspace sudah berganti.
-function apply(wid: string, res: unknown, mark: Set<string>): void {
-  if (get(activeWorkspaceId) !== wid || !Array.isArray(res)) return;
+function apply(seq: number, wid: string, res: unknown, mark: Set<string>): void {
+  if (!isLatestLoad(seq, loadSeq) || get(activeWorkspaceId) !== wid || !Array.isArray(res)) return;
   const fresh = groupBySession(res.filter(isRun));
   store.update((m) => {
     const next = { ...fresh };
@@ -82,12 +88,13 @@ function apply(wid: string, res: unknown, mark: Set<string>): void {
 }
 
 async function load(method: 'runs.list' | 'runs.detail'): Promise<void> {
+  const seq = ++loadSeq;
   const wid = get(activeWorkspaceId);
   if (!wid) { store.set({}); return; }
   touched = new Set();
   const mark = touched;
   try {
-    apply(wid, await call<Run[]>(method, { workspaceId: wid }), mark);
+    apply(seq, wid, await call<Run[]>(method, { workspaceId: wid }), mark);
   } catch (e) {
     console.warn(`${method} gagal:`, e);
   }
@@ -105,7 +112,7 @@ let unsub: (() => void) | null = null;
 // Idempoten: panggilan berikutnya mengembalikan pembersih yang sama.
 export function startRunsSync(): () => void {
   const stop = () => {
-    if (unsub) { unsub(); unsub = null; }
+    if (unsub) { unsub(); unsub = null; loadSeq++; }
   };
   if (unsub) return stop;
   // Berlangganan dahulu agar tidak ada event yang hilang, baru muat awal.
