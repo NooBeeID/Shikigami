@@ -12,12 +12,16 @@
   let confirmId = $state<string | null>(null);
   let notice = $state('');
   let busy = $state(false);
+  let addMenu = $state(false);
+  let showOpenList = $state(false);
 
   const openTabs = $derived(
     $openWorkspaceIds
       .map((id) => $workspaces.find((w) => w.id === id))
       .filter((w): w is NonNullable<typeof w> => !!w),
   );
+
+  const closedList = $derived($workspaces.filter((w) => !$openWorkspaceIds.includes(w.id)));
 
   let noticeTimer: ReturnType<typeof setTimeout> | undefined;
   let cancelled = false;
@@ -37,8 +41,28 @@
     try { await selectWorkspace(id); } catch (e) { say(errText(e)); }
   }
 
+  function toggleAdd() {
+    addMenu = !addMenu;
+    showOpenList = false;
+  }
+
+  async function openExisting(id: string) {
+    addMenu = false;
+    showOpenList = false;
+    try { await openWorkspace(id); } catch (e) { say(errText(e)); }
+  }
+
+  function askDelete(id: string) {
+    if ($workspaces.length <= 1) { say('Tidak bisa menghapus workspace terakhir'); return; }
+    addMenu = false;
+    showOpenList = false;
+    confirmId = id;
+  }
+
   async function add() {
     if (busy) return;
+    addMenu = false;
+    showOpenList = false;
     busy = true;
     try {
       const ws = await createWorkspace(defaultWorkspaceName($workspaces));
@@ -152,6 +176,21 @@
   });
 
   $effect(() => {
+    if (!addMenu) return;
+    const down = (e: PointerEvent) => {
+      const t = e.target as HTMLElement;
+      if (!t.closest?.('.addmenu') && !t.closest?.('.add')) { addMenu = false; showOpenList = false; }
+    };
+    const key = (e: KeyboardEvent) => { if (e.key === 'Escape') { addMenu = false; showOpenList = false; } };
+    window.addEventListener('pointerdown', down);
+    window.addEventListener('keydown', key);
+    return () => {
+      window.removeEventListener('pointerdown', down);
+      window.removeEventListener('keydown', key);
+    };
+  });
+
+  $effect(() => {
     if (!confirmId) return;
     const down = (e: PointerEvent) => {
       if (!(e.target as HTMLElement).closest?.('.confirm')) confirmId = null;
@@ -199,7 +238,27 @@
       {/if}
     {/each}
   </div>
-  <button type="button" class="add" aria-label="Workspace baru" title="Workspace baru" disabled={busy} onclick={add}>+</button>
+  <button type="button" class="add" aria-label="Workspace baru" title="Workspace baru" aria-haspopup="menu" aria-expanded={addMenu} disabled={busy} onclick={toggleAdd}>+</button>
+  {#if addMenu}
+    <div class="addmenu" role="menu">
+      <button type="button" role="menuitem" onclick={add}>Create New</button>
+      <button type="button" role="menuitem" aria-expanded={showOpenList} onclick={() => (showOpenList = !showOpenList)}>
+        Open Workspace <span class="chev">{showOpenList ? '▾' : '›'}</span>
+      </button>
+      {#if showOpenList}
+        <div class="openlist" role="group" aria-label="Workspace tersedia">
+          {#each closedList as w (w.id)}
+            <div class="orow">
+              <button type="button" role="menuitem" class="oname" title={w.name} onclick={() => openExisting(w.id)}>{w.name}</button>
+              <button type="button" class="odel" aria-label={`Hapus ${w.name}`} title="Hapus workspace" onclick={() => askDelete(w.id)}>🗑</button>
+            </div>
+          {:else}
+            <div class="empty">Tidak ada workspace lain</div>
+          {/each}
+        </div>
+      {/if}
+    </div>
+  {/if}
   {#if confirmId}
     <div class="confirm" role="alertdialog" aria-label="Konfirmasi hapus">
       <span>Hapus "{confirmName}"?</span>
@@ -280,6 +339,54 @@
     font-size: 18px;
   }
   .add:hover { background: var(--bg-hover, #333); color: var(--fg, inherit); }
+  .addmenu {
+    --wails-draggable: no-drag;
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    z-index: 1000;
+    min-width: 200px;
+    max-width: 280px;
+    padding: 4px;
+    background: var(--bg-elev, #222);
+    border: 1px solid var(--border, #444);
+    border-radius: 6px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  }
+  .addmenu > button {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 5px 8px;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    color: var(--fg, inherit);
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+  }
+  .addmenu > button:hover, .oname:hover, .odel:hover { background: var(--bg-hover, #333); }
+  .chev { color: var(--fg-muted, #888); }
+  .openlist { margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--border, #444); max-height: 240px; overflow-y: auto; }
+  .orow { display: flex; align-items: center; gap: 2px; }
+  .oname {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 5px 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    color: var(--fg, inherit);
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+  }
+  .odel { flex: none; padding: 3px 6px; background: transparent; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; }
+  .empty { padding: 5px 8px; font-size: 13px; color: var(--fg-muted, #888); }
   .confirm {
     position: absolute;
     top: calc(100% + 4px);
