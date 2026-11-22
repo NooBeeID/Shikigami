@@ -84,7 +84,10 @@ func TestExitListenerPanicIsContained(t *testing.T) {
 	if _, ok := e.states["s1"]; ok {
 		t.Fatal("Forget tidak jalan setelah panic")
 	}
-	_ = called // urutan map acak; yang dijamin: tidak panic keluar
+	// Tiap listener punya recover sendiri, jadi listener kedua selalu jalan.
+	if !called {
+		t.Fatal("listener kedua tidak dipanggil setelah listener pertama panic")
+	}
 }
 
 func TestExitListenerCancel(t *testing.T) {
