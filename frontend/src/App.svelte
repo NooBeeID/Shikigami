@@ -10,6 +10,7 @@
   import AgentSidebar from './modules/sidebar-left/AgentSidebar.svelte';
   import Palette from './modules/palette/Palette.svelte';
   import Toast from './modules/openfolder/Toast.svelte';
+  import { SettingsModal } from './modules/settings';
 
   let dispose: (() => void) | null = null;
 
@@ -41,6 +42,7 @@
     {#snippet right()}<RightPanel />{/snippet}
   </ShellFrame>
   <Palette />
+  <SettingsModal />
   <div class="toast-host"><Toast /></div>
 {/if}
 
