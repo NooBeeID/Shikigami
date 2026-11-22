@@ -1,0 +1,23 @@
+{
+ "session_id": "5f1b44bf-1504-43a6-895e-8327fa09ce9a",
+ "transcript_path": "/Users/USER/.claude/projects/-private-tmp-claude-501--Users-ascendiz-Documents-Projects-noobeeid-research-ai-terminal-e5d0a41d-2a5a-4696-87ab-5421d0b85090-scratchpad-spike-cwd/5f1b44bf-1504-43a6-895e-8327fa09ce9a.jsonl",
+ "cwd": "/private/tmp/claude-501/-Users-ascendiz-Documents-Projects-noobeeid-research-ai-terminal/e5d0a41d-2a5a-4696-87ab-5421d0b85090/scratchpad/spike/cwd",
+ "prompt_id": "b07e26a7-7317-46fd-954b-ff9365449022",
+ "permission_mode": "bypassPermissions",
+ "effort": {
+  "level": "medium"
+ },
+ "hook_event_name": "Stop",
+ "stop_hook_active": false,
+ "last_assistant_message": "The Agent probe returned \"hi\". The workflow `spike-probe` (run `wf_e8ae7cd1-a8d`) launched in the background, and its two \"ok\" results haven't come back yet. I'll report them when the completion notification arrives.",
+ "background_tasks": [
+  {
+   "id": "wkt61tgun",
+   "type": "workflow",
+   "status": "running",
+   "description": "Run two sequential agents that each reply ok",
+   "name": "spike-probe"
+  }
+ ],
+ "session_crons": []
+}

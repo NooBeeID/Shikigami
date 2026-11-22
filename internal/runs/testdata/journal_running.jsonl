@@ -1,0 +1,4 @@
+{"type":"launched"}
+{"type":"started","key":"v2:7f7104ae323989f0d6c025c439fdec8f9db1b3ac8a937f094da5fc4078d830fe","agentId":"a760caa2a8227c09d","label":"probe-1","phase":"Probe"}
+{"type":"result","key":"v2:7f7104ae323989f0d6c025c439fdec8f9db1b3ac8a937f094da5fc4078d830fe","agentId":"a760caa2a8227c09d","result":"ok","remoteControlDeviceReport":false,"sessionId":"5f1b44bf-1504-43a6-895e-8327fa09ce9a"}
+{"type":"started","key":"v2:148b16fe5ed65c0d4de44ee5756f29c96e1db10590985ac838a62a2b0d57cab6","agentId":"a6f3428590425bb2c","label":"probe-2","phase":"Probe"}

@@ -1,0 +1,12 @@
+{
+ "agentType": "workflow-subagent",
+ "isBuiltIn": true,
+ "description": "probe-1",
+ "workflowPhase": "Probe",
+ "spawnDepth": 1,
+ "requestShape": "foreground",
+ "requestNonInteractive": true,
+ "model": "claude-sonnet-5-5",
+ "pickedEffortModel": "claude-sonnet-5-5",
+ "inWorkflowRun": true
+}

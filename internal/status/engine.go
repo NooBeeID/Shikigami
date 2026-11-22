@@ -52,6 +52,10 @@ type Engine struct {
 	nextWait int
 
 	activitySink func(sessionID, event string, payload map[string]any)
+	hookLis      map[int]func(sessionID, event string, payload map[string]any)
+	nextHookLis  int
+	exitLis      map[int]func(sessionID string)
+	nextExitLis  int
 
 	streamMu sync.Mutex // melindungi ensureStream
 	stream   *ipc.Client
@@ -274,6 +278,43 @@ func (e *Engine) SetActivitySink(fn func(sessionID, event string, payload map[st
 	e.mu.Unlock()
 }
 
+// AddHookListener mendaftarkan listener untuk setiap hook event (termasuk event
+// yang tidak dikenal ClassifyEvent). Dipanggil di Apply setelah sink aktivitas,
+// di luar e.mu, dan panic listener ditangkap.
+func (e *Engine) AddHookListener(fn func(sessionID, event string, payload map[string]any)) (cancel func()) {
+	e.mu.Lock()
+	if e.hookLis == nil {
+		e.hookLis = map[int]func(string, string, map[string]any){}
+	}
+	id := e.nextHookLis
+	e.nextHookLis++
+	e.hookLis[id] = fn
+	e.mu.Unlock()
+	return func() {
+		e.mu.Lock()
+		delete(e.hookLis, id)
+		e.mu.Unlock()
+	}
+}
+
+// AddExitListener mendaftarkan listener yang dipanggil tepat sekali tiap sesi
+// keluar, apa pun status sesinya saat itu (juga bila sudah Done lewat Stop).
+func (e *Engine) AddExitListener(fn func(sessionID string)) (cancel func()) {
+	e.mu.Lock()
+	if e.exitLis == nil {
+		e.exitLis = map[int]func(string){}
+	}
+	id := e.nextExitLis
+	e.nextExitLis++
+	e.exitLis[id] = fn
+	e.mu.Unlock()
+	return func() {
+		e.mu.Lock()
+		delete(e.exitLis, id)
+		e.mu.Unlock()
+	}
+}
+
 func (e *Engine) Apply(idOrToken, event string, payload map[string]any) error {
 	id, ok := e.ResolveSessionID(idOrToken)
 	if !ok {
@@ -281,6 +322,10 @@ func (e *Engine) Apply(idOrToken, event string, payload map[string]any) error {
 	}
 	e.mu.Lock()
 	sink := e.activitySink
+	lis := make([]func(string, string, map[string]any), 0, len(e.hookLis))
+	for _, fn := range e.hookLis {
+		lis = append(lis, fn)
+	}
 	e.mu.Unlock()
 	if sink != nil {
 		func() {
@@ -290,6 +335,16 @@ func (e *Engine) Apply(idOrToken, event string, payload map[string]any) error {
 				}
 			}()
 			sink(id, event, payload)
+		}()
+	}
+	for _, fn := range lis {
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					slog.Warn("hook listener panic", "recover", r)
+				}
+			}()
+			fn(id, event, payload)
 		}()
 	}
 	st, known := ClassifyEvent(event)
@@ -320,6 +375,22 @@ func hookCapable(state *sessionState) bool {
 
 func (e *Engine) handleExit(id string) {
 	e.Set(id, StatusDone, SourceExit, "exit")
+	e.mu.Lock()
+	lis := make([]func(string), 0, len(e.exitLis))
+	for _, fn := range e.exitLis {
+		lis = append(lis, fn)
+	}
+	e.mu.Unlock()
+	for _, fn := range lis {
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					slog.Warn("exit listener panic", "recover", r)
+				}
+			}()
+			fn(id)
+		}()
+	}
 	e.Forget(id)
 }
 

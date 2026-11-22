@@ -1,0 +1,18 @@
+{
+ "session_id": "5f1b44bf-1504-43a6-895e-8327fa09ce9a",
+ "transcript_path": "/Users/USER/.claude/projects/-private-tmp-claude-501--Users-ascendiz-Documents-Projects-noobeeid-research-ai-terminal-e5d0a41d-2a5a-4696-87ab-5421d0b85090-scratchpad-spike-cwd/5f1b44bf-1504-43a6-895e-8327fa09ce9a.jsonl",
+ "cwd": "/private/tmp/claude-501/-Users-ascendiz-Documents-Projects-noobeeid-research-ai-terminal/e5d0a41d-2a5a-4696-87ab-5421d0b85090/scratchpad/spike/cwd",
+ "prompt_id": "b07e26a7-7317-46fd-954b-ff9365449022",
+ "permission_mode": "bypassPermissions",
+ "effort": {
+  "level": "medium"
+ },
+ "hook_event_name": "PreToolUse",
+ "tool_name": "Agent",
+ "tool_input": {
+  "description": "Spike probe agent",
+  "prompt": "Reply with the word hi",
+  "run_in_background": false
+ },
+ "tool_use_id": "toolu_01XVrd27J6vbU5djmFACYvvQ"
+}

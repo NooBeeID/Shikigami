@@ -1,0 +1,75 @@
+{
+ "runId": "wf_e8ae7cd1-a8d",
+ "timestamp": "2026-11-22T05:45:50.871Z",
+ "taskId": "wkt61tgun",
+ "scriptPath": "/Users/USER/.claude/projects/-private-tmp-claude-501--Users-ascendiz-Documents-Projects-noobeeid-research-ai-terminal-e5d0a41d-2a5a-4696-87ab-5421d0b85090-scratchpad-spike-cwd/5f1b44bf-1504-43a6-895e-8327fa09ce9a/workflows/scripts/spike-probe-wf_e8ae7cd1-a8d.js",
+ "args": {
+  "ticket": "docs/tickets/T-SPIKE.md"
+ },
+ "result": {
+  "a": "ok",
+  "b": "ok"
+ },
+ "agentCount": 2,
+ "logs": [],
+ "durationMs": 3094,
+ "summary": "Run two sequential agents that each reply ok",
+ "workflowName": "spike-probe",
+ "status": "completed",
+ "startTime": 1795326347759,
+ "phases": [
+  {
+   "title": "Probe"
+  }
+ ],
+ "defaultModel": "claude-sonnet-5-5",
+ "workflowProgress": [
+  {
+   "type": "workflow_phase",
+   "index": 1,
+   "title": "Probe"
+  },
+  {
+   "type": "workflow_agent",
+   "index": 1,
+   "label": "probe-1",
+   "phaseIndex": 1,
+   "phaseTitle": "Probe",
+   "agentId": "a760caa2a8227c09d",
+   "model": "claude-sonnet-5-5",
+   "state": "done",
+   "startedAt": 1795326347795,
+   "queuedAt": 1795326347792,
+   "attempt": 1,
+   "promptPreview": "Reply with the word ok",
+   "promptFramed": true,
+   "lastProgressAt": 1795326349473,
+   "tokens": 21080,
+   "toolCalls": 0,
+   "durationMs": 1678,
+   "resultPreview": "ok"
+  },
+  {
+   "type": "workflow_agent",
+   "index": 2,
+   "label": "probe-2",
+   "phaseIndex": 1,
+   "phaseTitle": "Probe",
+   "agentId": "a6f3428590425bb2c",
+   "model": "claude-sonnet-5-5",
+   "state": "done",
+   "startedAt": 1795326349475,
+   "queuedAt": 1795326349473,
+   "attempt": 1,
+   "promptPreview": "Reply with the word ok",
+   "promptFramed": true,
+   "lastProgressAt": 1795326350869,
+   "tokens": 21080,
+   "toolCalls": 0,
+   "durationMs": 1394,
+   "resultPreview": "ok"
+  }
+ ],
+ "totalTokens": 42160,
+ "totalToolCalls": 0
+}
