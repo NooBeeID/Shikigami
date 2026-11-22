@@ -68,6 +68,11 @@ function reviewActiveFromLayout(doc: LayoutDoc): string | null | undefined {
   return undefined;
 }
 
+// Ambil daftar file review satu sesi tanpa menyentuh store aktif (dipakai tab review).
+export async function fetchReviewFiles(sessionId: string): Promise<ReviewFilesResult> {
+  return reviewNormalize(await call<unknown>('review.files', { sessionId }));
+}
+
 export async function refreshReview(sessionId: string): Promise<void> {
   if (!sessionId) return;
   const isActive = sessionId === activeSessionId;

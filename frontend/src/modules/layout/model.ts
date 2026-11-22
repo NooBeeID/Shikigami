@@ -1,6 +1,6 @@
 // Model pohon pane: tipe dan fungsi murni (tanpa IPC, tanpa mutasi masukan).
 
-export type PaneKind = 'terminal' | 'file' | 'thread' | 'lark-board' | 'lark-doc' | 'git-mr' | 'git-pipeline'; // string terbuka lewat registerPaneKind
+export type PaneKind = 'terminal' | 'file' | 'thread' | 'lark-board' | 'lark-doc' | 'git-mr' | 'git-pipeline' | 'review'; // string terbuka lewat registerPaneKind
 export interface Tab {
   id: string; // prefix 't_'
   kind: PaneKind;
@@ -20,6 +20,7 @@ export interface Tab {
   nodeToken?: string;
   number?: number; // nomor MR/PR
   pipelineId?: string;
+  reviewSessionId?: string; // sesi agent yang diulas (tab review); sengaja terpisah dari sessionId agar tidak dedupe ke tab terminal
   title: string;
 }
 export interface Leaf {
@@ -62,6 +63,7 @@ export interface NewLeaf {
   nodeToken?: string;
   number?: number; // nomor MR/PR
   pipelineId?: string;
+  reviewSessionId?: string;
 }
 
 export const emptyDoc = (): LayoutDoc => ({ version: 1, root: null });
@@ -179,6 +181,7 @@ export function makeLeaf(nl: NewLeaf): Tab {
   if (nl.nodeToken !== undefined) leaf.nodeToken = nl.nodeToken;
   if (nl.number !== undefined) leaf.number = nl.number;
   if (nl.pipelineId !== undefined) leaf.pipelineId = nl.pipelineId;
+  if (nl.reviewSessionId !== undefined) leaf.reviewSessionId = nl.reviewSessionId;
   return leaf;
 }
 
@@ -222,6 +225,9 @@ function mapLeaf(doc: LayoutDoc, paneId: string, fn: (l: Leaf) => Leaf): LayoutD
 
 // Aturan dedupe: apakah tab sudah memuat konten yang diminta.
 function sameContent(nl: NewLeaf, t: Tab): boolean {
+  if (nl.kind === 'review' || t.kind === 'review') {
+    return nl.kind === t.kind && nl.reviewSessionId !== undefined && t.reviewSessionId === nl.reviewSessionId && t.filePath === nl.filePath;
+  }
   if (nl.sessionId !== undefined && t.sessionId === nl.sessionId) return true;
   if (nl.filePath !== undefined && t.filePath === nl.filePath && t.projectId === nl.projectId) return true;
   if (nl.threadId !== undefined && t.threadId === nl.threadId) return true;

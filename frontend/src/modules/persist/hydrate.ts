@@ -5,7 +5,7 @@ import type { LayoutDoc, Leaf, Node, PaneKind, Tab } from '../layout/model';
 const isStr = (v: unknown): v is string => typeof v === 'string';
 const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
 
-const STR_KEYS = ['sessionId', 'projectId', 'provider', 'filePath', 'workspaceId', 'root', 'threadId', 'sourceId', 'tableId', 'viewId', 'nodeToken', 'pipelineId'] as const;
+const STR_KEYS = ['sessionId', 'projectId', 'provider', 'filePath', 'workspaceId', 'root', 'threadId', 'sourceId', 'tableId', 'viewId', 'nodeToken', 'pipelineId', 'reviewSessionId'] as const;
 const MAX_DEPTH = 64;
 
 // Tab dari objek tab (bentuk baru) atau objek leaf lama (id sengaja dikosongkan oleh pemanggil).
