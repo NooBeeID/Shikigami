@@ -31,6 +31,14 @@ export function sessionMenuItems(): Readable<SessionMenuItemSpec[]> {
   return derived(menuItemStore, (m) => Object.values(m).sort(byOrder));
 }
 
+// Keputusan (tiket main-rail-ticket-02-threads-rail): Threads kini item rail
+// (registerRailItem, id 'threads'), bukan section di panel Agen. Mekanisme
+// registerSidebarSection/sidebarSections sengaja DIBIARKAN sebagai titik ekstensi
+// untuk section opsional di dalam panel Agen; saat ini TIDAK ADA pendaftar.
+// Pemakai di frontend/src (hasil grep): AgentSidebar.svelte (merender generik) dan
+// ekspor ulang di index.ts; satu-satunya pemanggil register lama
+// (modules/thread/index.ts, 'thread-sidebar') dihapus oleh wiring threads-rail-item.
+// Jangan ubah perilaku mekanisme ini tanpa memeriksa ulang pemakai (grep).
 export interface SidebarSectionSpec { id: string; component: Component<any>; order?: number }
 const sectionStore = writable<Record<string, SidebarSectionSpec>>({});
 export function registerSidebarSection(spec: SidebarSectionSpec): void { sectionStore.update((m) => ({ ...m, [spec.id]: spec })); }

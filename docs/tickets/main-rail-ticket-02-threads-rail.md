@@ -2,7 +2,7 @@
 id: main-rail-ticket-02-threads-rail
 title: Threads sebagai item rail sendiri
 spec: docs/superpowers/specs/2026-11-22-08-main-rail-design.md
-status: ready
+status: implemented
 wave: 2
 depends_on: [main-rail-ticket-01-main-rail]
 ---

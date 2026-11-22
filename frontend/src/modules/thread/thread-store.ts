@@ -1,5 +1,5 @@
 // Store thread: daftar thread workspace aktif, pesan per thread, dan langganan event real-time.
-import { derived, get, writable, type Readable } from 'svelte/store';
+import { derived, get, writable, type Readable, type Writable } from 'svelte/store';
 import { inWails } from '../../lib/ipc';
 import { activeWorkspaceId } from '../../lib/stores';
 import { layout } from '../../lib/stores/layout';
@@ -12,6 +12,10 @@ import type { Thread, ThreadMessage } from './types';
 export const threads = writable<Thread[]>([]);
 export const messagesByThread = writable<Record<string, ThreadMessage[]>>({});
 export const threadError = writable('');
+
+// State panel Threads yang harus bertahan saat panel di-unmount (item rail lain aktif).
+export interface ThreadPanelState { scrollTop: number }
+export const threadPanelState: Writable<ThreadPanelState> = writable<ThreadPanelState>({ scrollTop: 0 });
 
 export function sortThreads(list: Thread[]): Thread[] {
   return [...list].sort((a, b) => (a.createdAt < b.createdAt ? 1 : a.createdAt > b.createdAt ? -1 : 0));

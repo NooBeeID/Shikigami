@@ -3,11 +3,26 @@
   import { statusStore } from '../status/store';
   import { ReadyBadge } from './close';
   import NewThreadDialog from './NewThreadDialog.svelte';
-  import { openThreadPane, threadError, threads } from './thread-store';
-
-  let {}: { onerror: (msg: string) => void } = $props();
+  import { onMount, tick } from 'svelte';
+  import { openThreadPane, threadError, threadPanelState, threads } from './thread-store';
 
   let dialogOpen = $state(false);
+  let scroller: HTMLDivElement | undefined = $state();
+
+  function saveScroll(): void {
+    if (scroller) threadPanelState.set({ scrollTop: scroller.scrollTop });
+  }
+
+  onMount(() => {
+    // Pulihkan setelah daftar dirender. Penyimpanan dilakukan lewat onscroll,
+    // karena saat unmount elemen bisa sudah lepas dan scrollTop terbaca 0.
+    void tick().then(() => {
+      if (scroller) scroller.scrollTop = $threadPanelState.scrollTop;
+    });
+    return () => {
+      if (scroller?.isConnected) saveScroll();
+    };
+  });
 
   function masterActive(t: (typeof $threads)[number]): boolean {
     const m = t.participants.find((p) => p.role === 'master');
@@ -21,6 +36,7 @@
     <button type="button" class="new" disabled={!$activeWorkspaceId} onclick={() => (dialogOpen = true)}>Thread baru</button>
   </div>
   {#if $threadError}<div class="err">{$threadError}</div>{/if}
+  <div class="scroll" bind:this={scroller} onscroll={saveScroll}>
   <ul>
     {#each $threads as t (t.id)}
       {@const active = masterActive(t)}
@@ -36,12 +52,14 @@
       <li class="empty">Belum ada thread</li>
     {/each}
   </ul>
+  </div>
   <NewThreadDialog open={dialogOpen} onclose={() => (dialogOpen = false)} />
 </section>
 
 <style>
-  section { padding: 6px 12px; border-bottom: 1px solid var(--border, #8884); }
-  .head { display: flex; align-items: center; justify-content: space-between; padding: 0 8px; }
+  section { display: flex; flex-direction: column; height: 100%; min-height: 0; padding: 8px 12px; box-sizing: border-box; }
+  .scroll { flex: 1; min-height: 0; overflow-y: auto; }
+  .head { flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; }
   .label { font-size: 11px; color: var(--fg-muted, #888); text-transform: uppercase; letter-spacing: 0.04em; }
   .new { font: inherit; font-size: 11px; color: var(--fg, #222); background: transparent; border: 1px solid var(--border, #8884); border-radius: 4px; padding: 2px 8px; cursor: pointer; }
   .new:hover:not(:disabled) { background: var(--bg-hover, #0001); }
@@ -55,5 +73,5 @@
   .title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .tag { font-size: 10px; color: var(--fg-muted, #888); flex: none; }
   .empty { padding: 4px 8px; font-size: 12px; color: var(--fg-muted, #888); }
-  .err { padding: 2px 8px; font-size: 11px; color: var(--danger, #e5484d); }
+  .err { flex: none; padding: 2px 8px; font-size: 11px; color: var(--danger, #e5484d); }
 </style>

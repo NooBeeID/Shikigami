@@ -17,6 +17,7 @@
 <aside class="side">
   <div class="label">AGENT</div>
   <WorkspaceHeader {onerror} />
+  <!-- Section generik opsional di panel Agen; saat ini tanpa pendaftar. -->
   {#each $sections as s (s.id)}
     {@const S = s.component}
     <S {onerror} />
