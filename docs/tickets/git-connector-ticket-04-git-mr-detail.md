@@ -2,7 +2,7 @@
 id: git-connector-ticket-04-git-mr-detail
 title: Detail MR/PR
 spec: docs/superpowers/specs/2026-11-22-10-git-connector-design.md
-status: ready
+status: implemented
 wave: 4
 depends_on: [git-connector-ticket-03-git-pipelines]
 ---
