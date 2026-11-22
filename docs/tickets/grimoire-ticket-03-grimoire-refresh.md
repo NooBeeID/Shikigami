@@ -2,7 +2,7 @@
 id: grimoire-ticket-03-grimoire-refresh
 title: Grimoire: deteksi perubahan, stale, dan build latar belakang
 spec: docs/superpowers/specs/2026-11-22-grimoire-design.md
-status: ready
+status: implemented
 wave: 3
 depends_on: [grimoire-ticket-02-grimoire-inject]
 ---

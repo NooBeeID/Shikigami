@@ -14,7 +14,7 @@ import (
 )
 
 const grimoireUsage = `penggunaan:
-  shikigamictl grimoire build  [--project <id>]   bangun ulang grimoire project
+  shikigamictl grimoire build  [--project <id>] [--full]   bangun (inkremental; --full tulis ulang semua) grimoire project
   shikigamictl grimoire status [--project <id>]   tampilkan status grimoire project
 
 Tanpa --project, dipakai satu-satunya project bila hanya ada satu; bila lebih dari
@@ -85,6 +85,7 @@ func runGrimoire(ctx context.Context, c *ipc.Client, args []string) error {
 	fs := flag.NewFlagSet("grimoire "+sub, flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
 	project := fs.String("project", "", "id project")
+	full := fs.Bool("full", false, "tulis ulang semua modul (hanya untuk build)")
 	if err := fs.Parse(args[1:]); err != nil || fs.NArg() > 0 {
 		return errors.New(grimoireUsage)
 	}
@@ -96,6 +97,9 @@ func runGrimoire(ctx context.Context, c *ipc.Client, args []string) error {
 		}
 	}
 	params := map[string]any{"projectId": id}
+	if sub == "build" && *full {
+		params["full"] = true
+	}
 	if sub == "status" {
 		var out map[string]any
 		if err := c.Call("grimoire.status", params, &out); err != nil {
@@ -105,8 +109,12 @@ func runGrimoire(ctx context.Context, c *ipc.Client, args []string) error {
 			return err
 		}
 		num := func(k string) int { f, _ := out[k].(float64); return int(f) }
-		fmt.Fprintf(os.Stderr, "index: %d byte, ~%d token, %d halaman, laws: %d byte\n",
-			num("indexBytes"), num("estTokens"), num("pages"), num("lawsBytes"))
+		building := "tidak"
+		if b, _ := out["building"].(bool); b {
+			building = "ya"
+		}
+		fmt.Fprintf(os.Stderr, "index: %d byte, ~%d token, %d halaman, laws: %d byte, stale: %d, building: %s\n",
+			num("indexBytes"), num("estTokens"), num("pages"), num("lawsBytes"), num("staleCount"), building)
 		return nil
 	}
 	return grimoireError(callAndPrint(c, "grimoire."+sub, params))

@@ -5,6 +5,8 @@
   import type { GrimoireChapter } from './client';
   import LawsSlot from './laws/LawsSlot.svelte';
   import { lawsViewOpen } from './laws/lawsStore';
+  import StaleSlot from './stale/StaleSlot.svelte';
+  import StaleBadge from './stale/StaleBadge.svelte';
 
   let s = $state<GrimoireState>({ projectId: null, exists: false, building: false, books: [], error: null });
   let expanded = $state<Record<string, boolean>>({});
@@ -54,6 +56,7 @@
     {/if}
   </div>
   <LawsSlot projectId={s.projectId} exists={s.exists} />
+  <StaleSlot projectId={s.projectId} exists={s.exists} />
   {#if $lawsViewOpen && s.projectId && s.exists}
     <!-- editor laws menggantikan daftar buku -->
   {:else if !$activeProject || !s.projectId}
@@ -76,6 +79,7 @@
           <button class="book" type="button" aria-expanded={!!expanded[b.name]} onclick={() => toggleBook(b.name)}>
             <span class="arrow">{expanded[b.name] ? '▾' : '▸'}</span>
             <span class="name">{b.name}</span>
+            {#if b.chapters.some((c) => c.stale)}<StaleBadge />{/if}
             <span class="count">{b.chapters.length}</span>
           </button>
           {#if expanded[b.name]}
@@ -84,7 +88,7 @@
                 <li>
                   <button class="chapter" type="button" onclick={() => openChapter(c)} title={c.path}>
                     <span class="name">{c.name}</span>
-                    {#if c.stale}<span class="stale" title="Usang">!</span>{/if}
+                    {#if c.stale}<StaleBadge />{/if}
                   </button>
                 </li>
               {/each}
@@ -97,7 +101,7 @@
   {#if errText}
     <div class="msg err" role="alert" title={errText}>{errText}</div>
   {/if}
-  <!-- slot: stale/llm (tiket 3, 4) -->
+  <!-- slot: llm (tiket 4) -->
 </section>
 
 <style>
@@ -134,7 +138,6 @@
     border: 1px solid var(--border, currentColor); border-radius: 4px; background: var(--bg-elev, transparent);
   }
   .generate:disabled { opacity: 0.6; cursor: default; }
-  .stale { color: var(--danger, inherit); flex: none; }
   .err { color: var(--danger, inherit); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .msg { padding: 12px; color: var(--fg-muted, inherit); }
   .chapters { list-style: none; margin: 0; padding: 0; }

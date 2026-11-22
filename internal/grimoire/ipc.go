@@ -24,7 +24,7 @@ type Deps struct {
 
 type projectParams struct {
 	ProjectID string `json:"projectId"`
-	Full      bool   `json:"full"` // diterima dan diabaikan
+	Full      bool   `json:"full"`
 }
 
 type readParams struct {
@@ -57,6 +57,16 @@ type statusResult struct {
 	LLMEnabled    bool   `json:"llmEnabled"`
 	LastBuildCost int    `json:"lastBuildCost"`
 	Dir           string `json:"dir"`
+}
+
+type buildResult struct {
+	Books      int  `json:"books"`
+	Pages      int  `json:"pages"`
+	IndexBytes int  `json:"indexBytes"`
+	Rebuilt    int  `json:"rebuilt"`
+	Removed    int  `json:"removed"`
+	Failed     int  `json:"failed"`
+	Building   bool `json:"building,omitempty"`
 }
 
 type readResult struct {
@@ -189,7 +199,8 @@ func (s *service) status(id string) statusResult {
 	if abs, err := filepath.Abs(dir); err == nil {
 		dir = abs
 	}
-	res := statusResult{Dir: dir, Building: s.building(id), Exists: s.d.Store.Exists(id)}
+	res := statusResult{Dir: dir, Building: s.building(id) || RefreshBuilding(id), Exists: s.d.Store.Exists(id)}
+	res.StaleCount = RefreshStaleCount(id)
 	if !res.Exists {
 		return res
 	}
@@ -298,6 +309,22 @@ func Register(srv *ipc.Server, d Deps) {
 		if err := rpcDecode(params, &p); err != nil {
 			return nil, err
 		}
+		if RefreshActive() {
+			path, err := s.resolve(ctx, p.ProjectID)
+			if err != nil {
+				return nil, err
+			}
+			res, started, err := RefreshRun(ctx, p.ProjectID, path, p.Full)
+			if err != nil {
+				return nil, rpcMapErr(err)
+			}
+			if !started {
+				return buildResult{Building: true}, nil
+			}
+			st := s.status(p.ProjectID)
+			return buildResult{Books: st.Books, Pages: st.Pages, IndexBytes: st.IndexBytes,
+				Rebuilt: res.Rebuilt, Removed: res.Removed, Failed: res.Failed}, nil
+		}
 		sum, err := s.build(ctx, p.ProjectID)
 		if err != nil {
 			return nil, rpcMapErr(err)
@@ -322,7 +349,7 @@ func Register(srv *ipc.Server, d Deps) {
 		if err := s.checkID(p.ProjectID); err != nil {
 			return nil, err
 		}
-		return s.listBooks(p.ProjectID), nil
+		return RefreshApplyStale(p.ProjectID, s.listBooks(p.ProjectID)), nil
 	})
 	srv.Register("grimoire.read", func(ctx context.Context, params json.RawMessage) (any, error) {
 		var p readParams
