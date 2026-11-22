@@ -9,6 +9,8 @@
   import StatusBadge from '../status/StatusBadge.svelte';
   import { activeWorkspace } from '../../lib/stores/workspaces';
   import { sessions } from '../../lib/stores/sessions';
+  import { dirtyTabs } from '../files';
+  import { confirmCloseTabs } from '../files/confirmClose';
 
   interface Props {
     pane: Leaf;
@@ -86,9 +88,31 @@
     store.activateTab(pane.id, t.id);
   }
 
+  function tabLabel(t: Tab): string {
+    return t.title?.trim() || t.filePath?.split('/').pop() || t.id;
+  }
+
+  // Guard klik ganda selama dialog konfirmasi terbuka.
+  let closing = $state(false);
+  async function guardedClose(tabs: Tab[], proceed: () => void): Promise<void> {
+    if (closing || tabs.length === 0) return;
+    closing = true;
+    try {
+      const labels = Object.fromEntries(tabs.map((t) => [t.id, tabLabel(t)]));
+      const ok = await confirmCloseTabs(tabs.map((t) => t.id), labels);
+      if (ok) proceed();
+    } finally {
+      closing = false;
+    }
+  }
+
   function closeTabAction(t: Tab) {
-    store.closeTab(pane.id, t.id);
-    if (isTermTab(t)) void endTabSession(t);
+    void guardedClose([t], () => {
+      // Baca ulang: tab bisa sudah hilang selama dialog terbuka.
+      if (!pane.tabs.some((x) => x.id === t.id)) return;
+      store.closeTab(pane.id, t.id);
+      if (isTermTab(t)) void endTabSession(t);
+    });
   }
 
   function minimizeTab(t: Tab) {
@@ -103,9 +127,11 @@
   }
 
   function closeWholePane() {
-    const tabs = [...pane.tabs];
-    store.closePane(pane.id);
-    for (const t of tabs) if (isTermTab(t)) void endTabSession(t);
+    void guardedClose([...pane.tabs], () => {
+      const tabs = [...pane.tabs];
+      store.closePane(pane.id);
+      for (const t of tabs) if (isTermTab(t)) void endTabSession(t);
+    });
   }
 
   async function startRename() {
@@ -253,6 +279,10 @@
           <span
             class="title"
             ondblclick={(e) => { if (t.id === active.id) { e.stopPropagation(); startRename(); } }}>{t.title}</span>
+        {/if}
+        {#if $dirtyTabs.has(t.id)}
+          <span class="dirty-dot" title="Belum disimpan" aria-hidden="true">●</span>
+          <span class="sr-only">Belum disimpan</span>
         {/if}
         {#if isTermTab(t)}
           <button type="button" class="tbtn" aria-label="Minimize tab" title="Minimize (sesi tetap jalan)" tabindex="-1"
@@ -441,6 +471,22 @@
   .tab.active { background: var(--bg-hover, #333); color: var(--fg, #ddd); }
   .tab:focus-visible { outline: 1px solid var(--accent, #4f8cff); }
   .tabs.single .tab { background: transparent; padding-left: 0; }
+  .dirty-dot {
+    flex: none;
+    width: 10px;
+    font-size: 10px;
+    line-height: 1;
+    text-align: center;
+    color: var(--warning, var(--accent, #4f8cff));
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
   .tbtn {
     width: 18px;
     height: 18px;

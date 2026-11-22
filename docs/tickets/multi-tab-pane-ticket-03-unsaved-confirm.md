@@ -2,7 +2,7 @@
 id: multi-tab-pane-ticket-03-unsaved-confirm
 title: Konfirmasi tutup file belum disimpan
 spec: docs/superpowers/specs/2026-11-22-multi-tab-pane-design.md
-status: ready
+status: implemented
 wave: 3
 depends_on: [multi-tab-pane-ticket-02-tab-dnd]
 ---

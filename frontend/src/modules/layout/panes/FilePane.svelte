@@ -13,7 +13,7 @@
 {#if pane.readOnly && pane.root && pane.filePath}
   <ReadOnlyFileView root={pane.root} path={pane.filePath} projectId={pane.projectId} />
 {:else if pane.filePath}
-  <FileTab {refId} />
+  <FileTab {refId} tabId={pane.id} />
 {:else}
   <div class="empty">File tidak tersedia</div>
 {/if}

@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
+  import { onDestroy, onMount } from 'svelte';
+  import { registerFileTab, setFileTabDirty } from '../tabRegistry';
   import { decodeFileTab, setTabDirty } from '../shared/shellBridge';
   import { basename, watchFile } from '../shared/fsClient';
   import type { FileChangedEvent } from '../shared/types';
@@ -16,6 +17,7 @@
 
   let props: Record<string, unknown> = $props();
   const data = $derived(decodeFileTab(props));
+  const tabId = $derived(typeof props.tabId === 'string' ? props.tabId : undefined);
   const path = $derived(data.path);
   const kind = $derived(fileKind(path));
 
@@ -159,6 +161,17 @@
     await doWrite();
   }
 
+  // Dipakai registri tutup tab: tulis langsung lewat doWrite (tanpa guard mode di save()),
+  // karena dirty bisa saja true saat mode bukan 'edit'.
+  async function saveForClose(): Promise<boolean> {
+    // Tunggu penulisan yang sedang berjalan, lalu evaluasi hasil akhirnya.
+    while (saving) await new Promise<void>((r) => setTimeout(r, 25));
+    if (!dirty) return true;
+    await doWrite();
+    // doWrite menangkap semua galat; kegagalan terlihat sebagai dirty yang masih true.
+    return !dirty;
+  }
+
   async function overwrite() {
     if (saving) return;
     confirmOverwrite = false;
@@ -231,6 +244,18 @@
   });
 
   $effect(() => {
+    const id = tabId;
+    if (id) setFileTabDirty(id, dirty);
+  });
+
+  let unregister: (() => void) | undefined;
+  onMount(() => {
+    const id = tabId;
+    if (!id) return;
+    unregister = registerFileTab(id, { isDirty: () => dirty, save: saveForClose });
+  });
+
+  $effect(() => {
     if (visible && phase === 'ready') {
       startWatch();
       if (!wasVisible) {
@@ -264,6 +289,7 @@
   onDestroy(() => {
     stopWatch();
     clearTimeout(savedTimer);
+    unregister?.();
     setTabDirty(path, false);
   });
 </script>
