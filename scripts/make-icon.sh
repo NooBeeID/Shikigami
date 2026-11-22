@@ -54,12 +54,12 @@ generate_default_source() {
   <text x="512" y="720" font-size="600" font-family="Helvetica" font-weight="700" fill="#7c5cff" text-anchor="middle">S</text>
 </svg>
 SVG
-  if command -v qlmanage >/dev/null 2>&1; then
+  # Render via Swift/AppKit agar latar transparan (qlmanage memberi latar putih opak).
+  if command -v swift >/dev/null 2>&1; then
     tmp="$(mktemp -d)"
-    if qlmanage -t -s 1024 -o "$tmp" "$svg" >/dev/null 2>&1 \
-       && [ -f "$tmp/icon-source.svg.png" ] \
-       && size_ok "$tmp/icon-source.svg.png"; then
-      mv "$tmp/icon-source.svg.png" build/app-resources/icon-source.png
+    if swift scripts/render-icon.swift "$svg" "$tmp/icon.png" >/dev/null 2>&1 \
+       && size_ok "$tmp/icon.png"; then
+      mv "$tmp/icon.png" build/app-resources/icon-source.png
       ok=1
     fi
     rm -rf "$tmp"
