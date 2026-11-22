@@ -10,3 +10,6 @@ app/dist/*
 # Lain-lain
 .DS_Store
 *.sock
+
+# Artefak brainstorming
+.superpowers/
